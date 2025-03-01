@@ -1,47 +1,69 @@
-# Axe Handle - an MCP server generator
-
-[![License](https://img.shields.io/badge/license-[LICENSE_NAME]-blue.svg)](LICENSE_FILE)
-[![Contributors](https://img.shields.io/github/contributors/[YOUR_USERNAME]/[REPO_NAME])](https://github.com/[YOUR_USERNAME]/[REPO_NAME]/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/[YOUR_USERNAME]/[REPO_NAME])](https://github.com/[YOUR_USERNAME]/[REPO_NAME]/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/[YOUR_USERNAME]/[REPO_NAME])](https://github.com/[YOUR_USERNAME]/[REPO_NAME]/pulls)
-[![Last Commit](https://img.shields.io/github/last-commit/[YOUR_USERNAME]/[REPO_NAME])](https://github.com/[YOUR_USERNAME]/[REPO_NAME]/commits/master)
-[![Language](https://img.shields.io/github/languages/top/[YOUR_USERNAME]/[REPO_NAME])](https://github.com/[YOUR_USERNAME]/[REPO_NAME])
-[![Stars](https://img.shields.io/github/stars/[YOUR_USERNAME]/[REPO_NAME]?style=social)](https://github.com/[YOUR_USERNAME]/[REPO_NAME]/stargazers)
+# Axe Handle - MCP Server Generator
 
 ![Axe Handle Logo](assets/axe-handle-100x100.svg)
 
-## Table of Contents
+## What is Axe Handle?
 
--   [Description](#description)
--   [Key Features](#key-features)
--   [Getting Started](#getting-started)
-    -   [Installation](#installation)
-    -   [Usage](#usage)
--   [Why MCP?](#why-mcp)
--   [Contributing](#contributing)
--   [License](#license)
--   [Acknowledgments](#acknowledgments)
--   [Support](#support)
-
-## Description
-
-Ax Handle is intended to be an MCP server server. It's designed to streamline the creation of Model Context Protocol (MCP) compliant servers. It empowers developers to quickly generate high-quality, performant server code, reducing boilerplate and accelerating development. This generator focuses on adherence to the MCP specification, ensuring seamless interoperability and robust server implementations.
+Axe Handle generates Model Context Protocol (MCP) servers from your schema definitions. It creates clean, optimized TypeScript code that follows MCP specifications, letting you focus on your application logic instead of protocol details.
 
 ## Key Features
 
--   **MCP Compliance:** Generates server code that strictly adheres to the Model Context Protocol.
--   **Performance Optimization:** Produces optimized code for high-performance server operation.
--   **Customizable Templates:** Allows for customization of generated code through flexible templates.
--   **Language Support:** [List the programming languages you support, e.g., Python, Node.js, Go].
--   **Simplified Configuration:** Intuitive configuration options for easy server setup.
--   **Extensible Architecture:** Designed for extensibility, allowing developers to add custom functionality.
+- **Schema-driven generation** - Define your API once, generate server code automatically
+- **TypeScript-first** - Get type safety and modern language features
+- **Extensible design** - Add custom logic where you need it
+- **MCP compliance** - Implements the protocol correctly so you don't have to worry about it
+- **Developer experience** - Clear errors, helpful documentation, and sensible defaults
 
-## Getting Started
-
-### Installation
+## Quick Start
 
 ```bash
-# Example installation commands (adjust as needed)
-npm install -g mcp-server-generator # If using Node.js
-pip install mcp-server-generator # If using Python
-go get [github.com/](https://github.com/)[YOUR_USERNAME]/mcp-server-generator # If using Go
+# Install
+npm install -g axe-handle
+
+# Generate a server from your schema
+axe-handle generate --schema your-schema.proto --output ./server
+```
+
+## Why MCP?
+
+The Model Context Protocol (MCP) standardizes how AI applications communicate with their context. It lets you:
+
+- Connect AI models to your data and services
+- Create reusable components that work with any MCP-compatible client
+- Build complex AI workflows by connecting multiple MCP servers
+
+## Documentation
+
+Find complete documentation at [docs link].
+
+## Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## License
+
+[License details]
+
+## FAQ
+
+### Why "Axe Handle"?
+
+The name comes from Gary Snyder's poem ["Axe Handles"](https://www.poetryfoundation.org/poems/57150/axe-handles), which explores the idea that tools create other tools, and knowledge passes from person to person:
+
+> "One afternoon the last week in April  
+> Showing Kai how to throw a hatchet  
+> One-half turn and it sticks in a stump.  
+> He recalls the hatchet-head  
+> Without a handle, in the shop  
+> And go gets it, and wants it for his own.  
+> A broken-off axe handle behind the door  
+> Is long enough for a hatchet,  
+> We cut it to length and take it  
+> With the hatchet head  
+> And working hatchet, to the wood block."
+
+Like the poem's metaphor of crafting tools to make other tools, Axe Handle creates servers that help build better AI applications.
+
+## Support
+
+[Support information]
