@@ -8,7 +8,7 @@
 [![Language](https://img.shields.io/github/languages/top/[YOUR_USERNAME]/[REPO_NAME])](https://github.com/[YOUR_USERNAME]/[REPO_NAME])
 [![Stars](https://img.shields.io/github/stars/[YOUR_USERNAME]/[REPO_NAME]?style=social)](https://github.com/[YOUR_USERNAME]/[REPO_NAME]/stargazers)
 
-[Optional: Add a project logo or a diagram of the MCP architecture here]
+![Axe Handle Logo](axe-handle-100x100.svg)
 
 ## Table of Contents
 
