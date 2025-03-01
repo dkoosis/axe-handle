@@ -1,4 +1,4 @@
-# MCP Server Generator
+# Ax Handle - an MCP server generator
 
 [![License](https://img.shields.io/badge/license-[LICENSE_NAME]-blue.svg)](LICENSE_FILE)
 [![Contributors](https://img.shields.io/github/contributors/[YOUR_USERNAME]/[REPO_NAME])](https://github.com/[YOUR_USERNAME]/[REPO_NAME]/graphs/contributors)
