@@ -8,7 +8,7 @@
 [![Language](https://img.shields.io/github/languages/top/[YOUR_USERNAME]/[REPO_NAME])](https://github.com/[YOUR_USERNAME]/[REPO_NAME])
 [![Stars](https://img.shields.io/github/stars/[YOUR_USERNAME]/[REPO_NAME]?style=social)](https://github.com/[YOUR_USERNAME]/[REPO_NAME]/stargazers)
 
-![Axe Handle Logo](axe-handle-100x100.svg)
+![Axe Handle Logo](assets/axe-handle-100x100.svg)
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@
 
 ## Description
 
-The MCP Server Generator is a powerful tool designed to streamline the creation of Model Context Protocol (MCP) compliant servers. It empowers developers to quickly generate high-quality, performant server code, reducing boilerplate and accelerating development. This generator focuses on adherence to the MCP specification, ensuring seamless interoperability and robust server implementations.
+Ax Handle is intended to be an MCP server server. It's designed to streamline the creation of Model Context Protocol (MCP) compliant servers. It empowers developers to quickly generate high-quality, performant server code, reducing boilerplate and accelerating development. This generator focuses on adherence to the MCP specification, ensuring seamless interoperability and robust server implementations.
 
 ## Key Features
 
