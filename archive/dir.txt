@@ -1,0 +1,25 @@
+total 760
+-rw-r--r--@   1 davidkoosis  staff   47857 Mar  1 15:06 ts-parser.js
+-rw-r--r--@   1 davidkoosis  staff    3917 Mar  1 19:50 test.js
+-rw-r--r--@   1 davidkoosis  staff    3911 Mar  1 18:08 template-engine.js
+-rw-r--r--@   1 davidkoosis  staff   31279 Mar  1 14:44 schema.ts
+-rw-r--r--@   1 davidkoosis  staff    4845 Mar  1 18:11 request-handler-template.ts
+-rw-r--r--@   1 davidkoosis  staff    3493 Mar  1 18:13 project-readme.md
+-rw-r--r--@   1 davidkoosis  staff    1052 Mar  1 18:29 package.json
+-rw-r--r--@   1 davidkoosis  staff  201930 Mar  1 19:49 package-lock.json
+drwxr-xr-x@ 297 davidkoosis  staff    9504 Mar  1 18:40 node_modules/
+-rw-r--r--@   1 davidkoosis  staff     846 Mar  1 18:13 index.js
+-rw-r--r--@   1 davidkoosis  staff    3630 Mar  1 18:14 implementation-summary.md
+-rw-r--r--@   1 davidkoosis  staff   20933 Mar  1 18:11 express-templates.ts
+-rw-r--r--@   1 davidkoosis  staff       0 Mar  1 19:51 dir.txt
+-rw-r--r--@   1 davidkoosis  staff    7906 Mar  1 18:09 code-generator.js
+-rw-r--r--@   1 davidkoosis  staff   11376 Mar  1 18:12 cli.js
+drwxr-xr-x@   4 davidkoosis  staff     128 Mar  1 14:44 assets/
+-rw-r--r--@   1 davidkoosis  staff    2267 Mar  1 14:48 README.md
+-rw-r--r--@   1 davidkoosis  staff     148 Mar  1 18:25 .prettierrc.js
+-rw-r--r--@   1 davidkoosis  staff      13 Mar  1 18:36 .gitignore
+drwxr-xr-x@  15 davidkoosis  staff     480 Mar  1 19:50 .git/
+-rw-r--r--@   1 davidkoosis  staff     334 Mar  1 18:25 .eslintrc.js
+-rw-r--r--@   1 davidkoosis  staff    6148 Mar  1 19:30 .DS_Store
+drwxr-xr-x   18 davidkoosis  staff     576 Mar  1 19:29 ../
+drwxr-xr-x@  24 davidkoosis  staff     768 Mar  1 19:51 ./
