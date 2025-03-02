@@ -430,3 +430,6 @@ class ServiceParser {
     console.warn(`This may cause issues in the generated code. Consider using a known type.`);
   }
 }
+
+// Export the singleton instance
+export const serviceParser = ServiceParser.getInstance();
