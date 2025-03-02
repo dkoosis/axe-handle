@@ -99,6 +99,7 @@ main
 09/
 0a/
 0b/
+0c/
 11/
 14/
 18/
@@ -121,6 +122,7 @@ main
 36/
 3c/
 3d/
+42/
 43/
 44/
 46/
@@ -130,11 +132,13 @@ main
 4b/
 4d/
 4e/
+4f/
 51/
 52/
 54/
 55/
 56/
+57/
 58/
 5a/
 5c/
@@ -149,6 +153,7 @@ main
 71/
 74/
 75/
+76/
 77/
 78/
 79/
@@ -166,7 +171,10 @@ main
 8e/
 8f/
 91/
+92/
+93/
 95/
+96/
 9a/
 9b/
 9d/
@@ -181,6 +189,7 @@ ba/
 bc/
 bf/
 c0/
+c2/
 c3/
 c4/
 c6/
@@ -188,7 +197,9 @@ c8/
 c9/
 ca/
 cb/
+cc/
 cd/
+ce/
 cf/
 d3/
 d6/
@@ -208,6 +219,7 @@ e7/
 e8/
 e9/
 ec/
+f0/
 f3/
 f4/
 f6/
@@ -237,22 +249,30 @@ d8d37b3aef41a0363154403eed0026ec6b3fed
 ./
 ../
 055f1ad1939b3961196b27d261cb6ad0335eaf
+2ea4995764da2b7b6d2e58dc17adfa035195d8
 fbf23c1e388cb298c01d7217710c010e55647f
 
 ./.git/objects/0a:
 ./
 ../
 3cd9403d0186dfa4681c6ce71098ad84c433d7
+91a84df882376cfbc79c2b0039ae1208fc088f
 
 ./.git/objects/0b:
 ./
 ../
 90367e742293808b81f9937386daf70948558a
 
+./.git/objects/0c:
+./
+../
+a94bf4ae4f2946028245ba9f8e52d73787edf0
+
 ./.git/objects/11:
 ./
 ../
 541af682045e456934bf2b34addfa304b3c37a
+d78149d1dc95fdee94536dde3b9d8748fd1c76
 
 ./.git/objects/14:
 ./
@@ -274,6 +294,7 @@ b91fc55ca03532c3a5407842f0992bb625d4c4
 ./
 ../
 418b3c0d3de7f9bbbcc009036382138ca64751
+71c0eaec692c8ac562ed6b8e4522258598cea8
 ab06b6d9f453dd56fcb635265a667cc7712f72
 cf26318ef611b9ebba68fb8c55efe2fa0539df
 
@@ -310,12 +331,14 @@ f67def8203f856d0836ecead6eb6994b6a6f70
 ./.git/objects/28:
 ./
 ../
+002283b1e3d5a928cecbf354c9cfdf26b0930c
 8c2913af6db4dc8c7ccee3392fb965fd6a35bb
 98e4f7792b74469f1510b4ac7d4c86a246d802
 
 ./.git/objects/2a:
 ./
 ../
+680dd177a530b9e119f414bc4e3b2e7c132783
 951466ee221d76ef445887891a15749e6dbf01
 
 ./.git/objects/2b:
@@ -373,6 +396,11 @@ f2adb60aa0310a71f33f0171d634e2e9bcf2d1
 af923c848dbb6dfdfbdc205dc92e9075845c29
 f418e936fb57b1c7ca5f5d907a52e3b5759dfc
 
+./.git/objects/42:
+./
+../
+45c2258ac2e69ff60af0d6d3913dd714329a99
+
 ./.git/objects/43:
 ./
 ../
@@ -421,6 +449,11 @@ b023e1c1535824a494c40facfdb95ffdb4eb13
 ../
 a59aa101e0e9138219781128fedcb570cc3a95
 
+./.git/objects/4f:
+./
+../
+50260c6236b21bb705f61a9371bd8942837abb
+
 ./.git/objects/51:
 ./
 ../
@@ -447,6 +480,11 @@ ab0c12d2aa968bda8ffaa26667560189f2c61f
 ../
 271090f2e2015120546db918c457854744917d
 fb4338e349368ba8a31bc3d46ea51e5c0f6645
+
+./.git/objects/57:
+./
+../
+ee459ea8a05186147de9390bb77d22525463c1
 
 ./.git/objects/58:
 ./
@@ -477,6 +515,7 @@ ec133bca11f49b5ad7b485ddcfce831360d058
 ./.git/objects/61:
 ./
 ../
+37d6df9946446550ea471465649d0416a5e108
 d1f9de79364acbb65323c86ff39ff57e507761
 
 ./.git/objects/62:
@@ -487,6 +526,7 @@ d1f9de79364acbb65323c86ff39ff57e507761
 ./.git/objects/65:
 ./
 ../
+88fce1752ca235d8638dd817423e754a300874
 d4b2ce6a827e1cd306bd4274b526863572debc
 
 ./.git/objects/69:
@@ -523,6 +563,11 @@ e6b84bde74eb78c8ba7dc340ac973f39518395
 8a21988e46e9e029db6c96ab990a36f02bb723
 8f2c5a19de8a739fad8a89435518fc4d990bf7
 
+./.git/objects/76:
+./
+../
+d28bbe9b42c0bc71accee51ea4dd21a36e9f8f
+
 ./.git/objects/77:
 ./
 ../
@@ -537,6 +582,7 @@ daeef9c7a17957a3ad77ee77cb6bf36af8d94f
 ./.git/objects/79:
 ./
 ../
+22e8e886fb0674f743d47f4d8be36332d2bc37
 b9516a5b8465d31de123dec4e93ea51591a002
 
 ./.git/objects/7c:
@@ -612,10 +658,25 @@ f771ec8c0e0ec59f75aa1ef399b58c1bab55a1
 ../
 60fa09db5c425dcb3a87c69a899a3b6e5caed4
 
+./.git/objects/92:
+./
+../
+f8e62ce8816a34783946eb95be20b91a2fcc27
+
+./.git/objects/93:
+./
+../
+6f05f4563005f89a660d66a9b35c51eba83ab6
+
 ./.git/objects/95:
 ./
 ../
 2ec4cb0b0588156ea2a4629c5974f937b511c2
+
+./.git/objects/96:
+./
+../
+fe55f4a29cb6c1de48e3cb6d58958b5f9d8bad
 
 ./.git/objects/9a:
 ./
@@ -637,6 +698,7 @@ eb0b2a51ad127c4b380d7b2a97f3c503921886
 ../
 12ea43f7cdd658ce3cf7c9902fefcbe553f96d
 3f9899ee00c2b4f9c582021c6cd726d7469b05
+c45a873c8be915ab678609b6c23d411d45ad48
 d338373db80d1e3fef4b8105465eb3afe4db0c
 
 ./.git/objects/a2:
@@ -690,9 +752,15 @@ b4a04357e2bf2454a99ba232573ae7b9616ffa
 ../
 437d39a06b194f7007cbbc2c2c83e2ecfa5773
 
+./.git/objects/c2:
+./
+../
+1fb26024bba811e802c918915b6484c7969fd7
+
 ./.git/objects/c3:
 ./
 ../
+7432a4fae0494e9e4b84da4353efc26e63f4ab
 ea124aebf53c7d9100568bd96527740c55506f
 
 ./.git/objects/c4:
@@ -727,11 +795,22 @@ db7f9b69d98049680497172323d2983e5342f5
 ../
 8f63214721487f49f4651251b52b1a2cfe807b
 
+./.git/objects/cc:
+./
+../
+b337514254d8ccf650c672cc9ce7833ed87418
+
 ./.git/objects/cd:
 ./
 ../
 031e288cead998706e0ade88e598a375d4e236
 eed2fc6eb196324b99173e8dd35d0777338a95
+
+./.git/objects/ce:
+./
+../
+98444e25dd7b4172fe297a2ac776f691b7f876
+9e64f3b956e5107b6bda2525ea041ffb8ac5b1
 
 ./.git/objects/cf:
 ./
@@ -791,6 +870,7 @@ d3f0933d2e9011acff806cbfc74c8cd7aaf5f9
 ../
 20607b35f8185ac925cdd2a623e8dea6e0e93d
 5676b869d5cdf3ddb007ab3ecb5f23cfbf0352
+60febf0ad29fd9cb53d9dcc1798aa162b1e853
 
 ./.git/objects/e1:
 ./
@@ -823,17 +903,25 @@ e4e4b2e53a4c443affe65004767a9dfd31fc0f
 ./.git/objects/e8:
 ./
 ../
+4429d581256930bcf9a4aeff8c00add34dafbb
 5543a44e7a43a47809f823360ff465ca6160bd
 
 ./.git/objects/e9:
 ./
 ../
+a0127a14631317d41f886d15b87c8122e1da1d
 d87fc13c192c77aeb9e858c81c6bd503006a2c
 
 ./.git/objects/ec:
 ./
 ../
 66ce25c6b98dbe44ddcec0097fd523e367009f
+d4e118ee3d3a913c9c8074d471bc7cdde77ed5
+
+./.git/objects/f0:
+./
+../
+7cfe4014578caf42ede7d5b49a6d798c5004ba
 
 ./.git/objects/f3:
 ./
@@ -847,6 +935,7 @@ f4f2c3411677dd98995abce9bdfb5248ed81e5
 ./.git/objects/f4:
 ./
 ../
+e0feb40ce787b39d5f45ea5351274b0b3f68ae
 eb7638dc7df4b9bff96cbe53dc91f2126e8732
 
 ./.git/objects/f6:
@@ -37811,6 +37900,7 @@ generatorDebugger.ts
 index.ts
 mcp/
 parser/
+setupTemplates.ts
 types/
 types.ts
 utils/
@@ -37824,6 +37914,7 @@ gts-integration.md
 ./
 ../
 generator.ts
+generator.txt
 
 ./src/mcp:
 ./
