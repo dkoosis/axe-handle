@@ -6,10 +6,6 @@ import * as path from 'path';
 import * as ejs from 'ejs';
 import {
   MappedService,
-  MappedResource,
-  MappedType,
-  MappedField,
-  MappedOperation,
   GeneratorOptions,
   AxeError,
   ErrorPrefix,

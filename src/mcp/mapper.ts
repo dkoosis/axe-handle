@@ -17,8 +17,6 @@ import {
   AxeErrorCategory
 } from '../types';
 
-
-
 /**
  * Creates an AxeError specific to the mapper.
  * @param code Numeric error code
@@ -75,18 +73,18 @@ class Mapper {
     try {
       // Map resources
       const mappedResources = userService.resources.map(resource =>
-        this.mapResource(resource, userService, mcpSpec)
+        this.mapResource(resource, mcpSpec)
       );
 
       // Map types
       const mappedTypes = [
         // Map resource types
         ...userService.resources.map(resource =>
-          this.mapResourceType(resource, userService)
+          this.mapResourceType(resource)
         ),
         // Map supporting types
         ...userService.types.map(type =>
-          this.mapSupportingType(type, userService)
+          this.mapSupportingType(type)
         )
       ];
 
@@ -114,18 +112,16 @@ class Mapper {
   /**
    * Maps a user resource to an MCP resource.
    * @param resource The user resource to map
-   * @param userService The user service
    * @param mcpSpec The MCP specification
    * @returns The mapped resource
    */
   private mapResource(
     resource: UserResource,
-    userService: UserService,
     mcpSpec: McpSpecification
   ): MappedResource {
     // Map fields
     const mappedFields = resource.fields.map(field =>
-      this.mapField(field, userService)
+      this.mapField(field)
     );
 
     // Map operations
@@ -142,17 +138,15 @@ class Mapper {
   /**
    * Maps a user resource to a mapped type.
    * @param resource The user resource to map
-   * @param userService The user service
    * @returns The mapped type
    */
   private mapResourceType(
-    resource: UserResource,
-    userService: UserService
+    resource: UserResource
   ): MappedType {
     return {
       name: resource.name,
       description: resource.description || `${resource.name} resource`,
-      fields: resource.fields.map(field => this.mapField(field, userService)),
+      fields: resource.fields.map(field => this.mapField(field)),
       isResource: true
     };
   }
@@ -160,17 +154,15 @@ class Mapper {
   /**
    * Maps a user type to a mapped type.
    * @param type The user type to map
-   * @param userService The user service
    * @returns The mapped type
    */
   private mapSupportingType(
-    type: UserType,
-    userService: UserService
+    type: UserType
   ): MappedType {
     return {
       name: type.name,
       description: type.description || `${type.name} type`,
-      fields: type.fields.map(field => this.mapField(field, userService)),
+      fields: type.fields.map(field => this.mapField(field)),
       isResource: false
     };
   }
@@ -178,12 +170,10 @@ class Mapper {
   /**
    * Maps a user field to a mapped field.
    * @param field The user field to map
-   * @param userService The user service
    * @returns The mapped field
    */
   private mapField(
-    field: UserField,
-    userService: UserService
+    field: UserField
   ): MappedField {
     return {
       name: field.name,
