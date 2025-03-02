@@ -2,7 +2,7 @@
  * Template Engine.
  * Handles the loading and rendering of EJS templates.
  */
-export declare class TemplateEngine {
+export default class TemplateEngine {
     private templateDir;
     private templates;
     private helpers;
@@ -35,11 +35,22 @@ export declare class TemplateEngine {
      */
     renderTemplate(templateName: string, data: any): string;
     /**
+     * Find a file by name in a directory recursively.
+     * @param dir Directory to search
+     * @param filename Filename to find
+     * @returns Array of matching file paths
+     */
+    private findFileInDir;
+    /**
      * Renders a template to a file.
      * @param templateName Name of the template to render
      * @param outputPath Path to output the rendered template
      * @param data Data to pass to the template
      */
     renderToFile(templateName: string, outputPath: string, data: any): void;
+    /**
+     * Lists all templates that have been loaded.
+     * @returns Array of template names
+     */
+    listLoadedTemplates(): string[];
 }
-export default TemplateEngine;
