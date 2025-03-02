@@ -120,7 +120,14 @@ program
         console.log(chalk_1.default.green(`Output directory: ${outDir}`));
     }
     catch (error) {
-        console.error(formatError(error instanceof Error ? error : new Error(String(error))));
+        // Improved error handling
+        if (error instanceof Error) {
+            console.error(formatError(error));
+        }
+        else {
+            // For unknown error types
+            console.error(chalk_1.default.red(`ERROR: ${JSON.stringify(error, null, 2)}`));
+        }
         process.exit(1);
     }
 });

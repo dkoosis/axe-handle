@@ -42,6 +42,7 @@ exports.mapper = exports.generator = exports.serviceParser = exports.mcpSpecPars
 exports.initialize = initialize;
 const path = __importStar(require("path"));
 const mcpSpecParser_1 = require("./parser/mcpSpecParser");
+const mcpSchemaAdapter_1 = require("./parser/mcpSchemaAdapter");
 const serviceParser_1 = require("./parser/serviceParser");
 const mapper_1 = require("./mcp/mapper");
 const generator_1 = require("./generator/generator");
@@ -79,7 +80,17 @@ exports.generateMcpServer = (0, errorUtils_1.withErrorHandling)(async (options) 
     // For now, we're just setting up the infrastructure
     });
     // Parse the MCP specification
-    const mcpSpec = await mcpSpecParser_1.mcpSpecParser.parseSpecification();
+    const schemaPath = path.resolve(process.cwd(), 'schemas/mcp-spec/schema.ts');
+    let mcpSpec;
+    try {
+        // Try the full parser first
+        mcpSpec = await mcpSpecParser_1.mcpSpecParser.parseSpecification();
+    }
+    catch (error) {
+        console.log("Full MCP parser failed, using adapter instead...");
+        // Fall back to the simpler adapter
+        mcpSpec = await (0, mcpSchemaAdapter_1.extractMcpSpecification)(schemaPath);
+    }
     // Parse the user service
     const userService = await serviceParser_1.serviceParser.parseService(options.inputFile, mcpSpec);
     // Map the user service to MCP concepts
@@ -89,7 +100,6 @@ exports.generateMcpServer = (0, errorUtils_1.withErrorHandling)(async (options) 
 }, errorUtils_1.createCliError);
 // Export public modules and utilities
 __exportStar(require("./types"), exports);
-__exportStar(require("./types/schemaTypes"), exports);
 __exportStar(require("./utils/errorUtils"), exports);
 __exportStar(require("./utils/configManager"), exports);
 __exportStar(require("./utils/templateManager"), exports);

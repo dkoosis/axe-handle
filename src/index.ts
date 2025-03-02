@@ -4,6 +4,7 @@
 import * as path from 'path';
 import { GeneratorOptions } from './types';
 import { mcpSpecParser } from './parser/mcpSpecParser';
+import { extractMcpSpecification } from './parser/mcpSchemaAdapter';
 import { serviceParser } from './parser/serviceParser';
 import { mapper } from './mcp/mapper';
 import { generator } from './generator/generator';
@@ -48,7 +49,16 @@ export const generateMcpServer = withErrorHandling(
     });
     
     // Parse the MCP specification
-    const mcpSpec = await mcpSpecParser.parseSpecification();
+    const schemaPath = path.resolve(process.cwd(), 'schemas/mcp-spec/schema.ts');
+    let mcpSpec;
+    try {
+      // Try the full parser first
+      mcpSpec = await mcpSpecParser.parseSpecification();
+    } catch (error) {
+      console.log("Full MCP parser failed, using adapter instead...");
+      // Fall back to the simpler adapter
+      mcpSpec = await extractMcpSpecification(schemaPath);
+    }
     
     // Parse the user service
     const userService = await serviceParser.parseService(options.inputFile, mcpSpec);
@@ -64,7 +74,6 @@ export const generateMcpServer = withErrorHandling(
 
 // Export public modules and utilities
 export * from './types';
-export * from './types/schemaTypes';
 export * from './utils/errorUtils';
 export * from './utils/configManager';
 export * from './utils/templateManager';

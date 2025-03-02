@@ -12,7 +12,6 @@ export declare function initialize(): void;
  */
 export declare const generateMcpServer: (options: GeneratorOptions) => Promise<void>;
 export * from './types';
-export * from './types/schemaTypes';
 export * from './utils/errorUtils';
 export * from './utils/configManager';
 export * from './utils/templateManager';

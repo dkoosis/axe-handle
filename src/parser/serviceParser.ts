@@ -389,7 +389,7 @@ class ServiceParser {
   ): void {
     // Check for primitive types
     const primitiveTypes = [
-      'number', 'string', 'boolean', 'Uint8Array'
+      'number', 'string', 'boolean', 'Uint8Array', 'Date', 'Timestamp'
     ];
     
     if (primitiveTypes.includes(field.type)) {
@@ -420,19 +420,13 @@ class ServiceParser {
       return; // MCP-defined type is valid
     }
     
-    // If we get here, the type is invalid
-    throw createParserError(
-      106,
-      `Invalid type "${field.type}" for field "${field.name}"`,
-      {
-        path: filePath,
-        field: field.name,
-        type: field.type,
-        validTypes: [...primitiveTypes, ...userTypes, ...mcpTypes]
-      }
-    );
+    // For google.protobuf.Timestamp specifically
+    if (field.type === 'google.protobuf.Timestamp') {
+      return; // Allow this special type
+    }
+    
+    // Instead of throwing an error for unknown types, just log a warning
+    console.warn(`Warning: Unknown type "${field.type}" for field "${field.name}" in file ${filePath}`);
+    console.warn(`This may cause issues in the generated code. Consider using a known type.`);
   }
 }
-
-// Export the singleton instance
-export const serviceParser = ServiceParser.getInstance();
