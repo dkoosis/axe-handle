@@ -9,11 +9,11 @@ const setupScriptsPath = path.join(__dirname, 'setup-templates.js');
 fs.chmodSync(setupScriptsPath, '755');
 
 // Run the update package.json script
-require('./update-package-json')();
+require('../update-package-json')();
 
 // Run the setup templates script
 console.log('\nSetting up templates...');
-require('./setup-templates')();
+require('../setup-templates')();
 
 console.log('\nInstallation complete!');
 console.log('You can now run: npm run setup-templates any time you need to regenerate the templates');
