@@ -1,47 +1,65 @@
 {
   "name": "axe-handle",
   "version": "0.1.0",
-  "description": "MCP Server Generator",
-  "main": "index.js",
+  "description": "MCP Server Generator for Express.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "axe-handle": "./cli.js"
+    "axe-handle": "dist/cli.js"
   },
   "scripts": {
-    "start": "node cli.js",
+    "build": "tsc",
+    "watch": "tsc --watch",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "generate": "ts-node src/cli.ts",
+    "start:generated": "node generated/server.js",
+    "dev": "concurrently \"npm:watch\" \"npm:test:watch\"",
+    "preinstall": "npx only-allow pnpm",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
-    "format": "prettier --write .",
-    "build": "npm run lint && npm run format && tsc",
-    "setup-templates": "node setup-templates.js"
+    "lint:fix": "eslint . --ext .ts --fix"
   },
   "keywords": [
     "mcp",
-    "server",
+    "model-context-protocol",
     "generator",
-    "code-generation",
-    "model-context-protocol"
+    "express",
+    "typescript"
   ],
-  "author": "Axe Handle Team",
+  "author": "",
   "license": "MIT",
+  "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.17.22",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.0.3",
+    "ts-jest": "^29.2.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
   "dependencies": {
     "chalk": "^4.1.2",
-    "commander": "^11.0.0",
-    "ejs": "^3.1.9",
-    "inquirer": "^8.2.5",
-    "mkdirp": "^3.0.1",
-    "typescript": "^5.1.6"
+    "commander": "^11.1.0",
+    "ejs": "^3.1.10",
+    "express": "^4.18.2",
+    "protobufjs": "^7.4.0"
   },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.25.0",
-    "@typescript-eslint/parser": "^8.25.0",
-    "eslint": "^9.21.0",
-    "eslint-config-prettier": "^10.0.2",
-    "eslint-plugin-prettier": "^5.2.3",
-    "jest": "^29.6.2",
-    "prettier": "^3.5.2"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dkoosis/axe-handle.git"
   },
-  "engines": {
-    "node": ">=14.0.0"
-  }
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dkoosis/axe-handle/issues"
+  },
+  "homepage": "https://github.com/dkoosis/axe-handle#readme"
 }

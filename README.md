@@ -1,69 +1,123 @@
-# Axe Handle - MCP Server Generator
+# Axe Handle: MCP Server Generator
 
-![Axe Handle Logo](assets/axe-handle-100x100.svg)
+A robust, maintainable, and extensible TypeScript-based code generator for Model Context Protocol (MCP) servers, targeting Express.js.
 
-## What is Axe Handle?
+## Overview
 
-Axe Handle generates Model Context Protocol (MCP) servers from your schema definitions. It creates clean, optimized TypeScript code that follows MCP specifications, letting you focus on your application logic instead of protocol details.
+Axe Handle generates Express.js servers from user-provided Protobuf schemas that define the service. The generated code follows MCP specifications and provides a complete, production-ready server implementation.
 
-## Key Features
+## Features
 
-- **Schema-driven generation** - Define your API once, generate server code automatically
-- **TypeScript-first** - Get type safety and modern language features
-- **Extensible design** - Add custom logic where you need it
-- **MCP compliance** - Implements the protocol correctly so you don't have to worry about it
-- **Developer experience** - Clear errors, helpful documentation, and sensible defaults
+- **Schema-Driven Development**: Define your service using Protobuf schemas
+- **MCP Compliance**: Adherence to the official MCP specification
+- **TypeScript Optimization**: Generated code follows best practices for TypeScript
+- **Robust Error Handling**: Clear, informative, and actionable error messages
+- **Developer-Friendly Workflow**: Easy to build, run, test, and iterate
 
-## Quick Start
+## Installation
 
 ```bash
-# Install
-npm install -g axe-handle
+# Clone the repository
+git clone https://github.com/your-username/axe-handle.git
+cd axe-handle
 
-# Generate a server from your schema
-axe-handle generate --schema your-schema.proto --output ./server
+# Install dependencies
+pnpm install
+
+# Build the project
+pnpm build
 ```
 
-## Why MCP?
+## Usage
 
-The Model Context Protocol (MCP) standardizes how AI applications communicate with their context. It lets you:
+Generate an MCP server from a Protobuf schema:
 
-- Connect AI models to your data and services
-- Create reusable components that work with any MCP-compatible client
-- Build complex AI workflows by connecting multiple MCP servers
+```bash
+pnpm run generate schemas/examples/calendar.proto ./generated
+```
 
-## Documentation
+Run the generated server:
 
-Find complete documentation at [docs link].
+```bash
+cd generated
+pnpm install
+pnpm start
+```
+
+### Options
+
+- `--config <file>`: Specify a configuration file
+- `--overwrite`: Overwrite existing files
+- `--docs`: Generate documentation (default: true)
+- `--verbose`: Verbose output
+
+## Development
+
+```bash
+# Run development mode (watch + tests)
+pnpm dev
+
+# Run tests
+pnpm test
+```
+
+## Project Structure
+
+```
+axe-handle/
+├── src/
+│   ├── parser/
+│   │   ├── mcpSpecParser.ts  # Parses schema.ts (TS Compiler API, caching)
+│   │   ├── serviceParser.ts  # Parses .proto (protobufjs, detailed validation)
+│   │   └── openapiParser.ts  # Parses OpenAPI (conversion, with warnings)
+│   ├── generator/
+│   │   └── generator.ts     # Core generation (ejs, error handling)
+│   ├── mcp/
+│   │   └── mapper.ts        # Maps user schema to MCP
+│   ├── cli.ts             # Command-line interface (commander)
+│   ├── index.ts           # Main entry point
+│   └── types.ts           # Shared TypeScript types
+├── templates/             # EJS templates
+│   ├── server.ejs
+│   ├── handler.ejs
+│   ├── types.ejs
+│   ├── index.ejs
+│   └── api.ejs
+├── test/                  # Unit and integration tests
+├── schemas/
+│   ├── mcp-spec/         # MCP specification
+│   │   ├── schema.ts
+│   │   └── schema.json    # CACHED parsed MCP spec
+│   └── examples/
+│       └── calendar.proto
+└── generated/             # Output (gitignore this)
+```
+
+## Core Principles
+
+- **Extensibility**: Hooks/plugins for custom logic injection
+- **Maintainability**: Clean, modular code; extensive testing; clear separation of concerns
+- **Robust Error Handling**: Clear, informative, and actionable error messages
+- **Version Resilience**: Design with MCP versioning in mind
+- **Simplicity**: Prioritize straightforward, easy-to-understand code over complex solutions
+
+## Error Handling
+
+Axe Handle uses a hierarchical error classification system:
+
+- `AXE-`: Errors from the Axe Handle code generator
+  - `AXE-1XXX`: Parser errors
+  - `AXE-2XXX`: CLI errors
+  - `AXE-3XXX`: Generator errors
+  - `AXE-4XXX`: Mapper errors
+- `MCP-`: Errors related to the MCP specification or generated server
+  - `MCP-1XXX`: MCP specification violations
+  - `MCP-4XXX`: Runtime errors (e.g., 4004 - Not Found)
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Contributions are welcome! Please follow our coding standards and submit PRs for review.
 
 ## License
 
-[License details]
-
-## FAQ
-
-### Why "Axe Handle"?
-
-The name comes from Gary Snyder's poem ["Axe Handles"](https://www.poetryfoundation.org/poems/57150/axe-handles), which explores the idea that tools create other tools, and knowledge passes from person to person:
-
-> "One afternoon the last week in April  
-> Showing Kai how to throw a hatchet  
-> One-half turn and it sticks in a stump.  
-> He recalls the hatchet-head  
-> Without a handle, in the shop  
-> And go gets it, and wants it for his own.  
-> A broken-off axe handle behind the door  
-> Is long enough for a hatchet,  
-> We cut it to length and take it  
-> With the hatchet head  
-> And working hatchet, to the wood block."
-
-Like the poem's metaphor of crafting tools to make other tools, Axe Handle creates servers that help build better AI applications.
-
-## Support
-
-[Support information]
+MIT
