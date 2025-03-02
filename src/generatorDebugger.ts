@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import chalk from 'chalk';
 import { generateMcpServer } from './index';
-import { GeneratorOptions, AxeError } from './types';
+import { GeneratorOptions } from './types';
 import { getConfigManager } from './utils/configManager';
 import { getTemplateManager } from './utils/templateManager';
 import { mcpSpecParser } from './parser/mcpSpecParser';
@@ -103,7 +103,6 @@ async function debugStepByStep() {
     
     // Step 5: Validate Templates
     console.log(chalk.blue('\nStep 5: Validating Templates...'));
-    const templateManager = getTemplateManager();
     
     // Check essential templates
     const essentialTemplates = [
@@ -148,14 +147,14 @@ async function debugStepByStep() {
       console.error(`Message: ${error.message}`);
       console.error(`Stack: ${error.stack}`);
       
-      // Output additional properties for AxeError
-      if ('code' in error) {
+      // Output additional properties for error
+      if (error && typeof error === 'object' && 'code' in error) {
         console.error(`Code: ${(error as any).code}`);
       }
-      if ('details' in error) {
+      if (error && typeof error === 'object' && 'details' in error) {
         console.error(`Details: ${JSON.stringify((error as any).details, null, 2)}`);
       }
-      if ('cause' in error && (error as any).cause) {
+      if (error && typeof error === 'object' && 'cause' in error && (error as any).cause) {
         console.error(`Cause: ${JSON.stringify((error as any).cause, null, 2)}`);
       }
     } else {
@@ -204,14 +203,14 @@ async function runDebug() {
       console.error(`Message: ${error.message}`);
       console.error(`Stack: ${error.stack}`);
       
-      // Output additional properties for AxeError
-      if ('code' in error) {
+      // Output additional properties for error
+      if (error && typeof error === 'object' && 'code' in error) {
         console.error(`Code: ${(error as any).code}`);
       }
-      if ('details' in error) {
+      if (error && typeof error === 'object' && 'details' in error) {
         console.error(`Details: ${JSON.stringify((error as any).details, null, 2)}`);
       }
-      if ('cause' in error && (error as any).cause) {
+      if (error && typeof error === 'object' && 'cause' in error && (error as any).cause) {
         console.error(`Cause: ${JSON.stringify((error as any).cause, null, 2)}`);
       }
     } else {
