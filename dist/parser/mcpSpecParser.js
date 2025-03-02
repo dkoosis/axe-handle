@@ -399,6 +399,4 @@ class McpSpecParser {
 }
 // Export the singleton instance
 exports.mcpSpecParser = McpSpecParser.getInstance();
-from;
-'../types';
 //# sourceMappingURL=mcpSpecParser.js.map

@@ -2,6 +2,7 @@
 // Path: src/mcp/mapper.ts
 // Maps the parsed user service definition to an internal representation suitable for code generation.
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mapper = void 0;
 const types_1 = require("../types");
 /**
  * Creates an AxeError specific to the mapper.
@@ -25,10 +26,7 @@ function createMapperError(code, message, details, cause) {
  * representation suitable for code generation.
  */
 class Mapper {
-    constructor() {
-        // Export the singleton instance
-        this.mapper = Mapper.getInstance();
-    }
+    constructor() { }
     /**
      * Gets the singleton instance of the Mapper.
      * @returns The Mapper instance
@@ -258,4 +256,6 @@ class Mapper {
         }
     }
 }
+// Export the singleton instance
+exports.mapper = Mapper.getInstance();
 //# sourceMappingURL=mapper.js.map

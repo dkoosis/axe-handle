@@ -333,6 +333,6 @@ class Mapper {
       return `${name}s`;
     }
   }
-  
+}
 // Export the singleton instance
 export const mapper = Mapper.getInstance();
