@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.serviceParser = void 0;
 const protobuf = __importStar(require("protobufjs"));
 const fs = __importStar(require("fs/promises"));
 const path = __importStar(require("path"));
@@ -358,4 +359,6 @@ class ServiceParser {
         console.warn(`This may cause issues in the generated code. Consider using a known type.`);
     }
 }
+// Export the singleton instance
+exports.serviceParser = ServiceParser.getInstance();
 //# sourceMappingURL=serviceParser.js.map
