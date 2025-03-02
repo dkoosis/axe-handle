@@ -33,12 +33,6 @@ declare class McpSpecParser {
      */
     private parseFromSource;
     /**
-     * Parses the McpOperations interface to extract operation definitions.
-     * @param node The interface declaration node
-     * @param operations Array to populate with parsed operations
-     */
-    private parseOperationsInterface;
-    /**
      * Parses an MCP type interface to extract type definition.
      * @param node The interface declaration node
      * @returns The parsed MCP type or undefined if parsing failed
@@ -50,18 +44,6 @@ declare class McpSpecParser {
      * @param capabilities Array to populate with parsed capabilities
      */
     private parseCapabilitiesInterface;
-    /**
-     * Extracts the input type from an operation type reference.
-     * @param typeNode The type reference node
-     * @returns The input type name
-     */
-    private extractInputType;
-    /**
-     * Extracts the output type from an operation type reference.
-     * @param typeNode The type reference node
-     * @returns The output type name
-     */
-    private extractOutputType;
     /**
      * Extracts the field type from a type node.
      * @param typeNode The type node

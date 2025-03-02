@@ -2,9 +2,8 @@
 // Creates a simplified MCP specification from schema.ts
 
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import * as ts from 'typescript';
-import { McpSpecification, McpOperation, McpType, McpField, McpCapability } from '../types';
+import { McpSpecification } from '../types';
 import { createParserError } from '../utils/errorUtils';
 
 /**

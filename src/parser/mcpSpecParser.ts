@@ -236,33 +236,7 @@ class McpSpecParser {
     
     return spec;
   }
-  
-  /**
-   * Parses the McpOperations interface to extract operation definitions.
-   * @param node The interface declaration node
-   * @param operations Array to populate with parsed operations
-   */
-  private parseOperationsInterface(node: ts.InterfaceDeclaration, operations: McpOperation[]): void {
-    node.members.forEach(member => {
-      if (ts.isPropertySignature(member) && member.type && ts.isTypeReferenceNode(member.type)) {
-        const operationName = member.name.getText().replace(/['"]/g, '');
-        // Remove unused variable
-        // const operationType = member.type.typeName.getText();
-        const description = this.getJSDocComment(member);
-        
-        const operation: McpOperation = {
-          name: operationName,
-          description: description || `MCP ${operationName} operation`,
-          inputType: this.extractInputType(member.type),
-          outputType: this.extractOutputType(member.type),
-          required: member.questionToken === undefined
-        };
-        
-        operations.push(operation);
-      }
-    });
-  }
-  
+    
   /**
    * Parses an MCP type interface to extract type definition.
    * @param node The interface declaration node
@@ -323,31 +297,7 @@ class McpSpecParser {
       }
     });
   }
-  
-  /**
-   * Extracts the input type from an operation type reference.
-   * @param typeNode The type reference node
-   * @returns The input type name
-   */
-  private extractInputType(typeNode: ts.TypeReferenceNode): string {
-    if (typeNode.typeArguments && typeNode.typeArguments.length > 0) {
-      return typeNode.typeArguments[0].getText();
-    }
-    return 'any';
-  }
-  
-  /**
-   * Extracts the output type from an operation type reference.
-   * @param typeNode The type reference node
-   * @returns The output type name
-   */
-  private extractOutputType(typeNode: ts.TypeReferenceNode): string {
-    if (typeNode.typeArguments && typeNode.typeArguments.length > 1) {
-      return typeNode.typeArguments[1].getText();
-    }
-    return 'any';
-  }
-  
+    
   /**
    * Extracts the field type from a type node.
    * @param typeNode The type node

@@ -1,0 +1,176 @@
+{
+  "version": "2024-11-05",
+  "operations": [
+    {
+      "name": "",
+      "description": "MCP  operation",
+      "inputType": "Request",
+      "outputType": "Result",
+      "required": true
+    },
+    {
+      "name": "Initialize",
+      "description": "This request is sent from the client to the server when it first connects, asking it to begin initialization.",
+      "inputType": "InitializeRequest",
+      "outputType": "InitializeResult",
+      "required": true
+    },
+    {
+      "name": "Ping",
+      "description": "A ping, issued by either the server or the client, to check that the other party is still alive. The receiver must promptly respond, or else may be disconnected.",
+      "inputType": "PingRequest",
+      "outputType": "PingResult",
+      "required": true
+    },
+    {
+      "name": "ListResources",
+      "description": "Sent from the client to request a list of resources the server has.",
+      "inputType": "ListResourcesRequest",
+      "outputType": "ListResourcesResult",
+      "required": true
+    },
+    {
+      "name": "ListResourceTemplates",
+      "description": "Sent from the client to request a list of resource templates the server has.",
+      "inputType": "ListResourceTemplatesRequest",
+      "outputType": "ListResourceTemplatesResult",
+      "required": true
+    },
+    {
+      "name": "ReadResource",
+      "description": "Sent from the client to the server, to read a specific resource URI.",
+      "inputType": "ReadResourceRequest",
+      "outputType": "ReadResourceResult",
+      "required": true
+    },
+    {
+      "name": "Subscribe",
+      "description": "Sent from the client to request resources/updated notifications from the server whenever a particular resource changes.",
+      "inputType": "SubscribeRequest",
+      "outputType": "SubscribeResult",
+      "required": true
+    },
+    {
+      "name": "Unsubscribe",
+      "description": "Sent from the client to request cancellation of resources/updated notifications from the server. This should follow a previous resources/subscribe request.",
+      "inputType": "UnsubscribeRequest",
+      "outputType": "UnsubscribeResult",
+      "required": true
+    },
+    {
+      "name": "ListPrompts",
+      "description": "Sent from the client to request a list of prompts and prompt templates the server has.",
+      "inputType": "ListPromptsRequest",
+      "outputType": "ListPromptsResult",
+      "required": true
+    },
+    {
+      "name": "GetPrompt",
+      "description": "Used by the client to get a prompt provided by the server.",
+      "inputType": "GetPromptRequest",
+      "outputType": "GetPromptResult",
+      "required": true
+    },
+    {
+      "name": "ListTools",
+      "description": "Sent from the client to request a list of tools the server has.",
+      "inputType": "ListToolsRequest",
+      "outputType": "ListToolsResult",
+      "required": true
+    },
+    {
+      "name": "CallTool",
+      "description": "Used by the client to invoke a tool provided by the server.",
+      "inputType": "CallToolRequest",
+      "outputType": "CallToolResult",
+      "required": true
+    },
+    {
+      "name": "SetLevel",
+      "description": "A request from the client to the server, to enable or adjust logging.",
+      "inputType": "SetLevelRequest",
+      "outputType": "SetLevelResult",
+      "required": true
+    },
+    {
+      "name": "CreateMessage",
+      "description": "A request from the server to sample an LLM via the client. The client has full discretion over which model to select. The client should also inform the user before beginning sampling, to allow them to inspect the request (human in the loop) and decide whether to approve it.",
+      "inputType": "CreateMessageRequest",
+      "outputType": "CreateMessageResult",
+      "required": true
+    },
+    {
+      "name": "Complete",
+      "description": "A request from the client to the server, to ask for completion options.",
+      "inputType": "CompleteRequest",
+      "outputType": "CompleteResult",
+      "required": true
+    },
+    {
+      "name": "ListRoots",
+      "description": "Sent from the server to request a list of root URIs from the client. Roots allow\nservers to ask for specific directories or files to operate on. A common example\nfor roots is providing a set of repositories or directories a server should operate\non.\n\nThis request is typically used when the server needs to understand the file system\nstructure or access specific locations that the client has permission to read from.",
+      "inputType": "ListRootsRequest",
+      "outputType": "ListRootsResult",
+      "required": true
+    }
+  ],
+  "types": [
+    {
+      "name": "String",
+      "description": "String type",
+      "fields": []
+    },
+    {
+      "name": "Number",
+      "description": "Number type",
+      "fields": []
+    },
+    {
+      "name": "Boolean",
+      "description": "Boolean type",
+      "fields": []
+    }
+  ],
+  "capabilities": [
+    {
+      "name": "experimental",
+      "description": "Experimental, non-standard capabilities that the client supports.",
+      "required": false
+    },
+    {
+      "name": "roots",
+      "description": "Present if the client supports listing roots.",
+      "required": false
+    },
+    {
+      "name": "sampling",
+      "description": "Present if the client supports sampling from an LLM.",
+      "required": false
+    },
+    {
+      "name": "experimental",
+      "description": "Experimental, non-standard capabilities that the server supports.",
+      "required": false
+    },
+    {
+      "name": "logging",
+      "description": "Present if the server supports sending log messages to the client.",
+      "required": false
+    },
+    {
+      "name": "prompts",
+      "description": "Present if the server offers any prompt templates.",
+      "required": false
+    },
+    {
+      "name": "resources",
+      "description": "Present if the server offers any resources to read.",
+      "required": false
+    },
+    {
+      "name": "tools",
+      "description": "Present if the server offers any tools to call.",
+      "required": false
+    }
+  ]
+}
