@@ -1,4 +1,4 @@
-// generator.js - Main code generator for MCP servers
+// code-generator.js - Main code generator for MCP servers
 const path = require('path');
 const fs = require('fs');
 const { parseMCPSchema } = require('./ts-parser');

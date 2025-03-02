@@ -1,9 +1,9 @@
 // test.js - Basic test script for Axe Handle
 const path = require('path');
 const fs = require('fs');
-const { parseMCPSchema } = require('./ts-parser');
+const { parseMCPSchema } = require('./schema-parser');
 const TemplateEngine = require('./template-engine');
-const MCPServerGenerator = require('./generator');
+const MCPServerGenerator = require('./server-generator');
 
 // Configuration
 const schemaPath = process.argv[2] || './schema.ts';

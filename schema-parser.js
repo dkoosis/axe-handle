@@ -44,7 +44,7 @@ function parseMCPSchema(inputFile) {
         summary: {
             interfaceCount: 0,
             typeCount: 0,
-            constantCount:
+            constantCount: 0,
             resourceCount: 0,
             toolCount: 0,
             promptCount: 0

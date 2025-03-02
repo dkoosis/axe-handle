@@ -1,6 +1,6 @@
 // index.js - Main module exports for Axe Handle
 
-const MCPServerGenerator = require('./generator');
+const MCPServerGenerator = require('./server-generator');
 const TemplateEngine = require('./template-engine');
 const { parseMCPSchema, generateMarkdown } = require('./ts-parser');
 
