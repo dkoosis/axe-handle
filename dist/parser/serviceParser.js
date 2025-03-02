@@ -93,7 +93,7 @@ class ServiceParser {
             // Extract service name from file name
             const serviceName = this.extractServiceName(filePath);
             // Extract resources and types
-            const { resources, types } = await this.extractResourcesAndTypes(root.root, mcpSpec);
+            const { resources, types } = await this.extractResourcesAndTypes(root.root);
             // Create the user service
             const userService = {
                 name: serviceName,
@@ -129,10 +129,9 @@ class ServiceParser {
     /**
      * Extracts resources and types from the Protobuf root.
      * @param root The Protobuf root
-     * @param mcpSpec The MCP specification
      * @returns The extracted resources and types
      */
-    async extractResourcesAndTypes(root, mcpSpec) {
+    async extractResourcesAndTypes(root) {
         const resources = [];
         const types = [];
         // Get all message types
@@ -222,8 +221,10 @@ class ServiceParser {
             fields.push({
                 name: fieldName,
                 type: this.convertProtoTypeToTypeName(field.type, field.resolvedType),
-                required: field.rule === 'required',
-                repeated: field.rule === 'repeated',
+                // field.optional === false means required in proto3
+                required: !field.optional,
+                // Use field.repeated to determine if it's an array
+                repeated: field.repeated || false,
                 description: this.extractCommentFromOptions(field.options),
                 fieldNumber: field.id
             });
@@ -262,7 +263,7 @@ class ServiceParser {
     }
     /**
      * Extracts comments from Protobuf options.
-     * @param options The Protobuf options
+     * @param options The Protobuf options object
      * @returns The extracted comment or a default description
      */
     extractCommentFromOptions(options) {

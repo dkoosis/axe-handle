@@ -20,7 +20,7 @@ export async function generateMcpServer(options: GeneratorOptions): Promise<void
     const userService = await serviceParser.parseService(options.inputFile, mcpSpec);
     
     // Map the user service to MCP concepts
-    const mappedService = mapper.mapServiceToMcp(userService, mcpSpec);
+    const mappedService = mapper.mapServiceToMcp(userService);
     
     // Generate the server code
     await generator.generateServer(mappedService, options);

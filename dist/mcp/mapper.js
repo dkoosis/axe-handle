@@ -40,19 +40,18 @@ class Mapper {
     /**
      * Maps a user service to the MCP concepts.
      * @param userService The user service to map
-     * @param mcpSpec The MCP specification
      * @returns The mapped service ready for code generation
      */
-    mapServiceToMcp(userService, mcpSpec) {
+    mapServiceToMcp(userService) {
         try {
             // Map resources
-            const mappedResources = userService.resources.map(resource => this.mapResource(resource, userService, mcpSpec));
+            const mappedResources = userService.resources.map(resource => this.mapResource(resource));
             // Map types
             const mappedTypes = [
                 // Map resource types
-                ...userService.resources.map(resource => this.mapResourceType(resource, userService)),
+                ...userService.resources.map(resource => this.mapResourceType(resource)),
                 // Map supporting types
-                ...userService.types.map(type => this.mapSupportingType(type, userService))
+                ...userService.types.map(type => this.mapSupportingType(type))
             ];
             return {
                 name: userService.name,
@@ -72,15 +71,13 @@ class Mapper {
     /**
      * Maps a user resource to an MCP resource.
      * @param resource The user resource to map
-     * @param userService The user service
-     * @param mcpSpec The MCP specification
      * @returns The mapped resource
      */
-    mapResource(resource, userService, mcpSpec) {
+    mapResource(resource) {
         // Map fields
-        const mappedFields = resource.fields.map(field => this.mapField(field, userService));
+        const mappedFields = resource.fields.map(field => this.mapField(field));
         // Map operations
-        const mappedOperations = this.generateOperations(resource, mcpSpec);
+        const mappedOperations = this.generateOperations(resource);
         return {
             name: resource.name,
             description: resource.description || `${resource.name} resource`,
@@ -91,38 +88,35 @@ class Mapper {
     /**
      * Maps a user resource to a mapped type.
      * @param resource The user resource to map
-     * @param userService The user service
      * @returns The mapped type
      */
-    mapResourceType(resource, userService) {
+    mapResourceType(resource) {
         return {
             name: resource.name,
             description: resource.description || `${resource.name} resource`,
-            fields: resource.fields.map(field => this.mapField(field, userService)),
+            fields: resource.fields.map(field => this.mapField(field)),
             isResource: true
         };
     }
     /**
      * Maps a user type to a mapped type.
      * @param type The user type to map
-     * @param userService The user service
      * @returns The mapped type
      */
-    mapSupportingType(type, userService) {
+    mapSupportingType(type) {
         return {
             name: type.name,
             description: type.description || `${type.name} type`,
-            fields: type.fields.map(field => this.mapField(field, userService)),
+            fields: type.fields.map(field => this.mapField(field)),
             isResource: false
         };
     }
     /**
      * Maps a user field to a mapped field.
      * @param field The user field to map
-     * @param userService The user service
      * @returns The mapped field
      */
-    mapField(field, userService) {
+    mapField(field) {
         return {
             name: field.name,
             tsType: this.mapTypeToTsType(field.type, field.repeated),
@@ -169,10 +163,9 @@ class Mapper {
     /**
      * Generates operations for a resource.
      * @param resource The resource
-     * @param mcpSpec The MCP specification
      * @returns The mapped operations
      */
-    generateOperations(resource, mcpSpec) {
+    generateOperations(resource) {
         const operations = [];
         const resourcePath = this.getResourcePath(resource.name);
         const resourceNameLower = resource.name.toLowerCase();

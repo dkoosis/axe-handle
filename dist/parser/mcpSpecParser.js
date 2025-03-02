@@ -216,7 +216,8 @@ class McpSpecParser {
         node.members.forEach(member => {
             if (ts.isPropertySignature(member) && member.type && ts.isTypeReferenceNode(member.type)) {
                 const operationName = member.name.getText().replace(/['"]/g, '');
-                const operationType = member.type.typeName.getText();
+                // Remove unused variable
+                // const operationType = member.type.typeName.getText();
                 const description = this.getJSDocComment(member);
                 const operation = {
                     name: operationName,
@@ -366,6 +367,7 @@ class McpSpecParser {
         if (jsDocComments && jsDocComments.length > 0) {
             const jsDocComment = jsDocComments[0];
             if (ts.isJSDoc(jsDocComment)) {
+                // Fix the type issue with the comment property
                 return jsDocComment.comment;
             }
         }

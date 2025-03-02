@@ -6,7 +6,6 @@ import {
   UserResource,
   UserType,
   UserField,
-  McpSpecification,
   MappedService,
   MappedResource,
   MappedType,
@@ -63,17 +62,15 @@ class Mapper {
   /**
    * Maps a user service to the MCP concepts.
    * @param userService The user service to map
-   * @param mcpSpec The MCP specification
    * @returns The mapped service ready for code generation
    */
   public mapServiceToMcp(
-    userService: UserService,
-    mcpSpec: McpSpecification
+    userService: UserService
   ): MappedService {
     try {
       // Map resources
       const mappedResources = userService.resources.map(resource =>
-        this.mapResource(resource, mcpSpec)
+        this.mapResource(resource)
       );
 
       // Map types
@@ -112,12 +109,10 @@ class Mapper {
   /**
    * Maps a user resource to an MCP resource.
    * @param resource The user resource to map
-   * @param mcpSpec The MCP specification
    * @returns The mapped resource
    */
   private mapResource(
-    resource: UserResource,
-    mcpSpec: McpSpecification
+    resource: UserResource
   ): MappedResource {
     // Map fields
     const mappedFields = resource.fields.map(field =>
@@ -125,7 +120,7 @@ class Mapper {
     );
 
     // Map operations
-    const mappedOperations = this.generateOperations(resource, mcpSpec);
+    const mappedOperations = this.generateOperations(resource);
 
     return {
       name: resource.name,
@@ -227,12 +222,10 @@ class Mapper {
   /**
    * Generates operations for a resource.
    * @param resource The resource
-   * @param mcpSpec The MCP specification
    * @returns The mapped operations
    */
   private generateOperations(
-    resource: UserResource,
-    mcpSpec: McpSpecification
+    resource: UserResource
   ): MappedOperation[] {
     const operations: MappedOperation[] = [];
     const resourcePath = this.getResourcePath(resource.name);

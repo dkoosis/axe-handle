@@ -1,4 +1,4 @@
-import { UserService, McpSpecification, MappedService } from '../types';
+import { UserService, MappedService } from '../types';
 /**
  * MCP Mapper.
  * Responsible for mapping the parsed user service definition to an internal
@@ -15,36 +15,30 @@ declare class Mapper {
     /**
      * Maps a user service to the MCP concepts.
      * @param userService The user service to map
-     * @param mcpSpec The MCP specification
      * @returns The mapped service ready for code generation
      */
-    mapServiceToMcp(userService: UserService, mcpSpec: McpSpecification): MappedService;
+    mapServiceToMcp(userService: UserService): MappedService;
     /**
      * Maps a user resource to an MCP resource.
      * @param resource The user resource to map
-     * @param userService The user service
-     * @param mcpSpec The MCP specification
      * @returns The mapped resource
      */
     private mapResource;
     /**
      * Maps a user resource to a mapped type.
      * @param resource The user resource to map
-     * @param userService The user service
      * @returns The mapped type
      */
     private mapResourceType;
     /**
      * Maps a user type to a mapped type.
      * @param type The user type to map
-     * @param userService The user service
      * @returns The mapped type
      */
     private mapSupportingType;
     /**
      * Maps a user field to a mapped field.
      * @param field The user field to map
-     * @param userService The user service
      * @returns The mapped field
      */
     private mapField;
@@ -64,7 +58,6 @@ declare class Mapper {
     /**
      * Generates operations for a resource.
      * @param resource The resource
-     * @param mcpSpec The MCP specification
      * @returns The mapped operations
      */
     private generateOperations;

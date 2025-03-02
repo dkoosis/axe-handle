@@ -28,7 +28,6 @@ declare class ServiceParser {
     /**
      * Extracts resources and types from the Protobuf root.
      * @param root The Protobuf root
-     * @param mcpSpec The MCP specification
      * @returns The extracted resources and types
      */
     private extractResourcesAndTypes;
@@ -72,7 +71,7 @@ declare class ServiceParser {
     private convertProtoTypeToTypeName;
     /**
      * Extracts comments from Protobuf options.
-     * @param options The Protobuf options
+     * @param options The Protobuf options object
      * @returns The extracted comment or a default description
      */
     private extractCommentFromOptions;
