@@ -1,72 +1,64 @@
-// Path: src/utils/configManager.ts
-// Provides a centralized configuration management system for the Axe Handle code generator.
-
+// src/utils/configManager.ts
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { createGeneratorError } from './errorUtils';
+import { logger, LogCategory } from './logger';
 
 /**
- * Generator configuration.
+ * Generator configuration with typed options
  */
 export interface GeneratorConfig {
-  /** Project name for the generated code */
+  // Project configuration
   projectName: string;
-  /** Project version */
   version: string;
-  /** Project description */
   description: string;
-  /** Project author */
   author: string;
-  /** Project license */
   license: string;
-  /** Server framework to use */
+  
+  // Server configuration
   framework: 'express' | 'nestjs' | 'fastify';
-  /** Host for the server */
   host: string;
-  /** Port for the server */
   port: number;
-  /** Whether to generate OpenAPI documentation */
-  generateOpenApiDocs: boolean;
-  /** Configuration for TypeScript */
+  
+  // TypeScript configuration
   typescript: {
-    /** Target ECMAScript version */
     target: string;
-    /** Module system */
     module: string;
-    /** Strict type-checking options */
     strict: boolean;
-    /** Output directory */
     outDir: string;
   };
-  /** Additional dependencies to include */
+  
+  // Feature flags
+  features: {
+    generateOpenApiDocs: boolean;
+    generateTests: boolean;
+    includeExamples: boolean;
+    strictValidation: boolean;
+  };
+  
+  // Dependencies and scripts
   dependencies: Record<string, string>;
-  /** Additional dev dependencies to include */
   devDependencies: Record<string, string>;
-  /** Additional scripts to include */
   scripts: Record<string, string>;
+  
+  // Extension point for custom configuration
+  custom: Record<string, any>;
 }
 
 /**
- * Configuration Manager.
- * Responsible for managing configuration, loading config files,
- * and providing a unified interface for accessing configuration.
+ * Enhanced configuration manager with validation and extensibility
  */
 export class ConfigManager {
   private static instance: ConfigManager;
-  
   private config: GeneratorConfig;
+  private configPath?: string;
   
-  /**
-   * Creates a new ConfigManager.
-   */
   private constructor() {
-    // Set default configuration
     this.config = this.getDefaultConfig();
   }
   
   /**
-   * Gets the singleton instance of the ConfigManager.
-   * @returns The ConfigManager instance
+   * Get the singleton instance
    */
   public static getInstance(): ConfigManager {
     if (!ConfigManager.instance) {
@@ -76,8 +68,7 @@ export class ConfigManager {
   }
   
   /**
-   * Gets the default configuration.
-   * @returns The default configuration
+   * Get default configuration
    */
   private getDefaultConfig(): GeneratorConfig {
     return {
@@ -86,95 +77,84 @@ export class ConfigManager {
       description: 'MCP Protocol Server',
       author: process.env.USER || 'MCP Generator User',
       license: 'MIT',
+      
       framework: 'express',
       host: 'localhost',
       port: 3000,
-      generateOpenApiDocs: true,
+      
       typescript: {
         target: 'ES2020',
         module: 'NodeNext',
         strict: true,
         outDir: 'dist'
       },
+      
+      features: {
+        generateOpenApiDocs: true,
+        generateTests: true,
+        includeExamples: true,
+        strictValidation: false
+      },
+      
       dependencies: {},
       devDependencies: {},
-      scripts: {}
+      scripts: {},
+      
+      custom: {}
     };
   }
   
   /**
-   * Gets the current configuration.
-   * @returns The current configuration
+   * Get the current configuration
    */
   public getConfig(): GeneratorConfig {
     return { ...this.config };
   }
   
   /**
-   * Updates the configuration with the provided partial configuration.
-   * @param partialConfig Partial configuration to merge with the current configuration
+   * Update configuration with partial values
    */
   public updateConfig(partialConfig: Partial<GeneratorConfig>): void {
+    logger.debug('Updating configuration', LogCategory.CONFIG);
     this.config = this.mergeConfigs(this.config, partialConfig);
   }
   
   /**
-   * Merges two configurations.
-   * @param baseConfig The base configuration
-   * @param overrideConfig The configuration to override with
-   * @returns The merged configuration
+   * Get a specific configuration value
    */
-  private mergeConfigs(
-    baseConfig: GeneratorConfig,
-    overrideConfig: Partial<GeneratorConfig>
-  ): GeneratorConfig {
-    // Start with a copy of the base config
-    const result: GeneratorConfig = { ...baseConfig };
-    
-    // Override top-level properties
-    for (const key of Object.keys(overrideConfig) as Array<keyof GeneratorConfig>) {
-      if (key === 'typescript') {
-        // For typescript, we need to merge the sub-properties
-        result.typescript = {
-          ...result.typescript,
-          ...(overrideConfig.typescript || {})
-        };
-      } else if (
-        key === 'dependencies' || 
-        key === 'devDependencies' || 
-        key === 'scripts'
-      ) {
-        // For objects, we need to merge the properties
-        result[key] = {
-          ...result[key],
-          ...(overrideConfig[key] || {})
-        };
-      } else if (overrideConfig[key] !== undefined) {
-        // For primitive values, we can just override
-        (result[key] as any) = overrideConfig[key];
-      }
-    }
-    
-    return result;
+  public get<K extends keyof GeneratorConfig>(key: K): GeneratorConfig[K] {
+    return this.config[key];
   }
   
   /**
-   * Loads a configuration file.
-   * @param configPath Path to the configuration file
+   * Set a specific configuration value
+   */
+  public set<K extends keyof GeneratorConfig>(key: K, value: GeneratorConfig[K]): void {
+    logger.debug(`Setting config ${String(key)}`, LogCategory.CONFIG);
+    this.config[key] = value;
+  }
+  
+  /**
+   * Load configuration from a file
    */
   public async loadConfigFile(configPath: string): Promise<void> {
     try {
-      // Read the configuration file
-      const configContent = await fs.readFile(configPath, 'utf-8');
+      logger.info(`Loading configuration from ${configPath}`, LogCategory.CONFIG);
       
-      // Parse the configuration
-      const parsedConfig = JSON.parse(configContent);
+      // Read and parse the configuration file
+      const content = await fs.readFile(configPath, 'utf-8');
+      const parsed = JSON.parse(content);
       
       // Validate the configuration
-      this.validateConfig(parsedConfig);
+      this.validateConfig(parsed);
+      
+      // Store the config path for later save operations
+      this.configPath = configPath;
       
       // Update the configuration
-      this.updateConfig(parsedConfig);
+      this.updateConfig(parsed);
+      
+      logger.success('Configuration loaded successfully', LogCategory.CONFIG);
     } catch (error) {
       throw createGeneratorError(
         3001,
@@ -186,12 +166,72 @@ export class ConfigManager {
   }
   
   /**
-   * Validates a configuration object.
-   * @param config The configuration to validate
-   * @throws Error if the configuration is invalid
+   * Merge configurations deeply
+   */
+  private mergeConfigs(
+    baseConfig: GeneratorConfig,
+    overrideConfig: Partial<GeneratorConfig>
+  ): GeneratorConfig {
+    const result = { ...baseConfig };
+    
+    for (const [key, value] of Object.entries(overrideConfig)) {
+      const typedKey = key as keyof GeneratorConfig;
+      
+      // Handle nested objects
+      if (
+        value !== null &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        typeof result[typedKey] === 'object' &&
+        result[typedKey] !== null &&
+        !Array.isArray(result[typedKey])
+      ) {
+        // Recursively merge nested objects
+        (result[typedKey] as any) = this.mergeDeep(
+          result[typedKey] as Record<string, any>,
+          value as Record<string, any>
+        );
+      } else if (value !== undefined) {
+        // Set value directly
+        (result[typedKey] as any) = value;
+      }
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Deep merge helper for nested objects
+   */
+  private mergeDeep(target: Record<string, any>, source: Record<string, any>): Record<string, any> {
+    const result = { ...target };
+    
+    for (const [key, value] of Object.entries(source)) {
+      if (
+        value !== null &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        key in result &&
+        typeof result[key] === 'object' &&
+        result[key] !== null &&
+        !Array.isArray(result[key])
+      ) {
+        // Recursively merge nested objects
+        result[key] = this.mergeDeep(result[key], value);
+      } else if (value !== undefined) {
+        // Set value directly
+        result[key] = value;
+      }
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Validate configuration
    */
   private validateConfig(config: any): void {
-    // Check if the config is an object
+    // Check if config is an object
     if (!config || typeof config !== 'object') {
       throw createGeneratorError(
         3002,
@@ -200,9 +240,9 @@ export class ConfigManager {
       );
     }
     
-    // Check if the framework is valid
+    // Check framework
     if (
-      config.framework && 
+      config.framework &&
       !['express', 'nestjs', 'fastify'].includes(config.framework)
     ) {
       throw createGeneratorError(
@@ -212,44 +252,82 @@ export class ConfigManager {
       );
     }
     
-    // Add more validation as needed
+    // Check port range
+    if (config.port && (config.port < 1 || config.port > 65535)) {
+      throw createGeneratorError(
+        3004,
+        'Invalid configuration: port must be between 1 and 65535',
+        { port: config.port }
+      );
+    }
+    
+    // More validations can be added as needed
   }
   
   /**
-   * Saves the current configuration to a file.
-   * @param configPath Path to save the configuration to
+   * Save configuration to a file
    */
-  public async saveConfigFile(configPath: string): Promise<void> {
+  public async saveConfigFile(configPath?: string): Promise<void> {
+    const savePath = configPath || this.configPath;
+    
+    if (!savePath) {
+      throw createGeneratorError(
+        3005,
+        'No configuration path specified for saving',
+        {}
+      );
+    }
+    
     try {
-      // Create the directory if it doesn't exist
-      const configDir = path.dirname(configPath);
-      await fs.mkdir(configDir, { recursive: true });
+      logger.info(`Saving configuration to ${savePath}`, LogCategory.CONFIG);
       
-      // Write the configuration to the file
+      // Ensure directory exists
+      const dir = path.dirname(savePath);
+      await fs.mkdir(dir, { recursive: true });
+      
+      // Write configuration file
       await fs.writeFile(
-        configPath,
+        savePath,
         JSON.stringify(this.config, null, 2),
         'utf-8'
       );
+      
+      logger.success('Configuration saved successfully', LogCategory.CONFIG);
     } catch (error) {
       throw createGeneratorError(
-        3004,
-        `Failed to save configuration file: ${configPath}`,
-        { configPath },
+        3006,
+        `Failed to save configuration file: ${savePath}`,
+        { configPath: savePath },
         error instanceof Error ? error : undefined
       );
     }
   }
   
   /**
-   * Resets the configuration to the default values.
+   * Reset configuration to defaults
    */
   public resetConfig(): void {
+    logger.info('Resetting configuration to defaults', LogCategory.CONFIG);
     this.config = this.getDefaultConfig();
+  }
+  
+  /**
+   * Add custom configuration
+   */
+  public addCustomConfig(key: string, value: any): void {
+    logger.debug(`Adding custom config: ${key}`, LogCategory.CONFIG);
+    this.config.custom[key] = value;
+  }
+  
+  /**
+   * Get custom configuration
+   */
+  public getCustomConfig(key: string): any {
+    return this.config.custom[key];
   }
 }
 
-// Export a function to get the singleton instance
+// Export factory function
 export function getConfigManager(): ConfigManager {
   return ConfigManager.getInstance();
 }
