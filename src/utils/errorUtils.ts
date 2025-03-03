@@ -133,7 +133,7 @@ export function createMapperError(
  * @param cause Underlying error cause
  * @returns AxeError object
  */
-export function createMcpSpecError(
+export function createMcpProtocolError(
   code: number,
   message: string,
   details?: Record<string, unknown>,
@@ -141,7 +141,7 @@ export function createMcpSpecError(
 ): AxeError {
   return createError(
     ErrorPrefix.MCP,
-    McpErrorCategory.SPECIFICATION,
+    McpErrorCategory.PROTOCOL,
     code,
     message,
     details,

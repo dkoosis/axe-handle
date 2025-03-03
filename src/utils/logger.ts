@@ -1,261 +1,207 @@
 // Path: src/utils/logger.ts
-// Provides a centralized logging system for the Axe Handle code generator.
+// Enhanced console logging for the Axe Handle CLI
+
+import chalk from 'chalk';
 
 /**
- * Log levels in order of increasing severity.
+ * Log levels for CLI output
  */
 export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
   WARN = 2,
-  ERROR = 3
+  ERROR = 3,
+  SUCCESS = 4,
+  SILENT = 5
 }
 
 /**
- * Logger configuration.
+ * Logger configuration
  */
-
 export interface LoggerConfig {
-  /** Minimum log level to display */
+  /** Current verbosity level */
+  verbose: boolean;
+  /** Current log level */
   level: LogLevel;
-  /** Whether to include timestamps in log messages */
-  timestamps: boolean;
-  /** Whether to use colors in log output */
+  /** Whether to use color */
   colors: boolean;
-  /** Custom formatter for log messages */
-  formatter?: (level: LogLevel, message: string, context?: object) => string;
+  /** Whether to show timestamps */
+  timestamps: boolean;
+  /** Whether to show prefixes for log levels */
+  prefixes: boolean;
 }
 
 /**
- * A module-specific logger instance.
+ * CLI Logger - Manages console output with different styling for different message types
  */
-export interface Logger {
-  /** Log a debug message */
-  debug(message: string, context?: object): void;
-  /** Log an info message */
-  info(message: string, context?: object): void;
-  /** Log a warning message */
-  warn(message: string, context?: object): void;
-  /** Log an error message */
-  error(message: string, error?: Error, context?: object): void;
-  /** Set the log level for this logger */
-  setLevel(level: LogLevel): void;
-}
-
-/**
- * Logger Manager.
- * Responsible for creating and managing loggers.
- */
-export class LoggerManager {
-  private static instance: LoggerManager;
-  
+export class CliLogger {
+  private static instance: CliLogger;
   private config: LoggerConfig;
-  private loggers: Map<string, Logger> = new Map();
   
-  /**
-   * Creates a new LoggerManager.
-   * @param config Logger configuration
-   */
-  private constructor(config: Partial<LoggerConfig>) {
-    const { level = LogLevel.INFO, timestamps = true, colors = true, ...restConfig } = config;
+  private constructor(config: Partial<LoggerConfig> = {}) {
     this.config = {
-      level,
-      timestamps,
-      colors,
-      ...restConfig
+      verbose: config.verbose ?? false,
+      level: config.level ?? LogLevel.INFO,
+      colors: config.colors ?? true,
+      timestamps: config.timestamps ?? false,
+      prefixes: config.prefixes ?? true
     };
   }
   
   /**
-   * Gets the singleton instance of the LoggerManager.
-   * @param config Logger configuration (optional, only used on first call)
-   * @returns The LoggerManager instance
+   * Get the singleton instance of CliLogger
    */
-  public static getInstance(config?: Partial<LoggerConfig>): LoggerManager {
-    if (!LoggerManager.instance) {
-      LoggerManager.instance = new LoggerManager(config || {});
+  public static getInstance(config?: Partial<LoggerConfig>): CliLogger {
+    if (!CliLogger.instance) {
+      CliLogger.instance = new CliLogger(config);
+    } else if (config) {
+      // Update existing instance config
+      CliLogger.instance.updateConfig(config);
     }
-    return LoggerManager.instance;
+    return CliLogger.instance;
   }
   
   /**
-   * Gets or creates a logger for a module.
-   * @param moduleName Name of the module
-   * @returns A logger instance
-   */
-  public getLogger(moduleName: string): Logger {
-    // Check if the logger already exists
-    if (this.loggers.has(moduleName)) {
-      return this.loggers.get(moduleName)!;
-    }
-    
-    // Create a new logger
-    const logger: Logger = {
-      debug: (message: string, context?: object) => {
-        this.log(LogLevel.DEBUG, moduleName, message, undefined, context);
-      },
-      info: (message: string, context?: object) => {
-        this.log(LogLevel.INFO, moduleName, message, undefined, context);
-      },
-      warn: (message: string, context?: object) => {
-        this.log(LogLevel.WARN, moduleName, message, undefined, context);
-      },
-      error: (message: string, error?: Error, context?: object) => {
-        this.log(LogLevel.ERROR, moduleName, message, error, context);
-      },
-      setLevel: (level: LogLevel) => {
-        // This would typically set a module-specific level,
-        // but for simplicity we're just setting the global level
-        this.config.level = level;
-      }
-    };
-    
-    // Store the logger
-    this.loggers.set(moduleName, logger);
-    
-    return logger;
-  }
-  
-  /**
-   * Logs a message.
-   * @param level Log level
-   * @param moduleName Name of the module
-   * @param message Message to log
-   * @param error Optional error object
-   * @param context Optional context object
-   */
-  private log(
-    level: LogLevel,
-    moduleName: string,
-    message: string,
-    error?: Error,
-    context?: object
-  ): void {
-    // Check if the log level is high enough
-    if (level < this.config.level) {
-      return;
-    }
-    
-    // Format the message
-    let formattedMessage: string;
-    
-    if (this.config.formatter) {
-      formattedMessage = this.config.formatter(level, message, context);
-    } else {
-      formattedMessage = this.formatMessage(level, moduleName, message);
-    }
-    
-    // Output the message
-    switch (level) {
-      case LogLevel.DEBUG:
-        console.debug(formattedMessage);
-        break;
-      case LogLevel.INFO:
-        console.info(formattedMessage);
-        break;
-      case LogLevel.WARN:
-        console.warn(formattedMessage);
-        break;
-      case LogLevel.ERROR:
-        console.error(formattedMessage);
-        if (error) {
-          console.error(error);
-        }
-        break;
-    }
-    
-    // Log context if provided
-    if (context) {
-      console.log(context);
-    }
-  }
-  
-  /**
-   * Formats a log message.
-   * @param level Log level
-   * @param moduleName Name of the module
-   * @param message Message to log
-   * @returns Formatted message
-   */
-  private formatMessage(level: LogLevel, moduleName: string, message: string): string {
-    // Build timestamp
-    const timestamp = this.config.timestamps ? `[${new Date().toISOString()}] ` : '';
-    
-    // Build level string
-    let levelStr: string;
-    
-    if (this.config.colors) {
-      switch (level) {
-        case LogLevel.DEBUG:
-          levelStr = '\x1b[34mDEBUG\x1b[0m'; // Blue
-          break;
-        case LogLevel.INFO:
-          levelStr = '\x1b[32mINFO\x1b[0m';  // Green
-          break;
-        case LogLevel.WARN:
-          levelStr = '\x1b[33mWARN\x1b[0m';  // Yellow
-          break;
-        case LogLevel.ERROR:
-          levelStr = '\x1b[31mERROR\x1b[0m'; // Red
-          break;
-        default:
-          levelStr = String(level);
-      }
-    } else {
-      switch (level) {
-        case LogLevel.DEBUG:
-          levelStr = 'DEBUG';
-          break;
-        case LogLevel.INFO:
-          levelStr = 'INFO';
-          break;
-        case LogLevel.WARN:
-          levelStr = 'WARN';
-          break;
-        case LogLevel.ERROR:
-          levelStr = 'ERROR';
-          break;
-        default:
-          levelStr = String(level);
-      }
-    }
-    
-    // Build module string
-    const moduleStr = moduleName ? `[${moduleName}] ` : '';
-    
-    // Build final message
-    return `${timestamp}${levelStr} ${moduleStr}${message}`;
-  }
-  
-  /**
-   * Updates the logger configuration.
-   * @param config New logger configuration
+   * Update logger configuration
    */
   public updateConfig(config: Partial<LoggerConfig>): void {
-    this.config = {
-      ...this.config,
-      ...config
-    };
+    this.config = { ...this.config, ...config };
   }
   
   /**
-   * Sets the global log level.
-   * @param level New log level
+   * Set verbose mode on/off
    */
-  public setLevel(level: LogLevel): void {
-    this.config.level = level;
+  public setVerbose(verbose: boolean): void {
+    this.config.verbose = verbose;
+  }
+  
+  /**
+   * Format a message with optional prefix and timestamp
+   */
+  private format(level: LogLevel, message: string): string {
+    const parts: string[] = [];
+    
+    // Add timestamp if enabled
+    if (this.config.timestamps) {
+      const timestamp = new Date().toISOString();
+      parts.push(`[${timestamp}]`);
+    }
+    
+    // Add prefix if enabled
+    if (this.config.prefixes) {
+      let prefix: string;
+      
+      switch (level) {
+        case LogLevel.DEBUG:
+          prefix = this.config.colors ? chalk.gray('DEBUG') : 'DEBUG';
+          break;
+        case LogLevel.INFO:
+          prefix = this.config.colors ? chalk.white('INFO') : 'INFO';
+          break;
+        case LogLevel.WARN:
+          prefix = this.config.colors ? chalk.yellow('WARN') : 'WARN';
+          break;
+        case LogLevel.ERROR:
+          prefix = this.config.colors ? chalk.red('ERROR') : 'ERROR';
+          break;
+        case LogLevel.SUCCESS:
+          prefix = this.config.colors ? chalk.green('SUCCESS') : 'SUCCESS';
+          break;
+        default:
+          prefix = '';
+      }
+      
+      if (prefix) {
+        parts.push(prefix);
+      }
+    }
+    
+    // Add the message
+    parts.push(message);
+    
+    return parts.join(' ');
+  }
+  
+  /**
+   * Log a debug message (only in verbose mode)
+   */
+  public debug(message: string): void {
+    if (this.config.level <= LogLevel.DEBUG && this.config.verbose) {
+      const formattedMessage = this.format(LogLevel.DEBUG, message);
+      console.log(this.config.colors ? chalk.gray(formattedMessage) : formattedMessage);
+    }
+  }
+  
+  /**
+   * Log an info message (plain white)
+   */
+  public info(message: string): void {
+    if (this.config.level <= LogLevel.INFO) {
+      if (this.config.verbose || !message.includes('template') && !message.includes('Template')) {
+        const formattedMessage = this.format(LogLevel.INFO, message);
+        // Use white for all info messages
+        console.log(formattedMessage);
+      }
+    }
+  }
+  
+  /**
+   * Log a warning message (yellow)
+   */
+  public warn(message: string): void {
+    if (this.config.level <= LogLevel.WARN) {
+      const prefix = this.config.colors ? chalk.yellow('WARN') : 'WARN';
+      // Apply yellow color to the entire message
+      const text = this.config.colors ? chalk.yellow(message) : message;
+      console.log(`${prefix} ${text}`);
+    }
+  }
+  
+  /**
+   * Log an error message (red)
+   */
+  public error(message: string): void {
+    if (this.config.level <= LogLevel.ERROR) {
+      const prefix = this.config.colors ? chalk.red.bold('ERROR') : 'ERROR';
+      // Apply red color to the entire message
+      const text = this.config.colors ? chalk.red(message) : message;
+      console.log(`${prefix} ${text}`);
+    }
+  }
+  
+  /**
+   * Log a success message (green)
+   */
+  public success(message: string): void {
+    if (this.config.level <= LogLevel.SUCCESS) {
+      const prefix = this.config.colors ? chalk.green('SUCCESS') : 'SUCCESS';
+      // Apply green color to the entire message
+      const text = this.config.colors ? chalk.green(message) : message;
+      console.log(`${prefix} ${text}`);
+    }
+  }
+  
+  /**
+   * Log a section header (for separating logical sections of output)
+   */
+  public section(title: string): void {
+    if (this.config.level <= LogLevel.INFO) {
+      console.log('');
+      console.log(this.config.colors ? chalk.cyan.bold(title) : title);
+      console.log(this.config.colors ? chalk.cyan('─'.repeat(title.length)) : '─'.repeat(title.length));
+    }
+  }
+  
+  /**
+   * Log a summary line (for highlighting important information)
+   */
+  public summary(message: string): void {
+    if (this.config.level <= LogLevel.INFO) {
+      console.log('');
+      console.log(this.config.colors ? chalk.bold(message) : message);
+    }
   }
 }
 
-// Export a function to get the singleton instance
-export function getLoggerManager(config?: Partial<LoggerConfig>): LoggerManager {
-  return LoggerManager.getInstance(config);
-}
-
-// Export a function to get a logger for a module
-export function getLogger(moduleName: string): Logger {
-  return getLoggerManager().getLogger(moduleName);
-}
-
-// Export the root logger
-export const logger = getLogger('root');
+// Export singleton instance
+export const logger = CliLogger.getInstance();

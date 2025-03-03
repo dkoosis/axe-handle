@@ -8,25 +8,22 @@ import fs from 'fs/promises';
 import chalk from 'chalk';
 import { generateMcpServer } from './index';
 import { AxeError, ErrorPrefix, AxeErrorCategory, GeneratorOptions } from './types';
+import { logger } from './utils/logger';
 
 // Create CLI program
 const program = new Command();
 
 /**
  * Formats an error message for CLI display.
- * @param error The error to format.  Can be a standard Error or an AxeError.
- * @returns Formatted error message string.
- * @description Checks if the error has a 'code' property to determine if it's an AxeError.
- *  If so, formats the message with the code, message, details, and cause (recursively).
- *  If not, formats it as a generic error.  This distinction is important because
- *  AxeErrors have a structured format for reporting to the user.
+ * @param error The error to format
+ * @returns Formatted error message string
  */
 function formatError(error: Error | AxeError): string {
   if ('code' in error) {
     const axeError = error as AxeError;
-    let message = `${chalk.red('ERROR')} ${chalk.yellow(axeError.code)}: ${axeError.message}`;
+    let message = `${chalk.red(axeError.code)}: ${axeError.message}`;
 
-    if (axeError.details) {
+    if (axeError.details && Object.keys(axeError.details).length > 0) {
       message += '\n\nDetails:';
       for (const [key, value] of Object.entries(axeError.details)) {
         message += `\n  ${chalk.cyan(key)}: ${value}`;
@@ -39,79 +36,10 @@ function formatError(error: Error | AxeError): string {
 
     return message;
   } else {
-    return chalk.red(`ERROR: ${error.message}`);
+    return error.message;
   }
 }
 
-/**
- * Creates an Axe Handle error.
- * @param category - The category of the error (e.g., CLI, GENERATOR).
- * @param code - A numeric code specific to the error within the category.
- * @param message - A human-readable error message.
- * @param details - (Optional) An object containing additional details about the error.
- * @param cause - (Optional) The underlying error that caused this error, if any.
- * @returns An AxeError object.
- * @description This function standardizes the creation of AxeError objects, ensuring
- *  consistent error code formatting and structure.
- */
-function createAxeError(
-  category: AxeErrorCategory,
-  code: number,
-  message: string,
-  details?: Record<string, unknown>,
-  cause?: Error | AxeError
-): AxeError {
-  return {
-    code: `${ErrorPrefix.AXE}-${category}${String(code).padStart(3, '0')}`,
-    message,
-    details,
-    cause,
-  };
-}
-
-// --- Custom Error Types ---
-
-class InputFileNotFoundError extends Error implements AxeError {
-  code: string;
-  details?: Record<string, unknown>;
-  cause?: Error | AxeError;
-
-  constructor(message: string, filePath: string, cause?: Error) {
-    super(message);
-    this.code = `${ErrorPrefix.AXE}-${AxeErrorCategory.CLI}001`;
-    this.details = { path: filePath };
-    this.cause = cause;
-    this.name = 'InputFileNotFoundError'; // Important for instanceof checks
-  }
-}
-
-class OutputDirectoryCreationError extends Error implements AxeError {
-  code: string;
-  details?: Record<string, unknown>;
-  cause?: Error | AxeError;
-
-    constructor(message: string, dirPath: string, cause?: Error) {
-        super(message);
-        this.code = `${ErrorPrefix.AXE}-${AxeErrorCategory.CLI}002`;
-        this.details = { path: dirPath };
-        this.cause = cause;
-        this.name = 'OutputDirectoryCreationError';
-    }
-}
-
-class ConfigFileNotFoundError extends Error implements AxeError {
-    code: string;
-    details?: Record<string, unknown>;
-    cause?: Error | AxeError;
-    constructor(message: string, filePath: string, cause?: Error) {
-        super(message);
-        this.code = `${ErrorPrefix.AXE}-${AxeErrorCategory.CLI}003`;
-        this.details = { path: filePath };
-        this.cause = cause;
-        this.name = 'ConfigFileNotFoundError';
-    }
-}
-// --- End Custom Error Types ---
 program
   .name('axe-handle')
   .description('Generate an MCP server from a Protobuf schema')
@@ -123,23 +51,36 @@ program
   .option('-c, --config <file>', 'Configuration file (JSON)')
   .option('-o, --overwrite', 'Overwrite existing files', false)
   .option('-d, --docs', 'Generate documentation', true)
-  .option('-v, --verbose', 'Verbose output', false)
-  .action(async (schemaFile: string, outputDir: string, cmdOptions: any) => { //Consider rule 4 here, define an interface
+  .option('-v, --verbose', 'Verbose output with detailed logs', false)
+  .option('--no-color', 'Disable colored output')
+  .action(async (schemaFile: string, outputDir: string, cmdOptions: any) => {
     try {
+      // Configure logger based on CLI options
+      logger.updateConfig({
+        verbose: cmdOptions.verbose,
+        colors: cmdOptions.color !== false
+      });
+      
+      logger.section('Axe Handle MCP Server Generator');
+      
       // Validate input file
       const inputFile = path.resolve(process.cwd(), schemaFile);
       try {
         await fs.access(inputFile);
+        logger.info(`Schema file: ${inputFile}`);
       } catch (error) {
-        throw new InputFileNotFoundError(`Input file not found: ${schemaFile}`, inputFile, error instanceof Error ? error : undefined);
+        logger.error(`Input file not found: ${schemaFile}`);
+        process.exit(1);
       }
 
       // Validate output directory
       const outDir = path.resolve(process.cwd(), outputDir);
       try {
         await fs.mkdir(outDir, { recursive: true });
+        logger.info(`Output directory: ${outDir}`);
       } catch (error) {
-        throw new OutputDirectoryCreationError(`Failed to create output directory: ${outputDir}`, outDir, error instanceof Error ? error : undefined );
+        logger.error(`Failed to create output directory: ${outputDir}`);
+        process.exit(1);
       }
 
       // Validate config file if provided
@@ -148,8 +89,10 @@ program
         configFile = path.resolve(process.cwd(), cmdOptions.config);
         try {
           await fs.access(configFile);
+          logger.info(`Config file: ${configFile}`);
         } catch (error) {
-            throw new ConfigFileNotFoundError(`Configuration file not found: ${cmdOptions.config}`, configFile, error instanceof Error ? error : undefined);
+          logger.error(`Configuration file not found: ${cmdOptions.config}`);
+          process.exit(1);
         }
       }
 
@@ -164,32 +107,45 @@ program
       };
 
       // Log options in verbose mode
-      if (options.verbose) {
-        console.log(chalk.cyan('Generator Options:'));
-        console.log(chalk.cyan('  Input File:'), inputFile);
-        console.log(chalk.cyan('  Output Directory:'), outDir);
-        console.log(chalk.cyan('  Config File:'), configFile || 'None');
-        console.log(chalk.cyan('  Overwrite:'), options.overwrite);
-        console.log(chalk.cyan('  Generate Docs:'), options.generateDocs);
-      }
+      logger.debug(`Generator Options: ${JSON.stringify({
+        overwrite: options.overwrite,
+        generateDocs: options.generateDocs,
+        verbose: options.verbose
+      }, null, 2)}`);
 
       // Generate the MCP server
-      console.log(chalk.green('Generating MCP server...'));
+      logger.section('Generating MCP Server');
+      
       await generateMcpServer(options);
-      console.log(chalk.green('MCP server generated successfully!'));
-      console.log(chalk.green(`Output directory: ${outDir}`));
+      
+      logger.section('Generation Complete');
+      logger.success(`MCP server generated successfully!`);
+      logger.summary(`Output directory: ${outDir}`);
+      
+      if (options.generateDocs) {
+        const docsPath = path.join(outDir, 'docs', 'api.md');
+        logger.info(`API documentation: ${docsPath}`);
+      }
+      
+      logger.info('\nNext steps:');
+      logger.info(`  cd ${outputDir}`);
+      logger.info('  npm install');
+      logger.info('  npm run dev');
 
     } catch (error) {
-       // Improved error handling using instanceof
-        if (error instanceof InputFileNotFoundError || error instanceof OutputDirectoryCreationError || error instanceof ConfigFileNotFoundError) {
-          console.error(formatError(error));
-        } else if (error instanceof Error) {
-          console.error(formatError(error));
+      logger.section('Generation Failed');
+      
+      if (error instanceof Error) {
+        logger.error(formatError(error));
+        
+        if ('code' in error && (error as any).details) {
+          const details = (error as any).details;
+          logger.debug(`Error details: ${JSON.stringify(details, null, 2)}`);
         }
-        else {
-          // For unknown error types
-          console.error(chalk.red(`ERROR: ${JSON.stringify(error, null, 2)}`));
-        }
+      } else {
+        logger.error(`Unknown error: ${JSON.stringify(error, null, 2)}`);
+      }
+      
       process.exit(1);
     }
   });
