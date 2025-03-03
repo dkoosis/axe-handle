@@ -6,7 +6,7 @@ import TemplateEngine from './template-engine';
 import MCPServerGenerator from './server-generator';
 
 // Configuration
-const schemaPath = process.argv[2] || './schema.ts';
+const schemaPath = process.argv[2] || './protocol.ts';
 const outputDir = './test-output';
 
 // Ensure input schema exists

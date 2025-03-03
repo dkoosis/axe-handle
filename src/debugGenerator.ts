@@ -3,15 +3,15 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { mapper } from './mcp/mapper';
 import { serviceParser } from './parser/serviceParser';
-import { mcpSpecParser } from './parser/mcpSpecParser';
-import { extractMcpSpecification } from './parser/mcpSchemaAdapter';
+import { mcpProtocolParser } from './parser/mcpProtocolParser';
+import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
 import { generator } from './generator/generator';
 import { GeneratorOptions } from './types';
 
 // Configure the paths
 const schemaFile = path.resolve(process.cwd(), 'schemas/examples/calendar.proto');
 const outputDir = path.resolve(process.cwd(), 'debug-generated');
-const schemaPath = path.resolve(process.cwd(), 'schemas/mcp-spec/schema.ts');
+const schemaPath = path.resolve(process.cwd(), 'schemas/mcp-spec/protocol.ts');
 
 async function debugGeneration() {
   console.log('=== Generator Debugging ===');
@@ -24,12 +24,12 @@ async function debugGeneration() {
     let mcpSpec;
     try {
       console.log('Attempting to use full MCP parser...');
-      mcpSpec = await mcpSpecParser.parseSpecification();
-      console.log('✓ MCP specification parsed successfully');
+      mcpSpec = await mcpProtocolParser.parseProtocol();
+      console.log('✓ MCP protocol parsed successfully');
     } catch (error) {
       console.log('Full parser failed, trying adapter instead...');
-      mcpSpec = await extractMcpSpecification(schemaPath);
-      console.log('✓ MCP specification extracted via adapter');
+      mcpSpec = await extractMcpProtocol(schemaPath);
+      console.log('✓ MCP protocol extracted via adapter');
     }
     
     // Step 2: Parse User Service

@@ -1,6 +1,6 @@
 "use strict";
 // Path: src/parser/mcpSchemaAdapter.ts
-// Creates a simplified MCP specification from schema.ts
+// Creates a simplified MCP protocol from protocol.ts
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -35,15 +35,15 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.extractMcpSpecification = extractMcpSpecification;
+exports.extractMcpProtocol = extractMcpProtocol;
 const fs = __importStar(require("fs/promises"));
 const ts = __importStar(require("typescript"));
 const errorUtils_1 = require("../utils/errorUtils");
 /**
- * Extracts a simplified MCP specification from the schema.ts file.
+ * Extracts a simplified MCP protocol from the protocol.ts file.
  * This adapter is more flexible than the full parser and works with different schema structures.
  */
-async function extractMcpSpecification(schemaPath) {
+async function extractMcpProtocol(schemaPath) {
     try {
         // Read the schema file
         const schemaContent = await fs.readFile(schemaPath, 'utf-8');
@@ -103,7 +103,7 @@ async function extractMcpSpecification(schemaPath) {
         if (error instanceof Error && 'code' in error) {
             throw error; // Rethrow existing AxeError
         }
-        throw (0, errorUtils_1.createParserError)(1001, 'Failed to extract MCP specification', { schemaPath }, error instanceof Error ? error : undefined);
+        throw (0, errorUtils_1.createParserError)(1001, 'Failed to extract MCP protocol', { schemaPath }, error instanceof Error ? error : undefined);
     }
 }
 /**

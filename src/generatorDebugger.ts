@@ -8,8 +8,8 @@ import { generateMcpServer } from './index';
 import { GeneratorOptions } from './types';
 import { getConfigManager } from './utils/configManager';
 import { getTemplateManager } from './utils/templateManager';
-import { mcpSpecParser } from './parser/mcpSpecParser';
-import { extractMcpSpecification } from './parser/mcpSchemaAdapter';
+import { mcpProtocolParser } from './parser/mcpProtocolParser';
+import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
 import { serviceParser } from './parser/serviceParser';
 import { mapper } from './mcp/mapper';
 import { generator } from './generator/generator';
@@ -64,20 +64,20 @@ async function debugStepByStep() {
     
     // Step 2: Parse MCP Schema
     console.log(chalk.blue('\nStep 2: Parsing MCP Schema...'));
-    const schemaPath = path.resolve(process.cwd(), 'schemas/mcp-spec/schema.ts');
+    const schemaPath = path.resolve(process.cwd(), 'schemas/mcp-spec/protocol.ts');
     
     let mcpSpec;
     try {
       console.log('Attempting to use full MCP parser...');
-      mcpSpec = await mcpSpecParser.parseSpecification();
-      console.log(chalk.green('✓ MCP specification parsed successfully'));
+      mcpSpec = await mcpProtocolParser.parseProtocol();
+      console.log(chalk.green('✓ MCP protocol parsed successfully'));
     } catch (error) {
       console.log(chalk.yellow('Full parser failed, trying adapter instead...'));
-      mcpSpec = await extractMcpSpecification(schemaPath);
-      console.log(chalk.green('✓ MCP specification extracted via adapter'));
+      mcpSpec = await extractMcpProtocol(schemaPath);
+      console.log(chalk.green('✓ MCP protocol extracted via adapter'));
     }
     
-    console.log('MCP Spec version:', mcpSpec.version);
+    console.log('MCP protocol version:', mcpSpec.version);
     console.log('Operations:', mcpSpec.operations.length);
     console.log('Types:', mcpSpec.types.length);
     console.log('Capabilities:', mcpSpec.capabilities.length);

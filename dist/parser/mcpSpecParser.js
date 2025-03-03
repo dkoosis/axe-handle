@@ -1,6 +1,6 @@
 "use strict";
-// Path: src/parser/mcpSpecParser.ts
-// Parses the MCP specification schema and provides a cached representation.
+// Path: src/parser/mcpProtocolParser.ts
+// Parses the MCP protocol schema and provides a cached representation.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -35,21 +35,21 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mcpSpecParser = void 0;
+exports.mcpProtocolParser = void 0;
 const ts = __importStar(require("typescript"));
 const fs = __importStar(require("fs/promises"));
 const path = __importStar(require("path"));
 const types_1 = require("../types");
 /**
- * Path to the MCP specification TypeScript file.
+ * Path to the MCP protocol TypeScript file.
  */
-const MCP_SPEC_PATH = path.resolve(process.cwd(), 'schemas/mcp-spec/schema.ts');
+const MCP_PROTOCOL_PATH = path.resolve(process.cwd(), 'schemas/mcp-spec/protocol.ts');
 /**
- * Path to the cached MCP specification JSON file.
+ * Path to the cached MCP protocol JSON file.
  */
 const MCP_SPEC_CACHE_PATH = path.resolve(process.cwd(), 'schemas/mcp-spec/schema.json');
 /**
- * Creates an AxeError specific to the MCP specification parser.
+ * Creates an AxeError specific to the MCP protocol parser.
  * @param code Numeric error code
  * @param message Error message
  * @param details Additional error details
@@ -65,27 +65,27 @@ function createParserError(code, message, details, cause) {
     };
 }
 /**
- * MCP Specification Parser.
- * Responsible for parsing the MCP specification schema and providing a cached representation.
+ * MCP protocol Parser.
+ * Responsible for parsing the MCP protocol schema and providing a cached representation.
  * Implemented as a singleton to allow caching of the parsed specification across calls.
  */
-class McpSpecParser {
+class mcpProtocolParser {
     constructor() { }
     /**
-     * Gets the singleton instance of the McpSpecParser.
-     * @returns The McpSpecParser instance
+     * Gets the singleton instance of the mcpProtocolParser.
+     * @returns The mcpProtocolParser instance
      */
     static getInstance() {
-        if (!McpSpecParser.instance) {
-            McpSpecParser.instance = new McpSpecParser();
+        if (!mcpProtocolParser.instance) {
+            mcpProtocolParser.instance = new mcpProtocolParser();
         }
-        return McpSpecParser.instance;
+        return mcpProtocolParser.instance;
     }
     /**
-     * Parses the MCP specification schema from the TypeScript file.
+     * Parses the MCP protocol schema from the TypeScript file.
      * Tries to load from cache first, falls back to parsing from source if needed.
      */
-    async parseSpecification() {
+    async parseProtocol() {
         try {
             // Try to load from cache first
             const cachedSpec = await this.loadFromCache();
@@ -95,18 +95,18 @@ class McpSpecParser {
             // Parse from TypeScript source
             const parsedSpec = await this.parseFromSource();
             // Cache the result
-            await this.cacheSpecification(parsedSpec);
+            await this.cacheProtocol(parsedSpec);
             return parsedSpec;
         }
         catch (error) {
             if (error instanceof Error) {
-                throw createParserError(1, 'Failed to parse MCP specification', { path: MCP_SPEC_PATH }, error);
+                throw createParserError(1, 'Failed to parse MCP protocol', { path: MCP_PROTOCOL_PATH }, error);
             }
             throw error;
         }
     }
     /**
-     * Tries to load the MCP specification from the cache file.
+     * Tries to load the MCP protocol from the cache file.
      * @returns The cached specification or null if not available
      */
     async loadFromCache() {
@@ -121,7 +121,7 @@ class McpSpecParser {
             // Check if cache is newer than source
             const [cacheStats, sourceStats] = await Promise.all([
                 fs.stat(MCP_SPEC_CACHE_PATH),
-                fs.stat(MCP_SPEC_PATH)
+                fs.stat(MCP_PROTOCOL_PATH)
             ]);
             if (cacheStats.mtime <= sourceStats.mtime) {
                 return null; // Cache is older than source
@@ -137,10 +137,10 @@ class McpSpecParser {
         }
     }
     /**
-     * Caches the parsed MCP specification to a JSON file.
-     * @param spec The MCP specification to cache
+     * Caches the parsed MCP protocol to a JSON file.
+     * @param spec The MCP protocol to cache
      */
-    async cacheSpecification(spec) {
+    async cacheProtocol(spec) {
         try {
             // Ensure directory exists
             const cacheDir = path.dirname(MCP_SPEC_CACHE_PATH);
@@ -150,18 +150,18 @@ class McpSpecParser {
         }
         catch (error) {
             // Caching failed, but we can still continue without the cache
-            console.warn('Failed to cache MCP specification:', error);
+            console.warn('Failed to cache MCP protocol:', error);
         }
     }
     /**
-     * Parses the MCP specification from the TypeScript source file.
-     * @returns The parsed MCP specification
+     * Parses the MCP protocol from the TypeScript source file.
+     * @returns The parsed MCP protocol
      */
     async parseFromSource() {
         // Read TypeScript source
-        const sourceText = await fs.readFile(MCP_SPEC_PATH, 'utf-8');
+        const sourceText = await fs.readFile(MCP_PROTOCOL_PATH, 'utf-8');
         // Create TypeScript program
-        const fileName = MCP_SPEC_PATH;
+        const fileName = MCP_PROTOCOL_PATH;
         const sourceFile = ts.createSourceFile(fileName, sourceText, ts.ScriptTarget.Latest, true);
         // Initialize specification
         const spec = {
@@ -213,7 +213,7 @@ class McpSpecParser {
             }
         });
         // Validate the parsed specification
-        this.validateSpecification(spec);
+        this.validateProtocol(spec);
         return spec;
     }
     /**
@@ -338,14 +338,14 @@ class McpSpecParser {
         return undefined;
     }
     /**
-     * Validates the parsed MCP specification.
-     * @param spec The MCP specification to validate
+     * Validates the parsed MCP protocol.
+     * @param spec The MCP protocol to validate
      * @throws Error if the specification is invalid
      */
-    validateSpecification(spec) {
+    validateProtocol(spec) {
         // Check for required components
         if (spec.operations.length === 0) {
-            throw createParserError(2, 'MCP specification does not define any operations', { path: MCP_SPEC_PATH });
+            throw createParserError(2, 'MCP protocol does not define any operations', { path: MCP_PROTOCOL_PATH });
         }
         if (spec.types.length === 0) {
             // Instead of throwing an error, add some basic types
@@ -364,17 +364,17 @@ class McpSpecParser {
                 description: 'Boolean type',
                 fields: []
             });
-            console.warn('Warning: No types found in MCP specification, using basic types');
+            console.warn('Warning: No types found in MCP protocol, using basic types');
         }
         // Check for required operations
         if (spec.operations.length === 0) {
-            throw createParserError(4, 'MCP specification does not define any operations', { path: MCP_SPEC_PATH });
+            throw createParserError(4, 'MCP protocol does not define any operations', { path: MCP_PROTOCOL_PATH });
         }
         // Some basic CRUD operations should be available
         const basicOperations = ['Get', 'List', 'Create', 'Update', 'Delete'];
         const foundBasicOps = basicOperations.filter(op => spec.operations.some(specOp => specOp.name.includes(op)));
         if (foundBasicOps.length === 0) {
-            console.warn(`Warning: No basic CRUD operations found in MCP specification`);
+            console.warn(`Warning: No basic CRUD operations found in MCP protocol`);
         }
         // Check for required capabilities
         if (spec.capabilities.length === 0) {
@@ -389,10 +389,10 @@ class McpSpecParser {
                 description: 'Server can provide tools',
                 required: false
             });
-            console.warn('Warning: No capabilities found in MCP specification, using default capabilities');
+            console.warn('Warning: No capabilities found in MCP protocol, using default capabilities');
         }
     }
 }
 // Export the singleton instance
-exports.mcpSpecParser = McpSpecParser.getInstance();
-//# sourceMappingURL=mcpSpecParser.js.map
+exports.mcpProtocolParser = mcpProtocolParser.getInstance();
+//# sourceMappingURL=mcpProtocolParser.js.map

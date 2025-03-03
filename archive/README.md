@@ -4,7 +4,7 @@
 
 ## What is Axe Handle?
 
-Axe Handle generates Model Context Protocol (MCP) servers from your schema definitions. It creates clean, optimized TypeScript code that follows MCP specifications, letting you focus on your application logic instead of protocol details.
+Axe Handle generates Model Context Protocol (MCP) servers from your schema definitions. It creates clean, optimized TypeScript code that follows MCP protocols, letting you focus on your application logic instead of protocol details.
 
 ## Key Features
 

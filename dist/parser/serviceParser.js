@@ -1,6 +1,6 @@
 "use strict";
 // Path: src/parser/serviceParser.ts
-// Parses user-provided Protobuf service definitions and validates them against the MCP specification.
+// Parses user-provided Protobuf service definitions and validates them against the MCP protocol.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -59,7 +59,7 @@ function createParserError(code, message, details, cause) {
 /**
  * Service Parser.
  * Responsible for parsing user-provided Protobuf service definitions
- * and validating them against the MCP specification.
+ * and validating them against the MCP protocol.
  */
 class ServiceParser {
     constructor() { }
@@ -74,9 +74,9 @@ class ServiceParser {
         return ServiceParser.instance;
     }
     /**
-     * Parses a Protobuf service definition and validates it against the MCP specification.
+     * Parses a Protobuf service definition and validates it against the MCP protocol.
      * @param filePath Path to the Protobuf file
-     * @param mcpSpec The MCP specification to validate against
+     * @param mcpSpec The MCP protocol to validate against
      * @returns The parsed user service
      */
     async parseService(filePath, mcpSpec) {
@@ -275,9 +275,9 @@ class ServiceParser {
         return comment.toString().trim();
     }
     /**
-     * Validates the user service against the MCP specification.
+     * Validates the user service against the MCP protocol.
      * @param userService The user service to validate
-     * @param mcpSpec The MCP specification
+     * @param mcpSpec The MCP protocol
      * @param filePath Path to the Protobuf file (for error messages)
      * @throws Error if the service is invalid
      */
@@ -315,10 +315,10 @@ class ServiceParser {
         }
     }
     /**
-     * Validates a field type against the MCP specification.
+     * Validates a field type against the MCP protocol.
      * @param field The field to validate
      * @param userService The user service
-     * @param mcpSpec The MCP specification
+     * @param mcpSpec The MCP protocol
      * @param filePath Path to the Protobuf file (for error messages)
      * @throws Error if the field type is invalid
      */

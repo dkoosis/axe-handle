@@ -11,7 +11,7 @@ const chalk_1 = __importDefault(require("chalk"));
 const index_1 = require("./index");
 const configManager_1 = require("./utils/configManager");
 const templateManager_1 = require("./utils/templateManager");
-const mcpSpecParser_1 = require("./parser/mcpSpecParser");
+const mcpProtocolParser_1 = require("./parser/mcpProtocolParser");
 const mcpSchemaAdapter_1 = require("./parser/mcpSchemaAdapter");
 const serviceParser_1 = require("./parser/serviceParser");
 const mapper_1 = require("./mcp/mapper");
@@ -55,19 +55,19 @@ async function debugStepByStep() {
         console.log(chalk_1.default.green('✓ Managers initialized'));
         // Step 2: Parse MCP Schema
         console.log(chalk_1.default.blue('\nStep 2: Parsing MCP Schema...'));
-        const schemaPath = path_1.default.resolve(process.cwd(), 'schemas/mcp-spec/schema.ts');
+        const schemaPath = path_1.default.resolve(process.cwd(), 'schemas/mcp-spec/protocol.ts');
         let mcpSpec;
         try {
             console.log('Attempting to use full MCP parser...');
-            mcpSpec = await mcpSpecParser_1.mcpSpecParser.parseSpecification();
-            console.log(chalk_1.default.green('✓ MCP specification parsed successfully'));
+            mcpSpec = await mcpProtocolParser_1.mcpProtocolParser.parseProtocol();
+            console.log(chalk_1.default.green('✓ MCP protocol parsed successfully'));
         }
         catch (error) {
             console.log(chalk_1.default.yellow('Full parser failed, trying adapter instead...'));
-            mcpSpec = await (0, mcpSchemaAdapter_1.extractMcpSpecification)(schemaPath);
-            console.log(chalk_1.default.green('✓ MCP specification extracted via adapter'));
+            mcpSpec = await (0, mcpSchemaAdapter_1.extractMcpProtocol)(schemaPath);
+            console.log(chalk_1.default.green('✓ MCP protocol extracted via adapter'));
         }
-        console.log('MCP Spec version:', mcpSpec.version);
+        console.log('MCP protocol version:', mcpSpec.version);
         console.log('Operations:', mcpSpec.operations.length);
         console.log('Types:', mcpSpec.types.length);
         console.log('Capabilities:', mcpSpec.capabilities.length);

@@ -75,7 +75,7 @@ function createMapperError(code, message, details, cause) {
     return createError(types_1.ErrorPrefix.AXE, types_1.AxeErrorCategory.MAPPER, code, message, details, cause);
 }
 /**
- * Creates an MCP specification error.
+ * Creates an MCP protocol error.
  * @param code Numeric error code
  * @param message Error message
  * @param details Additional error details

@@ -6,7 +6,7 @@ exports.McpErrorCategory = exports.AxeErrorCategory = exports.ErrorPrefix = void
 /**
  * Error code prefixes used throughout the application.
  * AXE-*: Internal Axe Handle errors
- * MCP-*: MCP specification or generated server errors
+ * MCP-*: MCP protocol or generated server errors
  */
 var ErrorPrefix;
 (function (ErrorPrefix) {

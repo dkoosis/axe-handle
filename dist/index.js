@@ -38,10 +38,10 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapper = exports.generator = exports.serviceParser = exports.mcpSpecParser = exports.generateMcpServer = void 0;
+exports.mapper = exports.generator = exports.serviceParser = exports.mcpProtocolParser = exports.generateMcpServer = void 0;
 exports.initialize = initialize;
 const path = __importStar(require("path"));
-const mcpSpecParser_1 = require("./parser/mcpSpecParser");
+const mcpProtocolParser_1 = require("./parser/mcpProtocolParser");
 const mcpSchemaAdapter_1 = require("./parser/mcpSchemaAdapter");
 const serviceParser_1 = require("./parser/serviceParser");
 const mapper_1 = require("./mcp/mapper");
@@ -79,17 +79,17 @@ exports.generateMcpServer = (0, errorUtils_1.withErrorHandling)(async (options) 
     // Add any configuration from options
     // For now, we're just setting up the infrastructure
     });
-    // Parse the MCP specification
-    const schemaPath = path.resolve(process.cwd(), 'schemas/mcp-spec/schema.ts');
+    // Parse the MCP protocol
+    const schemaPath = path.resolve(process.cwd(), 'schemas/mcp-spec/protocol.ts');
     let mcpSpec;
     try {
         // Try the full parser first
-        mcpSpec = await mcpSpecParser_1.mcpSpecParser.parseSpecification();
+        mcpSpec = await mcpProtocolParser_1.mcpProtocolParser.parseProtocol();
     }
     catch (error) {
         console.log("Full MCP parser failed, using adapter instead...");
         // Fall back to the simpler adapter
-        mcpSpec = await (0, mcpSchemaAdapter_1.extractMcpSpecification)(schemaPath);
+        mcpSpec = await (0, mcpSchemaAdapter_1.extractMcpProtocol)(schemaPath);
     }
     // Parse the user service
     const userService = await serviceParser_1.serviceParser.parseService(options.inputFile, mcpSpec);
@@ -103,8 +103,8 @@ __exportStar(require("./types"), exports);
 __exportStar(require("./utils/errorUtils"), exports);
 __exportStar(require("./utils/configManager"), exports);
 __exportStar(require("./utils/templateManager"), exports);
-var mcpSpecParser_2 = require("./parser/mcpSpecParser");
-Object.defineProperty(exports, "mcpSpecParser", { enumerable: true, get: function () { return mcpSpecParser_2.mcpSpecParser; } });
+var mcpProtocolParser_2 = require("./parser/mcpProtocolParser");
+Object.defineProperty(exports, "mcpProtocolParser", { enumerable: true, get: function () { return mcpProtocolParser_2.mcpProtocolParser; } });
 var serviceParser_2 = require("./parser/serviceParser");
 Object.defineProperty(exports, "serviceParser", { enumerable: true, get: function () { return serviceParser_2.serviceParser; } });
 var generator_2 = require("./generator/generator");

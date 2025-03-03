@@ -272,7 +272,7 @@ program
             }
 
             // Create a sample schema file.
-            const schemaFilePath = path.join(schemaDir, 'mcp-schema.ts');
+            const schemaFilePath = path.join(schemaDir, 'mcp-protocol.ts');
             if (!fs.existsSync(schemaFilePath)) {
                 // Use a template if available, otherwise create a minimal schema.
                 const templateSchemaPath = path.join(__dirname, '..', 'templates', 'schema-template.ts'); //Adjusted path

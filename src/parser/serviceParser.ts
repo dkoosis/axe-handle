@@ -1,5 +1,5 @@
 // Path: src/parser/serviceParser.ts
-// Parses user-provided Protobuf service definitions and validates them against the MCP specification.
+// Parses user-provided Protobuf service definitions and validates them against the MCP protocol.
 
 import * as protobuf from 'protobufjs';
 import * as fs from 'fs/promises';
@@ -9,7 +9,7 @@ import {
   UserResource, 
   UserType, 
   UserField, 
-  McpSpecification,
+  McpProtocol,
   AxeError,
   ErrorPrefix,
   AxeErrorCategory
@@ -40,7 +40,7 @@ function createParserError(
 /**
  * Service Parser.
  * Responsible for parsing user-provided Protobuf service definitions
- * and validating them against the MCP specification.
+ * and validating them against the MCP protocol.
  */
 class ServiceParser {
   private static instance: ServiceParser;
@@ -59,14 +59,14 @@ class ServiceParser {
   }
   
   /**
-   * Parses a Protobuf service definition and validates it against the MCP specification.
+   * Parses a Protobuf service definition and validates it against the MCP protocol.
    * @param filePath Path to the Protobuf file
-   * @param mcpSpec The MCP specification to validate against
+   * @param mcpSpec The MCP protocol to validate against
    * @returns The parsed user service
    */
   public async parseService(
     filePath: string,
-    mcpSpec: McpSpecification
+    mcpSpec: McpProtocol
   ): Promise<UserService> {
     try {
       // Read the Protobuf file
@@ -308,15 +308,15 @@ class ServiceParser {
   }
   
   /**
-   * Validates the user service against the MCP specification.
+   * Validates the user service against the MCP protocol.
    * @param userService The user service to validate
-   * @param mcpSpec The MCP specification
+   * @param mcpSpec The MCP protocol
    * @param filePath Path to the Protobuf file (for error messages)
    * @throws Error if the service is invalid
    */
   private validateUserService(
     userService: UserService,
-    mcpSpec: McpSpecification,
+    mcpSpec: McpProtocol,
     filePath: string
   ): void {
     // Check for empty service
@@ -374,17 +374,17 @@ class ServiceParser {
   }
   
   /**
-   * Validates a field type against the MCP specification.
+   * Validates a field type against the MCP protocol.
    * @param field The field to validate
    * @param userService The user service
-   * @param mcpSpec The MCP specification
+   * @param mcpSpec The MCP protocol
    * @param filePath Path to the Protobuf file (for error messages)
    * @throws Error if the field type is invalid
    */
   private validateFieldType(
     field: UserField,
     userService: UserService,
-    mcpSpec: McpSpecification,
+    mcpSpec: McpProtocol,
     filePath: string
   ): void {
     // Check for primitive types

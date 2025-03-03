@@ -4,7 +4,7 @@
 /**
  * Error code prefixes used throughout the application.
  * AXE-*: Internal Axe Handle errors
- * MCP-*: MCP specification or generated server errors
+ * MCP-*: MCP protocol or generated server errors
  */
 export enum ErrorPrefix {
   AXE = 'AXE',
@@ -25,7 +25,7 @@ export enum AxeErrorCategory {
  * Error categories for MCP.
  */
 export enum McpErrorCategory {
-  SPECIFICATION = 1, // 1XXX
+  PROTOCOL = 1, // 1XXX (was SPECIFICATION)
   RUNTIME = 4, // 4XXX (aligns with HTTP 4XX status codes)
 }
 
@@ -62,10 +62,10 @@ export interface GeneratorOptions {
 }
 
 /**
- * Represents a parsed MCP specification.
+ * Represents a parsed MCP protocol definition.
  */
-export interface McpSpecification {
-  /** Version of the MCP specification */
+export interface McpProtocol {
+  /** Version of the MCP protocol */
   version: string;
   /** Available operations */
   operations: McpOperation[];
@@ -132,7 +132,7 @@ export interface McpCapability {
 }
 
 /**
- * Represents a parsed user service from a Protobuf schema.
+ * Represents a parsed user service from a Protobuf service definition.
  */
 export interface UserService {
   /** Name of the service */

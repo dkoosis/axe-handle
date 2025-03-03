@@ -1,7 +1,7 @@
 /**
  * Error code prefixes used throughout the application.
  * AXE-*: Internal Axe Handle errors
- * MCP-*: MCP specification or generated server errors
+ * MCP-*: MCP protocol or generated server errors
  */
 export declare enum ErrorPrefix {
     AXE = "AXE",
@@ -54,10 +54,10 @@ export interface GeneratorOptions {
     verbose?: boolean;
 }
 /**
- * Represents a parsed MCP specification.
+ * Represents a parsed MCP protocol.
  */
-export interface McpSpecification {
-    /** Version of the MCP specification */
+export interface McpProtocol {
+    /** Version of the MCP protocol */
     version: string;
     /** Available operations */
     operations: McpOperation[];

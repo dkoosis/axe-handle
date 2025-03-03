@@ -6,7 +6,7 @@ drwxr-xr-x@   3 davidkoosis  staff      96 Mar  1 20:27 templates/
 -rwxr-xr-x@   1 davidkoosis  staff    3911 Mar  1 18:08 template-engine.js*
 -rwxr-xr-x@   1 davidkoosis  staff    1055 Mar  1 20:19 setup-templates.js*
 -rw-r--r--@   1 davidkoosis  staff       0 Mar  1 21:05 server-generator.js
--rw-r--r--@   1 davidkoosis  staff   31279 Mar  1 14:44 schema.ts
+-rw-r--r--@   1 davidkoosis  staff   31279 Mar  1 14:44 protocol.ts
 -rw-r--r--@   1 davidkoosis  staff   10778 Mar  1 21:08 schema-parser.js
 -rw-r--r--@   1 davidkoosis  staff    4845 Mar  1 18:11 request-handler-template.ts
 -rw-r--r--@   1 davidkoosis  staff    3493 Mar  1 18:13 project-readme.md

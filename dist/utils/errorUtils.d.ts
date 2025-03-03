@@ -47,7 +47,7 @@ export declare function createGeneratorError(code: number, message: string, deta
  */
 export declare function createMapperError(code: number, message: string, details?: Record<string, unknown>, cause?: Error | AxeError): AxeError;
 /**
- * Creates an MCP specification error.
+ * Creates an MCP protocol error.
  * @param code Numeric error code
  * @param message Error message
  * @param details Additional error details

@@ -194,7 +194,7 @@ class MCPServerGenerator {
     if (!fs.existsSync(schemaDir)) { // Rule 26: Check to prevent errors.
         fs.mkdirSync(schemaDir, { recursive: true });  // Ensure directory exists
     }
-    fs.copyFileSync(this.schemaPath, path.join(schemaDir, 'mcp-schema.ts'));
+    fs.copyFileSync(this.schemaPath, path.join(schemaDir, 'mcp-protocol.ts'));
   }
 
   /**

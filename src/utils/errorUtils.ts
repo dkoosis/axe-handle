@@ -126,7 +126,7 @@ export function createMapperError(
 }
 
 /**
- * Creates an MCP specification error.
+ * Creates an MCP protocol error.
  * @param code Numeric error code
  * @param message Error message
  * @param details Additional error details

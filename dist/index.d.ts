@@ -15,7 +15,7 @@ export * from './types';
 export * from './utils/errorUtils';
 export * from './utils/configManager';
 export * from './utils/templateManager';
-export { mcpSpecParser } from './parser/mcpSpecParser';
+export { mcpProtocolParser } from './parser/mcpProtocolParser';
 export { serviceParser } from './parser/serviceParser';
 export { generator } from './generator/generator';
 export { mapper } from './mcp/mapper';

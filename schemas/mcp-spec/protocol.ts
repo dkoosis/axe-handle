@@ -1,3 +1,16 @@
+/**
+ * Path: schemas/mcp-spec/protocol.ts
+ * MCP Protocol Definition
+ * 
+ * This file contains the official Model Context Protocol (MCP) type definitions
+ * managed by the MCP standards committee. It defines the core interfaces, types,
+ * and constants that all MCP implementations must adhere to.
+ * 
+ * The protocol definition is a standardized specification that changes
+ * infrequently and only through formal processes.
+ * 
+ * Reference: https://spec.modelcontextprotocol.io/specification/
+ */
 /* JSON-RPC types */
 export type JSONRPCMessage =
   | JSONRPCRequest

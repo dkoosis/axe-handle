@@ -1,16 +1,16 @@
 // Path: src/parser/mcpSchemaAdapter.ts
-// Creates a simplified MCP specification from schema.ts
+// Creates a simplified MCP protocol from protocol.ts
 
 import * as fs from 'fs/promises';
 import * as ts from 'typescript';
-import { McpSpecification } from '../types';
+import { McpProtocol } from '../types';
 import { createParserError } from '../utils/errorUtils';
 
 /**
- * Extracts a simplified MCP specification from the schema.ts file.
+ * Extracts a simplified MCP protocol from the protocol.ts file.
  * This adapter is more flexible than the full parser and works with different schema structures.
  */
-export async function extractMcpSpecification(schemaPath: string): Promise<McpSpecification> {
+export async function extractMcpProtocol(schemaPath: string): Promise<McpProtocol> {
   try {
     // Read the schema file
     const schemaContent = await fs.readFile(schemaPath, 'utf-8');
@@ -24,7 +24,7 @@ export async function extractMcpSpecification(schemaPath: string): Promise<McpSp
     );
     
     // Initialize the specification
-    const spec: McpSpecification = {
+    const spec: McpProtocol = {
       version: '1.0.0', // Default version
       operations: [],
       types: [],
@@ -90,7 +90,7 @@ export async function extractMcpSpecification(schemaPath: string): Promise<McpSp
     
     throw createParserError(
       1001,
-      'Failed to extract MCP specification',
+      'Failed to extract MCP protocol',
       { schemaPath },
       error instanceof Error ? error : undefined
     );

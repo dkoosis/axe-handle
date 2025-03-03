@@ -1,8 +1,8 @@
-import { UserService, McpSpecification } from '../types';
+import { UserService, McpProtocol } from '../types';
 /**
  * Service Parser.
  * Responsible for parsing user-provided Protobuf service definitions
- * and validating them against the MCP specification.
+ * and validating them against the MCP protocol.
  */
 declare class ServiceParser {
     private static instance;
@@ -13,12 +13,12 @@ declare class ServiceParser {
      */
     static getInstance(): ServiceParser;
     /**
-     * Parses a Protobuf service definition and validates it against the MCP specification.
+     * Parses a Protobuf service definition and validates it against the MCP protocol.
      * @param filePath Path to the Protobuf file
-     * @param mcpSpec The MCP specification to validate against
+     * @param mcpSpec The MCP protocol to validate against
      * @returns The parsed user service
      */
-    parseService(filePath: string, mcpSpec: McpSpecification): Promise<UserService>;
+    parseService(filePath: string, mcpSpec: McpProtocol): Promise<UserService>;
     /**
      * Extracts the service name from the file path.
      * @param filePath Path to the Protobuf file
@@ -76,18 +76,18 @@ declare class ServiceParser {
      */
     private extractCommentFromOptions;
     /**
-     * Validates the user service against the MCP specification.
+     * Validates the user service against the MCP protocol.
      * @param userService The user service to validate
-     * @param mcpSpec The MCP specification
+     * @param mcpSpec The MCP protocol
      * @param filePath Path to the Protobuf file (for error messages)
      * @throws Error if the service is invalid
      */
     private validateUserService;
     /**
-     * Validates a field type against the MCP specification.
+     * Validates a field type against the MCP protocol.
      * @param field The field to validate
      * @param userService The user service
-     * @param mcpSpec The MCP specification
+     * @param mcpSpec The MCP protocol
      * @param filePath Path to the Protobuf file (for error messages)
      * @throws Error if the field type is invalid
      */

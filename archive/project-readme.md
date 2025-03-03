@@ -31,10 +31,10 @@ npm install axe-handle
 axe-handle init --name my-mcp-server
 
 # Generate code from schema
-axe-handle generate src/schema/mcp-schema.ts
+axe-handle generate src/schema/mcp-protocol.ts
 
 # Analyze a schema
-axe-handle analyze src/schema/mcp-schema.ts --output schema-docs.md
+axe-handle analyze src/schema/mcp-protocol.ts --output schema-docs.md
 ```
 
 ## Usage
@@ -91,7 +91,7 @@ const axeHandle = require('axe-handle');
 
 // Generate server from schema
 axeHandle.generate({
-  schemaPath: './schema.ts',
+  schemaPath: './protocol.ts',
   outputDir: './server',
   framework: 'express',
   config: {
@@ -103,7 +103,7 @@ axeHandle.generate({
 .catch(err => console.error('Error:', err));
 
 // Parse schema
-const schema = axeHandle.schema.parse('./schema.ts');
+const schema = axeHandle.schema.parse('./protocol.ts');
 console.log(`Found ${schema.summary.interfaceCount} interfaces`);
 ```
 

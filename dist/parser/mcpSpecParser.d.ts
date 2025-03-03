@@ -1,35 +1,35 @@
-import { McpSpecification } from '../types';
+import { McpProtocol } from '../types';
 /**
- * MCP Specification Parser.
- * Responsible for parsing the MCP specification schema and providing a cached representation.
+ * MCP protocol Parser.
+ * Responsible for parsing the MCP protocol schema and providing a cached representation.
  * Implemented as a singleton to allow caching of the parsed specification across calls.
  */
-declare class McpSpecParser {
+declare class mcpProtocolParser {
     private static instance;
     private constructor();
     /**
-     * Gets the singleton instance of the McpSpecParser.
-     * @returns The McpSpecParser instance
+     * Gets the singleton instance of the mcpProtocolParser.
+     * @returns The mcpProtocolParser instance
      */
-    static getInstance(): McpSpecParser;
+    static getInstance(): mcpProtocolParser;
     /**
-     * Parses the MCP specification schema from the TypeScript file.
+     * Parses the MCP protocol schema from the TypeScript file.
      * Tries to load from cache first, falls back to parsing from source if needed.
      */
-    parseSpecification(): Promise<McpSpecification>;
+    parseProtocol(): Promise<McpProtocol>;
     /**
-     * Tries to load the MCP specification from the cache file.
+     * Tries to load the MCP protocol from the cache file.
      * @returns The cached specification or null if not available
      */
     private loadFromCache;
     /**
-     * Caches the parsed MCP specification to a JSON file.
-     * @param spec The MCP specification to cache
+     * Caches the parsed MCP protocol to a JSON file.
+     * @param spec The MCP protocol to cache
      */
-    private cacheSpecification;
+    private cacheProtocol;
     /**
-     * Parses the MCP specification from the TypeScript source file.
-     * @returns The parsed MCP specification
+     * Parses the MCP protocol from the TypeScript source file.
+     * @returns The parsed MCP protocol
      */
     private parseFromSource;
     /**
@@ -63,11 +63,11 @@ declare class McpSpecParser {
      */
     private getJSDocComment;
     /**
-     * Validates the parsed MCP specification.
-     * @param spec The MCP specification to validate
+     * Validates the parsed MCP protocol.
+     * @param spec The MCP protocol to validate
      * @throws Error if the specification is invalid
      */
-    private validateSpecification;
+    private validateProtocol;
 }
-export declare const mcpSpecParser: McpSpecParser;
+export declare const mcpProtocolParser: mcpProtocolParser;
 export {};

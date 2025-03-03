@@ -4,12 +4,12 @@ A robust, maintainable, and extensible TypeScript-based code generator for Model
 
 ## Overview
 
-Axe Handle generates Express.js servers from user-provided Protobuf schemas that define the service. The generated code follows MCP specifications and provides a complete, production-ready server implementation.
+Axe Handle generates Express.js servers from user-provided Protobuf schemas that define the service. The generated code follows MCP protocols and provides a complete, production-ready server implementation.
 
 ## Features
 
 - **Schema-Driven Development**: Define your service using Protobuf schemas
-- **MCP Compliance**: Adherence to the official MCP specification
+- **MCP Compliance**: Adherence to the official MCP protocol
 - **TypeScript Optimization**: Generated code follows best practices for TypeScript
 - **Robust Error Handling**: Clear, informative, and actionable error messages
 - **Developer-Friendly Workflow**: Easy to build, run, test, and iterate
@@ -67,7 +67,7 @@ pnpm test
 axe-handle/
 ├── src/
 │   ├── parser/
-│   │   ├── mcpSpecParser.ts  # Parses schema.ts (TS Compiler API, caching)
+│   │   ├── mcpProtocolParser.ts  # Parses protocol.ts (TS Compiler API, caching)
 │   │   ├── serviceParser.ts  # Parses .proto (protobufjs, detailed validation)
 │   │   └── openapiParser.ts  # Parses OpenAPI (conversion, with warnings)
 │   ├── generator/
@@ -85,9 +85,9 @@ axe-handle/
 │   └── api.ejs
 ├── test/                  # Unit and integration tests
 ├── schemas/
-│   ├── mcp-spec/         # MCP specification
-│   │   ├── schema.ts
-│   │   └── schema.json    # CACHED parsed MCP spec
+│   ├── mcp-spec/         # MCP protocol
+│   │   ├── protocol.ts
+│   │   └── schema.json    # CACHED parsed MCP protocol
 │   └── examples/
 │       └── calendar.proto
 └── generated/             # Output (gitignore this)
@@ -110,8 +110,8 @@ Axe Handle uses a hierarchical error classification system:
   - `AXE-2XXX`: CLI errors
   - `AXE-3XXX`: Generator errors
   - `AXE-4XXX`: Mapper errors
-- `MCP-`: Errors related to the MCP specification or generated server
-  - `MCP-1XXX`: MCP specification violations
+- `MCP-`: Errors related to the MCP protocol or generated server
+  - `MCP-1XXX`: MCP protocol violations
   - `MCP-4XXX`: Runtime errors (e.g., 4004 - Not Found)
 
 ## Contributing

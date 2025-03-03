@@ -1044,7 +1044,7 @@ test-output.js
 ../
 axe-handle-100x100.svg
 axe-handle.svg
-schema.ts
+protocol.ts
 
 ./debug-generated:
 ./
@@ -1095,9 +1095,9 @@ mapper.js.map
 mcpSchemaAdapter.d.ts
 mcpSchemaAdapter.js
 mcpSchemaAdapter.js.map
-mcpSpecParser.d.ts
-mcpSpecParser.js
-mcpSpecParser.js.map
+mcpProtocolParser.d.ts
+mcpProtocolParser.js
+mcpProtocolParser.js.map
 serviceParser.d.ts
 serviceParser.js
 serviceParser.js.map
@@ -37886,7 +37886,7 @@ calendar.proto
 ./
 ../
 schema.json
-schema.ts
+protocol.ts
 
 ./src:
 ./
@@ -37925,7 +37925,7 @@ mapper.ts
 ./
 ../
 mcpSchemaAdapter.ts
-mcpSpecParser.ts
+mcpProtocolParser.ts
 serviceParser.ts
 
 ./src/types:
