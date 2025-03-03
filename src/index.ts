@@ -107,7 +107,7 @@ export const generateMcpServer = createAsyncErrorBoundary(
     // Map the user service to MCP concepts
     logger.section('Mapping Service to MCP');
     const mappedService = mapper.mapServiceToMcp(userService);
-    logger.success(`Service mapped successfully to MCP concepts`, LogCategory.MAPPER);
+    logger.success(`Service mapped successfully to MCP concepts`, LogCategory.GENERAL);
     
     // Generate the server code
     await mcpServerGenerator.generateServer(mappedService, options);
