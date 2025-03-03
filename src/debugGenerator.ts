@@ -5,7 +5,7 @@ import { mapper } from './mcp/mapper';
 import { serviceParser } from './parser/serviceParser';
 import { mcpProtocolParser } from './parser/mcpProtocolParser';
 import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
-import { generator } from './generator/generator';
+import { generator } from './generator/mcpServerGenerator';
 import { GeneratorOptions } from './types';
 
 // Configure the paths

@@ -12,7 +12,7 @@ import { mcpProtocolParser } from './parser/mcpProtocolParser';
 import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
 import { serviceParser } from './parser/serviceParser';
 import { mapper } from './mcp/mapper';
-import { generator } from './generator/generator';
+import { generator } from './generator/mcpServerGenerator';
 
 // Hardcoded paths for easier debugging
 const schemaFile = path.resolve(__dirname, '../schemas/examples/calendar.proto');
