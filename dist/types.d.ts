@@ -20,7 +20,7 @@ export declare enum AxeErrorCategory {
  * Error categories for MCP.
  */
 export declare enum McpErrorCategory {
-    SPECIFICATION = 1,// 1XXX
+    PROTOCOL = 1,// 1XXX (was SPECIFICATION)
     RUNTIME = 4
 }
 /**
@@ -54,7 +54,7 @@ export interface GeneratorOptions {
     verbose?: boolean;
 }
 /**
- * Represents a parsed MCP protocol.
+ * Represents a parsed MCP protocol definition.
  */
 export interface McpProtocol {
     /** Version of the MCP protocol */
@@ -119,7 +119,7 @@ export interface McpCapability {
     required: boolean;
 }
 /**
- * Represents a parsed user service from a Protobuf schema.
+ * Represents a parsed user service from a Protobuf service definition.
  */
 export interface UserService {
     /** Name of the service */

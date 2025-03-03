@@ -1,0 +1,58 @@
+# Node Modules
+node_modules/
+
+# Build/Distribution Output
+dist/
+build/
+generated/
+
+# IDE/Editor specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+._*
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependency directories (optional, if you use other package managers)
+# bower_components/
+# jspm_packages/
+
+# Test/Debug Output
+debug-output/
+debug-generated/
+archive/test-output/
+coverage/
+
+# Environment files (IMPORTANT!)
+.env
+.env.*
+!.env.example  # Keep .env.example if you have one (good practice)
+
+# Potentially generated files from your project
+archive/express-templates.ts
+archive/extract-request-handler.js
+archive/extract-templates.js
+archive/mcp-schema-markdown-generator.ts
+archive/mcp-schema-parser.ts
+archive/request-handler-template.ts
+archive/server-generator.js
+archive/setup-templates.js
+archive/template-engine.js
+archive/test-output/test-output.js
+archive/update-package-json.js
+archive/utils.js
+archive/templates-test
+*.map
+*.d.ts
+*.d.ts.map

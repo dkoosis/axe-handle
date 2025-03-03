@@ -20,7 +20,11 @@ const generator_1 = require("./generator/generator");
 const schemaFile = path_1.default.resolve(__dirname, '../schemas/examples/calendar.proto');
 const outputDir = path_1.default.resolve(__dirname, '../debug-output');
 const templatesDir = path_1.default.resolve(__dirname, '../templates');
-// Make sure template and output directories exist
+/**
+ * Ensures that the templates and output directories exist.
+ * Creates the output directory if it doesn't exist.
+ * @throws {Error} If the templates directory is not found or the output directory cannot be created.
+ */
 async function ensureDirectories() {
     try {
         // Check if templates directory exists
@@ -44,7 +48,10 @@ async function ensureDirectories() {
         throw err;
     }
 }
-// Step by step debug to isolate the issue
+/**
+ * Performs a step-by-step debug process to isolate and identify issues in the code generation.
+ * @throws {Error} If any of the debug steps encounter an error.
+ */
 async function debugStepByStep() {
     console.log(chalk_1.default.yellow('\n--- Step-by-Step Debugging ---'));
     try {
@@ -96,7 +103,6 @@ async function debugStepByStep() {
         console.log('Mapped types:', mappedService.types.length);
         // Step 5: Validate Templates
         console.log(chalk_1.default.blue('\nStep 5: Validating Templates...'));
-        const templateManager = (0, templateManager_1.getTemplateManager)();
         // Check essential templates
         const essentialTemplates = [
             { framework: 'express', category: 'server', name: 'server' },
@@ -136,14 +142,14 @@ async function debugStepByStep() {
             console.error(`Name: ${error.name}`);
             console.error(`Message: ${error.message}`);
             console.error(`Stack: ${error.stack}`);
-            // Output additional properties for AxeError
-            if ('code' in error) {
+            // Output additional properties for error
+            if (error && typeof error === 'object' && 'code' in error) {
                 console.error(`Code: ${error.code}`);
             }
-            if ('details' in error) {
+            if (error && typeof error === 'object' && 'details' in error) {
                 console.error(`Details: ${JSON.stringify(error.details, null, 2)}`);
             }
-            if ('cause' in error && error.cause) {
+            if (error && typeof error === 'object' && 'cause' in error && error.cause) {
                 console.error(`Cause: ${JSON.stringify(error.cause, null, 2)}`);
             }
         }
@@ -186,14 +192,14 @@ async function runDebug() {
             console.error(`Name: ${error.name}`);
             console.error(`Message: ${error.message}`);
             console.error(`Stack: ${error.stack}`);
-            // Output additional properties for AxeError
-            if ('code' in error) {
+            // Output additional properties for error
+            if (error && typeof error === 'object' && 'code' in error) {
                 console.error(`Code: ${error.code}`);
             }
-            if ('details' in error) {
+            if (error && typeof error === 'object' && 'details' in error) {
                 console.error(`Details: ${JSON.stringify(error.details, null, 2)}`);
             }
-            if ('cause' in error && error.cause) {
+            if (error && typeof error === 'object' && 'cause' in error && error.cause) {
                 console.error(`Cause: ${JSON.stringify(error.cause, null, 2)}`);
             }
         }

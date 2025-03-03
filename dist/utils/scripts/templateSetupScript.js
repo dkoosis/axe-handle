@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 "use strict";
-// Path: scripts/setup-templates.ts
+// Path: src/utils/scripts/templateSetupScript.ts
 // Script to properly set up the template directory structure
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -43,9 +43,8 @@ const fs = __importStar(require("fs/promises"));
 const path = __importStar(require("path"));
 const chalk_1 = __importDefault(require("chalk"));
 // Paths
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '../../..');
 const templatesDir = path.join(projectRoot, 'templates');
-const expressTemplatesDir = path.join(templatesDir, 'express');
 // Required template categories and files
 const requiredStructure = {
     'express': {
@@ -226,6 +225,7 @@ async function createStructure(baseDir, structure) {
             // Create each file
             for (const file of value) {
                 const filePath = path.join(currentPath, file);
+                // Look up template content if available, otherwise use empty string
                 const exampleContent = templateExamples[file] || '';
                 await ensureTemplateFile(filePath, exampleContent);
             }

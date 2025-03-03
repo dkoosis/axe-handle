@@ -28,7 +28,7 @@ var AxeErrorCategory;
  */
 var McpErrorCategory;
 (function (McpErrorCategory) {
-    McpErrorCategory[McpErrorCategory["SPECIFICATION"] = 1] = "SPECIFICATION";
+    McpErrorCategory[McpErrorCategory["PROTOCOL"] = 1] = "PROTOCOL";
     McpErrorCategory[McpErrorCategory["RUNTIME"] = 4] = "RUNTIME";
 })(McpErrorCategory || (exports.McpErrorCategory = McpErrorCategory = {}));
 //# sourceMappingURL=types.js.map

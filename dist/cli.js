@@ -16,8 +16,12 @@ const types_1 = require("./types");
 const program = new commander_1.Command();
 /**
  * Formats an error message for CLI display.
- * @param error The error to format
- * @returns Formatted error message
+ * @param error The error to format.  Can be a standard Error or an AxeError.
+ * @returns Formatted error message string.
+ * @description Checks if the error has a 'code' property to determine if it's an AxeError.
+ *  If so, formats the message with the code, message, details, and cause (recursively).
+ *  If not, formats it as a generic error.  This distinction is important because
+ *  AxeErrors have a structured format for reporting to the user.
  */
 function formatError(error) {
     if ('code' in error) {
@@ -40,12 +44,14 @@ function formatError(error) {
 }
 /**
  * Creates an Axe Handle error.
- * @param category Error category
- * @param code Numeric error code
- * @param message Error message
- * @param details Additional error details
- * @param cause Underlying error cause
- * @returns AxeError object
+ * @param category - The category of the error (e.g., CLI, GENERATOR).
+ * @param code - A numeric code specific to the error within the category.
+ * @param message - A human-readable error message.
+ * @param details - (Optional) An object containing additional details about the error.
+ * @param cause - (Optional) The underlying error that caused this error, if any.
+ * @returns An AxeError object.
+ * @description This function standardizes the creation of AxeError objects, ensuring
+ *  consistent error code formatting and structure.
  */
 function createAxeError(category, code, message, details, cause) {
     return {
@@ -55,6 +61,35 @@ function createAxeError(category, code, message, details, cause) {
         cause,
     };
 }
+// --- Custom Error Types ---
+class InputFileNotFoundError extends Error {
+    constructor(message, filePath, cause) {
+        super(message);
+        this.code = `${types_1.ErrorPrefix.AXE}-${types_1.AxeErrorCategory.CLI}001`;
+        this.details = { path: filePath };
+        this.cause = cause;
+        this.name = 'InputFileNotFoundError'; // Important for instanceof checks
+    }
+}
+class OutputDirectoryCreationError extends Error {
+    constructor(message, dirPath, cause) {
+        super(message);
+        this.code = `${types_1.ErrorPrefix.AXE}-${types_1.AxeErrorCategory.CLI}002`;
+        this.details = { path: dirPath };
+        this.cause = cause;
+        this.name = 'OutputDirectoryCreationError';
+    }
+}
+class ConfigFileNotFoundError extends Error {
+    constructor(message, filePath, cause) {
+        super(message);
+        this.code = `${types_1.ErrorPrefix.AXE}-${types_1.AxeErrorCategory.CLI}003`;
+        this.details = { path: filePath };
+        this.cause = cause;
+        this.name = 'ConfigFileNotFoundError';
+    }
+}
+// --- End Custom Error Types ---
 program
     .name('axe-handle')
     .description('Generate an MCP server from a Protobuf schema')
@@ -74,7 +109,7 @@ program
             await promises_1.default.access(inputFile);
         }
         catch (error) {
-            throw createAxeError(types_1.AxeErrorCategory.CLI, 1, `Input file not found: ${schemaFile}`, { path: inputFile }, error instanceof Error ? error : undefined);
+            throw new InputFileNotFoundError(`Input file not found: ${schemaFile}`, inputFile, error instanceof Error ? error : undefined);
         }
         // Validate output directory
         const outDir = path_1.default.resolve(process.cwd(), outputDir);
@@ -82,7 +117,7 @@ program
             await promises_1.default.mkdir(outDir, { recursive: true });
         }
         catch (error) {
-            throw createAxeError(types_1.AxeErrorCategory.CLI, 2, `Failed to create output directory: ${outputDir}`, { path: outDir }, error instanceof Error ? error : undefined);
+            throw new OutputDirectoryCreationError(`Failed to create output directory: ${outputDir}`, outDir, error instanceof Error ? error : undefined);
         }
         // Validate config file if provided
         let configFile = undefined;
@@ -92,7 +127,7 @@ program
                 await promises_1.default.access(configFile);
             }
             catch (error) {
-                throw createAxeError(types_1.AxeErrorCategory.CLI, 3, `Configuration file not found: ${cmdOptions.config}`, { path: configFile }, error instanceof Error ? error : undefined);
+                throw new ConfigFileNotFoundError(`Configuration file not found: ${cmdOptions.config}`, configFile, error instanceof Error ? error : undefined);
             }
         }
         // Create generator options
@@ -120,8 +155,11 @@ program
         console.log(chalk_1.default.green(`Output directory: ${outDir}`));
     }
     catch (error) {
-        // Improved error handling
-        if (error instanceof Error) {
+        // Improved error handling using instanceof
+        if (error instanceof InputFileNotFoundError || error instanceof OutputDirectoryCreationError || error instanceof ConfigFileNotFoundError) {
+            console.error(formatError(error));
+        }
+        else if (error instanceof Error) {
             console.error(formatError(error));
         }
         else {
