@@ -7,7 +7,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import chalk from 'chalk';
 import { generateMcpServer } from './index';
-import { AxeError, ErrorPrefix, AxeErrorCategory, GeneratorOptions } from './types';
+import { AxeError, GeneratorOptions } from './types';
 import { logger } from './utils/logger';
 
 // Create CLI program
