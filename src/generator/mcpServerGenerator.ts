@@ -1,7 +1,6 @@
 // Path: src/generator/mcpServerGenerator.ts
 // Core code generation functionality for the Axe Handle tool.
 
-import * as fs from 'fs/promises';
 import * as path from 'path';
 import { MappedService, GeneratorOptions } from '../types';
 import { logger, LogCategory } from '../utils/logger';

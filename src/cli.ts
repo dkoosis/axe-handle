@@ -57,7 +57,7 @@ program
     try {
       // Configure logger based on CLI options
       logger.updateConfig({
-        verbose: cmdOptions.verbose,
+        level: cmdOptions.verbose ? LogLevel.DEBUG : LogLevel.INFO,
         colors: cmdOptions.color !== false
       });
       
@@ -120,7 +120,7 @@ program
       
       logger.section('Generation Complete');
       logger.success(`MCP server generated successfully!`);
-      logger.summary(`Output directory: ${outDir}`);
+      logger.info(`Output directory: ${outDir}`);
       
       if (options.generateDocs) {
         const docsPath = path.join(outDir, 'docs', 'api.md');

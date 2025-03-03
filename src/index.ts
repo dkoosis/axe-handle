@@ -8,7 +8,6 @@ import { mapper } from './mcp/mapper';
 import { mcpServerGenerator } from './generator/mcpServerGenerator';
 import { getConfigManager } from './utils/configManager';
 import { getTemplateSystem } from './utils/templateSystem';
-import { createCliError } from './utils/errorUtils';
 import { createAsyncErrorBoundary } from './utils/errorBoundary';
 import { logger, LogCategory, LogLevel } from './utils/logger';
 import { performance } from './utils/performanceUtils';

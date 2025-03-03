@@ -70,7 +70,7 @@ async function debugGeneration() {
     };
     
     try {
-      await generator.generateServer(mappedService, options);
+      await mcpServerGenerator.generateServer(mappedService, options);
       console.log('✓ Server code generated successfully!');
     } catch (error) {
       console.error('Generator Error Details:');

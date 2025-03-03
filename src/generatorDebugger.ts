@@ -143,7 +143,7 @@ async function debugStepByStep() {
     
     // Instead of using the full generateMcpServer which has wrapped error handling,
     // call the generator directly to see the actual error
-    await generator.generateServer(mappedService, options);
+    await mcpServerGenerator.generateServer(mappedService, options);
     console.log(chalk.green('✓ Server code generated successfully!'));
     
   } catch (error) {
