@@ -176,9 +176,9 @@ class ServiceParser {
     while (currentIndex < namespaces.length) {
       const namespace = namespaces[currentIndex++];
       
-      // Add nested namespaces to the queue
+      // Add nested namespaces to the queue, BUT EXCLUDE message types
       Object.values(namespace.nested || {}).forEach(nestedObject => {
-        if (nestedObject instanceof protobuf.Namespace) {
+        if (nestedObject instanceof protobuf.Namespace && !(nestedObject instanceof protobuf.Type)) {
           namespaces.push(nestedObject);
         }
       });
