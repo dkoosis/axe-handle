@@ -5,7 +5,7 @@ import { mapper } from './mcp/mapper';
 import { serviceParser } from './parser/serviceParser';
 import { mcpProtocolParser } from './parser/mcpProtocolParser';
 import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
-import { generator } from './generator/mcpServerGenerator';
+import { mcpServerGenerator } from './generator/mcpServerGenerator';
 import { GeneratorOptions } from './types';
 
 // Configure the paths
@@ -49,9 +49,9 @@ async function debugGeneration() {
     
     // Step 4: Debug Generator Internal Structure
     console.log('\nStep 4: Examining Generator Object...');
-    console.log('Generator implementation:', generator);
-    console.log('Generator methods:', Object.getOwnPropertyNames(generator));
-    console.log('Generate Server implementation:', generator.generateServer);
+    console.log('Generator implementation:', mcpServerGenerator);
+    console.log('Generator methods:', Object.getOwnPropertyNames(mcpServerGenerator));
+    console.log('Generate Server implementation:', mcpServerGenerator.generateServer);
     
     // Step 5: Create output directory
     if (!fs.existsSync(outputDir)) {

@@ -1,7 +1,9 @@
 // src/utils/templateSystem.ts
-import * as fs from 'fs/promises';
+import * as fs from 'fs';
+import * as fsPromises from 'fs/promises';
 import * as path from 'path';
-import * as eta from 'eta';
+// Import eta with require to avoid type issues
+const eta = require('eta');
 import { createGeneratorError } from './errorUtils';
 import { logger } from './logger';
 
@@ -92,12 +94,12 @@ export class TemplateSystem {
       logger.debug('Initializing template system...');
       
       // Check if base directory exists
-      await fs.access(this.baseDir);
+      await fsPromises.access(this.baseDir);
       
       // If using a framework, check if that directory exists
       if (this.framework) {
         const frameworkDir = path.join(this.baseDir, this.framework);
-        await fs.access(frameworkDir);
+        await fsPromises.access(frameworkDir);
       }
       
       this.initialized = true;
@@ -140,7 +142,7 @@ export class TemplateSystem {
       const templatePath = this.resolveTemplatePath(templateName);
       
       // Check if template exists
-      await fs.access(templatePath);
+      await fsPromises.access(templatePath);
       
       // Load the template content
       let templateContent: string;
@@ -148,7 +150,7 @@ export class TemplateSystem {
       if (this.cache && this.templateCache.has(templatePath)) {
         templateContent = this.templateCache.get(templatePath)!;
       } else {
-        templateContent = await fs.readFile(templatePath, 'utf-8');
+        templateContent = await fsPromises.readFile(templatePath, 'utf-8');
         if (this.cache) {
           this.templateCache.set(templatePath, templateContent);
         }
@@ -179,10 +181,10 @@ export class TemplateSystem {
       
       // Ensure directory exists
       const dir = path.dirname(outputPath);
-      await fs.mkdir(dir, { recursive: true });
+      await fsPromises.mkdir(dir, { recursive: true });
       
       // Write the file
-      await fs.writeFile(outputPath, content, 'utf-8');
+      await fsPromises.writeFile(outputPath, content, 'utf-8');
       
       logger.debug(`Rendered template ${templateName} to ${outputPath}`);
     } catch (error) {
@@ -218,7 +220,7 @@ export class TemplateSystem {
   public async listTemplates(directory: string = ''): Promise<string[]> {
     try {
       const dir = path.join(this.baseDir, directory);
-      const files = await fs.readdir(dir);
+      const files = await fsPromises.readdir(dir);
       return files.filter(file => file.endsWith('.eta') || file.endsWith('.ejs'));
     } catch (error) {
       return [];

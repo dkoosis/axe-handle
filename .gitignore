@@ -40,19 +40,6 @@ coverage/
 !.env.example  # Keep .env.example if you have one (good practice)
 
 # Potentially generated files from your project
-archive/express-templates.ts
-archive/extract-request-handler.js
-archive/extract-templates.js
-archive/mcp-schema-markdown-generator.ts
-archive/mcp-schema-parser.ts
-archive/request-handler-template.ts
-archive/server-generator.js
-archive/setup-templates.js
-archive/template-engine.js
-archive/test-output/test-output.js
-archive/update-package-json.js
-archive/utils.js
-archive/templates-test
 *.map
 *.d.ts
 *.d.ts.map

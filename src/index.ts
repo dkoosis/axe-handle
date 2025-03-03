@@ -5,7 +5,7 @@ import { mcpProtocolParser } from './parser/mcpProtocolParser';
 import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
 import { serviceParser } from './parser/serviceParser';
 import { mapper } from './mcp/mapper';
-import { generator } from './generator/generator';
+import { mcpServerGenerator } from './generator/mcpServerGenerator';
 import { getConfigManager } from './utils/configManager';
 import { getTemplateSystem } from './utils/templateSystem';
 import { createCliError } from './utils/errorUtils';
@@ -111,7 +111,7 @@ export const generateMcpServer = createAsyncErrorBoundary(
     logger.success(`Service mapped successfully to MCP concepts`, LogCategory.MAPPER);
     
     // Generate the server code
-    await generator.generateServer(mappedService, options);
+    await mcpServerGenerator.generateServer(mappedService, options);
     
     // End tracking
     performance.end('total-generation');
@@ -142,5 +142,5 @@ export * from './utils/validationUtils';
 export * from './utils/errorBoundary';
 export { mcpProtocolParser } from './parser/mcpProtocolParser';
 export { serviceParser } from './parser/serviceParser';
-export { generator } from './generator/generator';
+export { mcpServerGenerator } from './generator/mcpServerGenerator';
 export { mapper } from './mcp/mapper';

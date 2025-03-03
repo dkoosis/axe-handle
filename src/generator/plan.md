@@ -223,7 +223,7 @@ Tools: ejs.
 Tasks: Load templates, generate code, write files.
 Errors (Generated Code): MCP-4XXX (e.g., MCP-4004 - Not Found).
 Testing: test/generator.test.ts (unit, snapshot).
-File Header: typescript // src/generator/generator.ts // Generates the TypeScript code for the server.
+File Header: typescript // src/generator/mcpServerGenerator.ts // Generates the TypeScript code for the server.
 Generated Server Example:
   generated/
   ├── server.ts       // Express server setup

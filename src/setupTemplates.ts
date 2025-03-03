@@ -790,7 +790,7 @@ for (const [name, content] of Object.entries(essentialTemplates)) {
 // Check generator implementation
 console.log('\nChecking generator implementation...');
 try {
-  const generatorPath = path.join(__dirname, '..', 'generator', 'generator.ts');
+  const generatorPath = path.join(__dirname, '..', 'generator', 'mcpServerGenerator.ts');
   console.log(`Generator path: ${generatorPath}`);
   
   if (fs.existsSync(generatorPath)) {
@@ -808,7 +808,7 @@ try {
         console.log(`this.templatesDir = path.resolve(__dirname, '../../templates');`);
       }
     } else {
-      console.log('WARNING: Could not find templatesDir initialization in generator.ts');
+      console.log('WARNING: Could not find templatesDir initialization in mcpServerGenerator.ts');
     }
   } else {
     console.log(`WARNING: Generator file not found at ${generatorPath}`);

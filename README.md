@@ -71,7 +71,7 @@ axe-handle/
 │   │   ├── serviceParser.ts  # Parses .proto (protobufjs, detailed validation)
 │   │   └── openapiParser.ts  # Parses OpenAPI (conversion, with warnings)
 │   ├── generator/
-│   │   └── generator.ts     # Core generation (ejs, error handling)
+│   │   └── mcpServerGenerator.ts     # Core generation (ejs, error handling)
 │   ├── mcp/
 │   │   └── mapper.ts        # Maps user schema to MCP
 │   ├── cli.ts             # Command-line interface (commander)

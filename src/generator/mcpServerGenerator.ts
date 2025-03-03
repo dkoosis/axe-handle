@@ -417,4 +417,4 @@ class McpServerGenerator {
 }
 
 // Export the singleton instance
-export const generator = McpServerGenerator.getInstance();
+export const mcpServerGenerator = McpServerGenerator.getInstance();
