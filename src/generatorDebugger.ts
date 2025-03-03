@@ -19,7 +19,11 @@ const schemaFile = path.resolve(__dirname, '../schemas/examples/calendar.proto')
 const outputDir = path.resolve(__dirname, '../debug-output');
 const templatesDir = path.resolve(__dirname, '../templates');
 
-// Make sure template and output directories exist
+/**
+ * Ensures that the templates and output directories exist.
+ * Creates the output directory if it doesn't exist.
+ * @throws {Error} If the templates directory is not found or the output directory cannot be created.
+ */
 async function ensureDirectories() {
   try {
     // Check if templates directory exists
@@ -44,7 +48,10 @@ async function ensureDirectories() {
   }
 }
 
-// Step by step debug to isolate the issue
+/**
+ * Performs a step-by-step debug process to isolate and identify issues in the code generation.
+ * @throws {Error} If any of the debug steps encounter an error.
+ */
 async function debugStepByStep() {
   console.log(chalk.yellow('\n--- Step-by-Step Debugging ---'));
   
