@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import { MappedService, GeneratorOptions } from '../types';
 import { logger, LogCategory } from '../utils/logger';
 import { createGeneratorError } from '../utils/errorUtils';
-import { getTemplateSystem } from '../utils/templateSystem';
+import { getTemplateSystem, TemplateSystem } from '../utils/templateSystem';
 import { ValidationUtils } from '../utils/validationUtils';
 import { performance } from '../utils/performanceUtils';
 import { createAsyncErrorBoundary } from '../utils/errorBoundary';
@@ -77,7 +77,7 @@ class McpServerGenerator {
     });
     
     // Load all templates
-    this.templateSystem.loadTemplates();
+    this.templateSystem.preloadTemplates(); 
     
     this.initialized = true;
     logger.debug('MCP server generator initialized successfully', LogCategory.GENERATOR);
