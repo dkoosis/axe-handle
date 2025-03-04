@@ -30,8 +30,10 @@ export default class TemplateEngine {
     eta.configure({
       cache: true,
       autoEscape: false,
-      views: templateDir
+      views: templateDir,
+      useWith: true 
     });
+
   }
 
   /**
