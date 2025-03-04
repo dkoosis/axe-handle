@@ -15,28 +15,8 @@ import {
   ErrorPrefix,
   AxeErrorCategory
 } from '../types';
-
-/**
- * Creates an AxeError specific to the mapper.
- * @param code Numeric error code
- * @param message Error message
- * @param details Additional error details
- * @param cause Underlying error cause
- * @returns AxeError object
- */
-function createMapperError(
-  code: number,
-  message: string,
-  details?: Record<string, unknown>,
-  cause?: Error | AxeError
-): AxeError {
-  return {
-    code: `${ErrorPrefix.AXE}-${AxeErrorCategory.MAPPER}${String(code).padStart(3, '0')}`,
-    message,
-    details,
-    cause,
-  };
-}
+import { logger, LogCategory } from '../utils/logger';
+import { createMapperError } from '../utils/errorUtils';
 
 /**
  * MCP Mapper.
@@ -64,10 +44,10 @@ class Mapper {
    * @param userService The user service to map
    * @returns The mapped service ready for code generation
    */
-  public mapServiceToMcp(
-    userService: UserService
-  ): MappedService {
+  public mapServiceToMcp(userService: UserService): MappedService {
     try {
+      logger.debug(`Mapping service: ${userService.name}`, LogCategory.GENERATOR);
+
       // Map resources
       const mappedResources = userService.resources.map(resource =>
         this.mapResource(resource)
@@ -85,6 +65,11 @@ class Mapper {
         )
       ];
 
+      logger.debug(
+        `Mapped ${mappedResources.length} resources and ${mappedTypes.length} types`,
+        LogCategory.GENERATOR
+      );
+
       return {
         name: userService.name,
         originalService: userService,
@@ -99,7 +84,7 @@ class Mapper {
 
       throw createMapperError(
         1,
-        'Failed to map service to MCP',
+        `Failed to map service to MCP: ${userService.name}`,
         { serviceName: userService.name },
         error instanceof Error ? error : new Error(String(error))
       );
@@ -111,9 +96,7 @@ class Mapper {
    * @param resource The user resource to map
    * @returns The mapped resource
    */
-  private mapResource(
-    resource: UserResource
-  ): MappedResource {
+  private mapResource(resource: UserResource): MappedResource {
     // Map fields
     const mappedFields = resource.fields.map(field =>
       this.mapField(field)
@@ -135,9 +118,7 @@ class Mapper {
    * @param resource The user resource to map
    * @returns The mapped type
    */
-  private mapResourceType(
-    resource: UserResource
-  ): MappedType {
+  private mapResourceType(resource: UserResource): MappedType {
     return {
       name: resource.name,
       description: resource.description || `${resource.name} resource`,
@@ -151,9 +132,7 @@ class Mapper {
    * @param type The user type to map
    * @returns The mapped type
    */
-  private mapSupportingType(
-    type: UserType
-  ): MappedType {
+  private mapSupportingType(type: UserType): MappedType {
     return {
       name: type.name,
       description: type.description || `${type.name} type`,
@@ -167,9 +146,7 @@ class Mapper {
    * @param field The user field to map
    * @returns The mapped field
    */
-  private mapField(
-    field: UserField
-  ): MappedField {
+  private mapField(field: UserField): MappedField {
     return {
       name: field.name,
       tsType: this.mapTypeToTsType(field.type, field.repeated),
@@ -183,15 +160,15 @@ class Mapper {
   /**
    * Maps a type to a TypeScript type.
    * @param type The type to map
-   * @param repeated Whether the type is repeated (array)
+   * @param isRepeated Whether the type is repeated (array)
    * @returns The TypeScript type
    */
-  private mapTypeToTsType(type: string, repeated: boolean): string {
+  private mapTypeToTsType(type: string, isRepeated: boolean): string {
     // Map type to TypeScript type
     const tsType = this.getTypeScriptType(type);
     
     // Add array syntax if repeated
-    return repeated ? `${tsType}[]` : tsType;
+    return isRepeated ? `${tsType}[]` : tsType;
   }
 
   /**
@@ -224,9 +201,7 @@ class Mapper {
    * @param resource The resource
    * @returns The mapped operations
    */
-  private generateOperations(
-    resource: UserResource
-  ): MappedOperation[] {
+  private generateOperations(resource: UserResource): MappedOperation[] {
     const operations: MappedOperation[] = [];
     const resourcePath = this.getResourcePath(resource.name);
     const resourceNameLower = resource.name.toLowerCase();
@@ -292,7 +267,6 @@ class Mapper {
       .toLowerCase();
     
     // Pluralize the resource name
-    // This is a simplified pluralization; a real implementation would use a library
     return `/${this.pluralize(kebabCase)}`;
   }
 
@@ -303,7 +277,6 @@ class Mapper {
    */
   private pluralize(name: string): string {
     // This is a simplified pluralization
-    // In a production implementation, you would use a library like pluralize
     if (name.endsWith('s') || 
         name.endsWith('x') || 
         name.endsWith('z') || 
@@ -317,5 +290,6 @@ class Mapper {
     }
   }
 }
+
 // Export the singleton instance
 export const mapper = Mapper.getInstance();

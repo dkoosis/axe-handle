@@ -32,8 +32,13 @@
 ├── src
 │   ├── cli.ts
 │   ├── docs
-│   │   └── gts-integration.md
+│   │   ├── gts-integration.md
+│   │   ├── neverthrow-implementation-plan.md
+│   │   └── neverthrow-readme.md
 │   ├── ensureProjectStructure.ts
+│   ├── examples
+│   │   ├── resultCli.ts
+│   │   └── resultUtilsExamples.ts
 │   ├── generator
 │   │   ├── mcpServerGenerator.ts
 │   │   └── plan.md
@@ -53,9 +58,9 @@
 │       ├── errorUtils.ts
 │       ├── logger.ts
 │       ├── performanceUtils.ts
-│       ├── scripts
+│       ├── resultTypes.ts
+│       ├── resultUtils.ts
 │       ├── templateEngine.ts
-│       ├── templateEngine.ts.bak
 │       ├── templateManager.ts
 │       ├── templateSystem.ts
 │       └── validationUtils.ts
@@ -91,4 +96,4 @@
 ├── tree.txt
 └── tsconfig.json
 
-25 directories, 67 files
+25 directories, 72 files

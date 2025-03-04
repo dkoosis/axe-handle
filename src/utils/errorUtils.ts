@@ -2,6 +2,7 @@
 // Provides centralized error handling utilities for the Axe Handle code generator.
 
 import { AxeError, ErrorPrefix, AxeErrorCategory, McpErrorCategory } from '../types';
+import { logger, LogCategory } from './logger';
 
 /**
  * Creates an Axe Handle error.
@@ -174,16 +175,11 @@ export function createMcpRuntimeError(
 }
 
 /**
- * Formats an error message for CLI display with proper coloring.
- * This function should be used in the CLI module to format error messages
- * before displaying them to the user.
- * 
+ * Formats an error message for display with proper structure.
  * @param error The error to format
- * @returns Formatted error message ready for CLI display
+ * @returns Formatted error message
  */
-export function formatErrorForCli(error: Error | AxeError): string {
-  // This implementation would use chalk for colors
-  // but we're leaving it as a stub for now
+export function formatError(error: Error | AxeError): string {
   if ('code' in error) {
     const axeError = error as AxeError;
     let message = `ERROR ${axeError.code}: ${axeError.message}`;
@@ -196,7 +192,7 @@ export function formatErrorForCli(error: Error | AxeError): string {
     }
     
     if (axeError.cause) {
-      message += `\n\nCaused by: ${formatErrorForCli(axeError.cause)}`;
+      message += `\n\nCaused by: ${formatError(axeError.cause)}`;
     }
     
     return message;
@@ -206,32 +202,81 @@ export function formatErrorForCli(error: Error | AxeError): string {
 }
 
 /**
- * Wraps a function with error handling logic.
- * If the function throws an error, it will be caught and wrapped in an AxeError.
- * 
+ * Error handler function type.
+ */
+type ErrorHandlerFunction<T extends (...args: any[]) => any> = 
+  (...args: Parameters<T>) => ReturnType<T>;
+
+/**
+ * Wraps a synchronous function with error handling.
  * @param fn The function to wrap
  * @param errorCreator A function that creates an AxeError
- * @returns A wrapped function
+ * @returns A wrapped function with error handling
+ */
+/**
+ * Wraps a synchronous function with error handling.
+ * @param fn The function to wrap
+ * @param errorCreator A function that creates an AxeError
+ * @returns A wrapped function with error handling
  */
 export function withErrorHandling<T extends (...args: any[]) => any>(
   fn: T,
-  errorCreator: (code: number, message: string, details?: Record<string, unknown>, cause?: Error) => AxeError
-): (...args: Parameters<T>) => ReturnType<T> {
+  errorCreator: (code: number, message: string, details?: Record<string, unknown>, cause?: Error) => AxeError,
+  category: LogCategory = LogCategory.GENERAL
+): ErrorHandlerFunction<T> {
   return (...args: Parameters<T>): ReturnType<T> => {
     try {
       return fn(...args);
     } catch (error) {
       if (error instanceof Error && 'code' in error) {
         // Error is already an AxeError, rethrow
+        logger.error(`Error in function ${fn.name}: ${error.message}`, category);
         throw error;
       }
       
-      throw errorCreator(
+      const wrappedError = errorCreator(
         999, // Generic error code
-        'An unexpected error occurred',
-        { function: fn.name },
+        `An unexpected error occurred in ${fn.name}`,
+        { function: fn.name, args: JSON.stringify(args) },
         error instanceof Error ? error : new Error(String(error))
       );
+      
+      logger.error(`Wrapped error in function ${fn.name}: ${wrappedError.message}`, category);
+      throw wrappedError;
+    }
+  };
+}
+
+/**
+ * Wraps an async function with error handling.
+ * @param fn The async function to wrap
+ * @param errorCreator A function that creates an AxeError
+ * @returns A wrapped async function with error handling
+ */
+export function withAsyncErrorHandling<T extends (...args: any[]) => Promise<any>>(
+  fn: T,
+  errorCreator: (code: number, message: string, details?: Record<string, unknown>, cause?: Error) => AxeError,
+  category: LogCategory = LogCategory.GENERAL
+): (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>> {
+  return async (...args: Parameters<T>): Promise<Awaited<ReturnType<T>>> => {
+    try {
+      return await fn(...args);
+    } catch (error) {
+      if (error instanceof Error && 'code' in error) {
+        // Error is already an AxeError, rethrow
+        logger.error(`Async error in function ${fn.name}: ${error.message}`, category);
+        throw error;
+      }
+      
+      const wrappedError = errorCreator(
+        999, // Generic error code
+        `An unexpected error occurred in async function ${fn.name}`,
+        { function: fn.name, args: JSON.stringify(args) },
+        error instanceof Error ? error : new Error(String(error))
+      );
+      
+      logger.error(`Wrapped async error in function ${fn.name}: ${wrappedError.message}`, category);
+      throw wrappedError;
     }
   };
 }

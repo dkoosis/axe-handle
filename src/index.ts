@@ -1,4 +1,6 @@
-// src/index.ts
+// Path: src/index.ts
+// Main entry point for the Axe Handle MCP server generator.
+
 import * as path from 'path';
 import { GeneratorOptions } from './types';
 import { mcpProtocolParser } from './parser/mcpProtocolParser';
@@ -36,17 +38,17 @@ export function initialize(options: { verbose?: boolean } = {}): void {
     cache: true,
     helpers: {
       // Register common helpers
-      isRequestType: (type: string) => type.endsWith('Request'),
-      isResponseType: (type: string) => type.endsWith('Result') || type.endsWith('Response'),
-      getResponseTypeForRequest: (requestType: string) => requestType.replace('Request', 'Result'),
-      getMethodFromRequest: (requestType: string) => {
+      isRequestType: (type: string): boolean => type.endsWith('Request'),
+      isResponseType: (type: string): boolean => type.endsWith('Result') || type.endsWith('Response'),
+      getResponseTypeForRequest: (requestType: string): string => requestType.replace('Request', 'Result'),
+      getMethodFromRequest: (requestType: string): string => {
         const methodParts = requestType.replace('Request', '').split(/(?=[A-Z])/);
         return methodParts.map(part => part.toLowerCase()).join('_');
       }
     }
   });
   
-  // Initialize the config manager (no action needed, just ensures it's created)
+  // Initialize the config manager
   getConfigManager();
   
   logger.debug('Application initialized', LogCategory.GENERAL);
@@ -113,7 +115,7 @@ export const generateMcpServer = createAsyncErrorBoundary(
     // Generate the server code
     await mcpServerGenerator.generateServer(mappedService, options);
     
-    // End tracking
+    // End performance tracking
     performance.end('total-generation');
     
     // Log summary if verbose
@@ -131,15 +133,36 @@ export const generateMcpServer = createAsyncErrorBoundary(
   }
 );
 
-// Export public modules and utilities
+// Export public modules and utilities - organized to avoid name conflicts
 export * from './types';
-export * from './utils/errorUtils';
-export * from './utils/configManager';
-export * from './utils/templateSystem';
-export * from './utils/logger';
-export * from './utils/performanceUtils';
-export * from './utils/validationUtils';
-export * from './utils/errorBoundary';
+
+// From errorUtils.ts, individually export functions 
+export { 
+  createError,
+  createParserError,
+  createCliError,
+  createGeneratorError,
+  createMapperError,
+  createMcpProtocolError,
+  createMcpRuntimeError,
+  formatError,
+  withErrorHandling,
+  withAsyncErrorHandling
+} from './utils/errorUtils';
+
+// Export configuration utilities
+export { getConfigManager } from './utils/configManager';
+export { getTemplateSystem } from './utils/templateSystem';
+
+// Export logging and performance utilities
+export { logger, LogLevel, LogCategory } from './utils/logger';
+export { performance } from './utils/performanceUtils';
+export { ValidationUtils } from './utils/validationUtils';
+
+// Export error boundary utilities - but rename the function to avoid conflicts
+export { createAsyncErrorBoundary as createErrorBoundary, createSyncErrorBoundary } from './utils/errorBoundary';
+
+// Export parser, generator and mapper modules
 export { mcpProtocolParser } from './parser/mcpProtocolParser';
 export { serviceParser } from './parser/serviceParser';
 export { mcpServerGenerator } from './generator/mcpServerGenerator';

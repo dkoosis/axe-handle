@@ -1,4 +1,6 @@
 // Path: src/utils/errorBoundary.ts
+// Provides error boundary utilities for wrapping functions with improved error handling.
+
 import { AxeError } from '../types';
 import { createGeneratorError } from './errorUtils';
 import { logger, LogCategory } from './logger';
@@ -7,7 +9,7 @@ import { performance } from './performanceUtils';
 /**
  * Error boundary options
  */
-interface ErrorBoundaryOptions {
+export interface ErrorBoundaryOptions {
   /** Operation name for logging and performance tracking */
   operation: string;
   /** Category for logging */
