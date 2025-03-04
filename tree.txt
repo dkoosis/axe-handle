@@ -38,6 +38,7 @@
 │   ├── ensureProjectStructure.ts
 │   ├── examples
 │   │   ├── resultCli.ts
+│   │   ├── resultExample.ts
 │   │   └── resultUtilsExamples.ts
 │   ├── generator
 │   │   ├── mcpServerGenerator.ts
@@ -96,4 +97,4 @@
 ├── tree.txt
 └── tsconfig.json
 
-25 directories, 72 files
+25 directories, 73 files

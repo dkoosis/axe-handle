@@ -1,30 +1,33 @@
 // Path: src/utils/templateEngine.ts
-// Provides a template engine for generating code from Eta templates.
+// Provides a template engine for generating code from Eta templates with error handling using neverthrow.
 
 import * as fs from 'fs';
 import * as path from 'path';
 import * as eta from 'eta';
+import { Result, ok, err } from 'neverthrow';
+import { AxeError } from '../types';
 import { createGeneratorError } from './errorUtils';
 import { logger, LogCategory } from './logger';
 
 /**
  * Template Engine.
- * Handles the loading and rendering of Eta templates.
+ * Handles the loading and rendering of Eta templates with Result-based error handling.
  */
 export default class TemplateEngine {
   private templateDir: string;
   private templates: Map<string, string> = new Map();
   private helpers: Record<string, Function> = {};
-  private isVerbose: boolean = false;
+  private verbose: boolean = false;
 
   /**
    * Creates a new Template Engine.
    * @param templateDir Directory containing templates
-   * @param isVerbose Whether to enable verbose logging
+   * @param verbose Whether to enable verbose logging
    */
-  constructor(templateDir: string, isVerbose: boolean = false) {
+  constructor(templateDir: string, verbose: boolean = false) {
     this.templateDir = templateDir;
-    this.isVerbose = isVerbose;
+    this.verbose = verbose;
+    
     logger.debug(`TemplateEngine initialized with directory: ${templateDir}`, LogCategory.TEMPLATE);
 
     // Configure Eta
@@ -38,19 +41,20 @@ export default class TemplateEngine {
 
   /**
    * Loads all templates from the template directory.
+   * @returns Result with void on success or AxeError on failure
    */
-  public loadTemplates(): void {
+  public loadTemplates(): Result<void, AxeError> {
     try {
       logger.debug(`Loading templates from directory: ${this.templateDir}`, LogCategory.TEMPLATE);
       
       // Check if template directory exists
       if (!fs.existsSync(this.templateDir)) {
         logger.error(`Template directory not found: ${this.templateDir}`, LogCategory.TEMPLATE);
-        throw createGeneratorError(
+        return err(createGeneratorError(
           3001,
           `Template directory not found: ${this.templateDir}`,
           { templateDir: this.templateDir }
-        );
+        ));
       }
 
       // List all files in the directory to verify access
@@ -78,29 +82,31 @@ export default class TemplateEngine {
             
             logger.debug(`Loaded template: ${relativePath}`, LogCategory.TEMPLATE);
           } catch (err) {
-            logger.error(`Failed to read template file: ${filePath}, error: ${err}`, LogCategory.TEMPLATE);
+            logger.warn(`Failed to read template file: ${filePath}, error: ${err}`, LogCategory.TEMPLATE);
           }
         }
       });
 
-      logger.info(`Loaded ${this.templates.size} templates`, LogCategory.TEMPLATE);
+      logger.debug(`Loaded ${this.templates.size} templates`, LogCategory.TEMPLATE);
       if (this.templates.size === 0) {
         logger.warn('No templates found. This may cause errors during generation.', LogCategory.TEMPLATE);
       }
+      
+      return ok(undefined);
     } catch (error) {
       logger.error(`Template loading error: ${error}`, LogCategory.TEMPLATE);
       
       if (error instanceof Error && 'code' in error) {
-        // Error is already a generator error, rethrow
-        throw error;
+        // Error is already an AxeError, return it
+        return err(error as AxeError);
       }
 
-      throw createGeneratorError(
+      return err(createGeneratorError(
         3002,
         `Failed to load templates from ${this.templateDir}`,
         { templateDir: this.templateDir },
         error instanceof Error ? error : new Error(String(error))
-      );
+      ));
     }
   }
 
@@ -124,11 +130,11 @@ export default class TemplateEngine {
             callback(filePath);
           }
         } catch (err) {
-          logger.error(`Error accessing path: ${filePath}, error: ${err}`, LogCategory.TEMPLATE);
+          logger.warn(`Error accessing path: ${filePath}, error: ${err}`, LogCategory.TEMPLATE);
         }
       }
     } catch (err) {
-      logger.error(`Error reading directory: ${dir}, error: ${err}`, LogCategory.TEMPLATE);
+      logger.warn(`Error reading directory: ${dir}, error: ${err}`, LogCategory.TEMPLATE);
     }
   }
 
@@ -146,28 +152,28 @@ export default class TemplateEngine {
    * Finds the best template match for the given name.
    * Searches in various locations to accommodate different template organization styles.
    * @param templateName Template name (with or without extension)
-   * @returns The template path and content, or null if not found
+   * @returns Result with template info on success, AxeError on failure
    */
-  private findTemplate(templateName: string): { path: string; content: string } | null {
+  private findTemplate(templateName: string): Result<{ path: string; content: string }, AxeError> {
     // Check for various forms of the template name
     let templateContent: string | undefined;
     
     // Step 1: Direct lookup in cache
     templateContent = this.templates.get(templateName);
     if (templateContent) {
-      return { path: templateName, content: templateContent };
+      return ok({ path: templateName, content: templateContent });
     }
     
     // Step 2: Try with extensions
     if (!templateName.endsWith('.eta') && !templateName.endsWith('.ejs')) {
       templateContent = this.templates.get(`${templateName}.eta`);
       if (templateContent) {
-        return { path: `${templateName}.eta`, content: templateContent };
+        return ok({ path: `${templateName}.eta`, content: templateContent });
       }
       
       templateContent = this.templates.get(`${templateName}.ejs`);
       if (templateContent) {
-        return { path: `${templateName}.ejs`, content: templateContent };
+        return ok({ path: `${templateName}.ejs`, content: templateContent });
       }
     }
     
@@ -182,7 +188,7 @@ export default class TemplateEngine {
       ) {
         templateContent = this.templates.get(key);
         if (templateContent) {
-          return { path: key, content: templateContent };
+          return ok({ path: key, content: templateContent });
         }
       }
       
@@ -191,7 +197,7 @@ export default class TemplateEngine {
       if (baseName === templateName) {
         templateContent = this.templates.get(key);
         if (templateContent) {
-          return { path: key, content: templateContent };
+          return ok({ path: key, content: templateContent });
         }
       }
     }
@@ -223,124 +229,116 @@ export default class TemplateEngine {
           // Cache for future use
           this.templates.set(templateName, templateContent);
           logger.debug(`Found template at: ${location}`, LogCategory.TEMPLATE);
-          return { path: location, content: templateContent };
+          return ok({ path: location, content: templateContent });
         } catch (err) {
-          logger.error(`Error reading template file ${location}: ${err}`, LogCategory.TEMPLATE);
+          logger.warn(`Error reading template file ${location}: ${err}`, LogCategory.TEMPLATE);
         }
       }
     }
     
-    // Template not found
-    return null;
+    // List available templates to help with debugging
+    const availableTemplates = Array.from(this.templates.keys())
+      .filter(t => !t.includes('/node_modules/'))
+      .sort();
+    
+    logger.error(`Template not found: ${templateName}`, LogCategory.TEMPLATE);
+    logger.debug(`Available templates (${availableTemplates.length}):`, LogCategory.TEMPLATE);
+    availableTemplates.slice(0, 20).forEach(t => logger.debug(`  - ${t}`, LogCategory.TEMPLATE));
+    
+    // Template not found - return error
+    return err(createGeneratorError(
+      3003,
+      `Template not found: ${templateName}`,
+      { 
+        templateName, 
+        templateDir: this.templateDir,
+        availableTemplates: availableTemplates.slice(0, 20) // List first 20 templates
+      }
+    ));
   }
 
   /**
    * Renders a template with the given data.
    * @param templateName Name of the template to render
    * @param data Data to pass to the template
-   * @returns Rendered template output
+   * @returns Result with rendered content on success, AxeError on failure
    */
-  public renderTemplate(templateName: string, data: any): string {
+  public renderTemplate(templateName: string, data: any): Result<string, AxeError> {
+    logger.debug(`Rendering template: ${templateName}`, LogCategory.TEMPLATE);
+    
+    // Find the template
+    const templateResult = this.findTemplate(templateName);
+    
+    if (templateResult.isErr()) {
+      return templateResult; // Return template finding error
+    }
+    
+    const template = templateResult.value;
+    logger.debug(`Using template: ${template.path}`, LogCategory.TEMPLATE);
+
+    // Create a context with helpers
+    const context = {
+      ...data,
+      ...this.helpers
+    };
+
+    // Render the template
     try {
-      logger.debug(`Rendering template: ${templateName}`, LogCategory.TEMPLATE);
+      // Attempt to render with Eta
+      const result = eta.render(template.content, context);
       
-      // Find the template
-      const template = this.findTemplate(templateName);
-      
-      if (!template) {
-        logger.error(`Template not found: ${templateName}`, LogCategory.TEMPLATE);
-        
-        // List available templates to help with debugging
-        const availableTemplates = Array.from(this.templates.keys())
-          .filter(t => !t.includes('/node_modules/'))
-          .sort();
-          
-        logger.error(`Available templates (${availableTemplates.length}):`, LogCategory.TEMPLATE);
-        availableTemplates.slice(0, 20).forEach(t => {
-          logger.error(`  - ${t}`, LogCategory.TEMPLATE);
-        });
-        
-        throw createGeneratorError(
-          3003,
-          `Template not found: ${templateName}`,
-          { 
-            templateName, 
-            templateDir: this.templateDir,
-            availableTemplates: availableTemplates.slice(0, 20) // List first 20 templates
-          }
-        );
-      }
-
-      logger.debug(`Using template: ${template.path}`, LogCategory.TEMPLATE);
-
-      // Create a context with helpers
-      const context = {
-        ...data,
-        ...this.helpers
-      };
-
-      // Render the template
-      try {
-        // Attempt to render with Eta
-        const result = eta.render(template.content, context);
-        
-        if (result === undefined || result === null) {
-          throw new Error('Eta rendering returned undefined or null');
-        }
-        
-        logger.debug(`Successfully rendered template: ${templateName}`, LogCategory.TEMPLATE);
-        return result;
-      } catch (renderError) {
-        logger.error(`Error during Eta rendering: ${renderError}`, LogCategory.TEMPLATE);
-        
-        // Try rendering with a more basic approach as fallback
-        logger.warn('Attempting fallback rendering...', LogCategory.TEMPLATE);
-        
-        // Extract some template details for error context
-        const templatePreview = template.content.substring(0, 100) + '...';
-        const dataKeys = Object.keys(data);
-        
-        throw createGeneratorError(
+      if (result === undefined || result === null) {
+        return err(createGeneratorError(
           3004,
-          `Failed to render template: ${renderError instanceof Error ? renderError.message : String(renderError)}`,
-          { 
-            templateName,
-            templatePath: template.path,
-            templatePreview,
-            availableData: dataKeys,
-            renderError: renderError instanceof Error ? renderError.message : String(renderError)
-          },
-          renderError instanceof Error ? renderError : new Error(String(renderError))
-        );
-      }
-    } catch (error) {
-      // If error is not already a generator error, wrap it
-      if (error instanceof Error && !('code' in error)) {
-        throw createGeneratorError(
-          3005,
-          `Template rendering error: ${error.message}`,
-          { templateName },
-          error
-        );
+          'Eta rendering returned undefined or null',
+          { templateName, templatePath: template.path }
+        ));
       }
       
-      throw error;
+      logger.debug(`Successfully rendered template: ${templateName}`, LogCategory.TEMPLATE);
+      return ok(result);
+    } catch (renderError) {
+      logger.error(`Error during template rendering: ${renderError}`, LogCategory.TEMPLATE);
+      
+      // Extract some template details for error context
+      const templatePreview = template.content.substring(0, 100) + '...';
+      const dataKeys = Object.keys(data);
+      
+      return err(createGeneratorError(
+        3005,
+        `Failed to render template: ${renderError instanceof Error ? renderError.message : String(renderError)}`,
+        { 
+          templateName,
+          templatePath: template.path,
+          templatePreview,
+          availableData: dataKeys,
+          renderError: renderError instanceof Error ? renderError.message : String(renderError)
+        },
+        renderError instanceof Error ? renderError : new Error(String(renderError))
+      ));
     }
   }
 
   /**
    * Renders a template to a file.
+   * For backward compatibility, this throws errors instead of returning Result.
    * @param templateName Name of the template to render
    * @param outputPath Path to output the rendered template
    * @param data Data to pass to the template
    */
   public renderToFile(templateName: string, outputPath: string, data: any): void {
+    logger.debug(`Rendering template ${templateName} to file: ${outputPath}`, LogCategory.TEMPLATE);
+    
+    // Render the template
+    const renderResult = this.renderTemplate(templateName, data);
+    
+    if (renderResult.isErr()) {
+      throw renderResult.error; // Throw error for backward compatibility
+    }
+    
+    const output = renderResult.value;
+    
     try {
-      logger.debug(`Rendering template ${templateName} to file: ${outputPath}`, LogCategory.TEMPLATE);
-      
-      // Render the template
-      const output = this.renderTemplate(templateName, data);
-
       // Create the output directory if it doesn't exist
       const outputDir = path.dirname(outputPath);
       if (!fs.existsSync(outputDir)) {
@@ -350,20 +348,59 @@ export default class TemplateEngine {
 
       // Write the rendered output to the file
       fs.writeFileSync(outputPath, output, 'utf-8');
-      logger.info(`Successfully wrote file: ${outputPath}`, LogCategory.TEMPLATE);
+      logger.debug(`Successfully wrote file: ${outputPath}`, LogCategory.TEMPLATE);
     } catch (error) {
       logger.error(`Error writing template to file: ${error}`, LogCategory.TEMPLATE);
       
-      if (error instanceof Error && !('code' in error)) {
-        throw createGeneratorError(
-          3006,
-          `Failed to render template to file: ${outputPath}`,
-          { templateName, outputPath },
-          error
-        );
+      throw createGeneratorError(
+        3006,
+        `Failed to write template to file: ${outputPath}`,
+        { templateName, outputPath },
+        error instanceof Error ? error : new Error(String(error))
+      );
+    }
+  }
+
+  /**
+   * Renders a template to a file using Result pattern.
+   * @param templateName Name of the template to render
+   * @param outputPath Path to output the rendered template
+   * @param data Data to pass to the template
+   * @returns Result with void on success, AxeError on failure
+   */
+  public renderToFileResult(templateName: string, outputPath: string, data: any): Result<void, AxeError> {
+    logger.debug(`Rendering template ${templateName} to file: ${outputPath}`, LogCategory.TEMPLATE);
+    
+    // Render the template
+    const renderResult = this.renderTemplate(templateName, data);
+    
+    if (renderResult.isErr()) {
+      return renderResult;
+    }
+    
+    const output = renderResult.value;
+    
+    try {
+      // Create the output directory if it doesn't exist
+      const outputDir = path.dirname(outputPath);
+      if (!fs.existsSync(outputDir)) {
+        logger.debug(`Creating output directory: ${outputDir}`, LogCategory.TEMPLATE);
+        fs.mkdirSync(outputDir, { recursive: true });
       }
+
+      // Write the rendered output to the file
+      fs.writeFileSync(outputPath, output, 'utf-8');
+      logger.debug(`Successfully wrote file: ${outputPath}`, LogCategory.TEMPLATE);
+      return ok(undefined);
+    } catch (error) {
+      logger.error(`Error writing template to file: ${error}`, LogCategory.TEMPLATE);
       
-      throw error;
+      return err(createGeneratorError(
+        3006,
+        `Failed to write template to file: ${outputPath}`,
+        { templateName, outputPath },
+        error instanceof Error ? error : new Error(String(error))
+      ));
     }
   }
 
@@ -379,6 +416,6 @@ export default class TemplateEngine {
    * Enable verbose logging
    */
   public enableVerboseLogging(): void {
-    this.isVerbose = true;
+    this.verbose = true;
   }
 }
