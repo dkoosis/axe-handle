@@ -1,9 +1,9 @@
 // Path: src/examples/resultUtilsExamples.ts
 // Examples demonstrating the usage of Result-based error handling.
 
-import { AxeResult, AxeResultAsync, okResult, errResult, createGeneratorErrorResult, runOperation, runAsyncOperation, combineResults } from '../utils/resultUtils';
+import { AxeResult, AxeResultAsync, okResult, runOperation, runAsyncOperation, combineResults } from '../utils/resultUtils';
 import { createGeneratorError } from '../utils/errorUtils';
-import { LogCategory } from '../utils/logger';
+//import { LogCategory } from '../utils/logger';
 
 /**
  * Example function that may succeed or fail.
@@ -38,7 +38,7 @@ function exampleWithResult(shouldSucceed: boolean): AxeResult<number> {
     () => {
       return maybeFailSync(shouldSucceed);
     },
-    LogCategory.GENERAL,
+    'exampleWithResult',
     102
   );
 }
@@ -50,7 +50,7 @@ function exampleWithResult(shouldSucceed: boolean): AxeResult<number> {
 function exampleWithResultAsync(shouldSucceed: boolean): AxeResultAsync<number> {
   return runAsyncOperation(
     () => maybeFailAsync(shouldSucceed),
-    LogCategory.GENERAL,
+    'exampleWithResultAsync',
     103
   );
 }

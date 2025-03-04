@@ -1,6 +1,5 @@
 // src/index.ts
 import * as path from 'path';
-import { Result, ResultAsync } from 'neverthrow';
 import { GeneratorOptions, AxeError } from './types';
 import { mcpProtocolParser } from './parser/mcpProtocolParser';
 import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
@@ -13,7 +12,7 @@ import { createAsyncErrorBoundary } from './utils/errorBoundary';
 import { logger, LogCategory, LogLevel } from './utils/logger';
 import { performance } from './utils/performanceUtils';
 import { ValidationUtils } from './utils/validationUtils';
-import { AxeResult, AxeResultAsync, okResult, errResult, createGeneratorErrorResult, runOperation, runAsyncOperation, combineResults, combineAsyncResults } from './utils/resultUtils';
+import { runAsyncOperation } from './utils/resultUtils';
 
 /**
  * Initialize the application by setting up the template system
@@ -65,7 +64,7 @@ export interface GenerationResult {
 /**
  * Result-based version of the main MCP server generator function
  */
-export function generateMcpServerResult(options: GeneratorOptions): AxeResultAsync<void> {
+export function generateMcpServerResult(options: GeneratorOptions) {
   return runAsyncOperation(
     async () => {
       // Track generation time
@@ -139,12 +138,6 @@ export function generateMcpServerResult(options: GeneratorOptions): AxeResultAsy
   );
 }
 
-/**
- * Main function for generating an MCP server from a Protobuf schema.
- * Wrapped with error handling for better error reporting.
- * 
- * @param options Configuration options for the generator
- */
 // Export public modules and utilities
 export * from './types';
 export * from './utils/errorUtils';
@@ -154,7 +147,6 @@ export * from './utils/logger';
 export * from './utils/performanceUtils';
 export * from './utils/validationUtils';
 export * from './utils/errorBoundary';
-export * from './utils/resultUtils';
 export { mcpProtocolParser } from './parser/mcpProtocolParser';
 export { serviceParser } from './parser/serviceParser';
 export { mcpServerGenerator } from './generator/mcpServerGenerator';

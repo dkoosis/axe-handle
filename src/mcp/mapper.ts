@@ -11,9 +11,6 @@ import {
   MappedType,
   MappedField,
   MappedOperation,
-  AxeError,
-  ErrorPrefix,
-  AxeErrorCategory
 } from '../types';
 import { logger, LogCategory } from '../utils/logger';
 import { createMapperError } from '../utils/errorUtils';

@@ -1,7 +1,7 @@
 // Path: src/utils/resultUtils.ts
 // Provides utilities for working with the Result pattern from neverthrow.
 
-import { Result, ResultAsync, Ok, err, ok } from 'neverthrow';
+import { Result, ResultAsync, err, ok } from 'neverthrow';
 import { AxeError } from '../types';
 import { createGeneratorError } from './errorUtils';
 import { logger, LogCategory } from './logger';
@@ -148,29 +148,29 @@ export function combineResults<T>(results: AxeResult<T>[]): AxeResult<T[]> {
  * @param results The async results to combine
  * @returns A combined async result
  */
-// Fix type issues with combineAsyncResults
 export function combineAsyncResults<T>(results: AxeResultAsync<T>[]): AxeResultAsync<T[]> {
-  // Use Promise.all to wait for all results
+  // Use Promise.all to wait for all results to complete
+  const promises = results.map(resultAsync => 
+    resultAsync.match<{ ok: true; value: T } | { ok: false; error: AxeError }>(
+      value => ({ ok: true, value }),
+      error => ({ ok: false, error })
+    )
+  );
+  
   return ResultAsync.fromPromise(
-    Promise.all(results.map(result => result.match(
-      (value) => ({ status: 'ok' as const, value }),
-      (error) => ({ status: 'err' as const, error })
-    ))),
-    (error) => createGeneratorError(/*...*/)
-  ).andThen((results) => {
-    // Add proper type assertion for results
-    const typedResults = results as Array<{status: 'ok', value: T} | {status: 'err', error: AxeError}>;
-    
-    // Check for any errors
-    const firstError = typedResults.find(result => result.status === 'err');
-    if (firstError && firstError.status === 'err') {
-      return err((firstError as {status: 'err', error: AxeError}).error);
+    Promise.all(promises),
+    error => createGeneratorError(9000, "Failed to combine async results", { error: String(error) })
+  ).andThen(results => {
+    // Find the first error
+    const firstError = results.find(r => !r.ok);
+    if (firstError && !firstError.ok) {
+      return err(firstError.error);
     }
     
-    // Extract values
-    const values = typedResults
-      .filter((result): result is { status: 'ok', value: T } => result.status === 'ok')
-      .map(result => result.value);
+    // All results are successful
+    const values = results
+      .filter((r): r is { ok: true; value: T } => r.ok)
+      .map(r => r.value);
     
     return ok(values);
   });

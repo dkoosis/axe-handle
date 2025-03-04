@@ -17,7 +17,7 @@ export default class TemplateEngine {
   private templateDir: string;
   private templates: Map<string, string> = new Map();
   private helpers: Record<string, Function> = {};
-  private verbose: boolean = false;
+  private isVerbose: boolean = false;
 
   /**
    * Creates a new Template Engine.
@@ -26,7 +26,7 @@ export default class TemplateEngine {
    */
   constructor(templateDir: string, verbose: boolean = false) {
     this.templateDir = templateDir;
-    this.verbose = verbose;
+    this.isVerbose = verbose;
     
     logger.debug(`TemplateEngine initialized with directory: ${templateDir}`, LogCategory.TEMPLATE);
 
@@ -264,13 +264,13 @@ export default class TemplateEngine {
    * @returns Result with rendered content on success, AxeError on failure
    */
   public renderTemplate(templateName: string, data: any): Result<string, AxeError> {
-    logger.debug(`Rendering template: ${templateName}`, LogCategory.TEMPLATE);
+    logger.debug(`Rendering template: ${templateName}${this.isVerbose ? ' (verbose mode)' : ''}`, LogCategory.TEMPLATE);
     
     // Find the template
     const templateResult = this.findTemplate(templateName);
     
     if (templateResult.isErr()) {
-      return templateResult; // Return template finding error
+      return err(templateResult.error); // Return just the error, not the whole result
     }
     
     const template = templateResult.value;
@@ -375,7 +375,7 @@ export default class TemplateEngine {
     const renderResult = this.renderTemplate(templateName, data);
     
     if (renderResult.isErr()) {
-      return renderResult;
+      return err(renderResult.error); // Return just the error
     }
     
     const output = renderResult.value;
@@ -416,6 +416,6 @@ export default class TemplateEngine {
    * Enable verbose logging
    */
   public enableVerboseLogging(): void {
-    this.verbose = true;
+    this.isVerbose = true;
   }
 }

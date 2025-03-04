@@ -4,7 +4,7 @@
 import { Command } from 'commander';
 import path from 'path';
 import chalk from 'chalk';
-import { generateMcpServerResult, GeneratorOptions, AxeResult } from '../index';
+import { generateMcpServerResult, GeneratorOptions } from '../index';
 import { logger, LogLevel } from '../utils/logger';
 
 /**
