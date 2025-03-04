@@ -1,6 +1,7 @@
 // Path: src/utils/validationUtils.ts
 import * as fs from 'fs';
 import { createGeneratorError } from './errorUtils';
+import readline from 'readline';
 
 /**
  * Utility class for validating inputs and paths
@@ -115,21 +116,60 @@ export class ValidationUtils {
   }
 
   /**
+   * Creates a readline interface for user input
+   */
+  private static createReadlineInterface(): readline.Interface {
+    return readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  }
+
+  /**
+   * Asks a yes/no question
+   * @param question The question to ask
+   * @returns True if the answer is yes, false otherwise
+   */
+  private static async askYesNoQuestion(question: string): Promise<boolean> {
+    const rl = this.createReadlineInterface();
+    
+    return new Promise<boolean>((resolve) => {
+      rl.question(`${question} (y/n): `, (answer) => {
+        rl.close();
+        const normalizedAnswer = answer.trim().toLowerCase();
+        resolve(normalizedAnswer === 'y' || normalizedAnswer === 'yes');
+      });
+    });
+  }
+
+  /**
    * Validates that a directory is empty or that overwrite is enabled
    * @param dirPath Directory path to validate
    * @param overwrite Whether overwrite is enabled
    * @param errorCode Error code for failures
    * @param errorMessage Custom error message
+   * @param promptForOverwrite Whether to prompt for overwrite if directory is not empty
    */
   public static async validateEmptyOrOverwrite(
     dirPath: string,
     overwrite: boolean,
     errorCode: number,
-    errorMessage?: string
+    errorMessage?: string,
+    promptForOverwrite = false
   ): Promise<void> {
     try {
       const files = await fs.promises.readdir(dirPath);
       if (files.length > 0 && !overwrite) {
+        if (promptForOverwrite) {
+          const shouldOverwrite = await this.askYesNoQuestion(
+            `Directory is not empty: ${dirPath}. Do you want to overwrite existing files?`
+          );
+          
+          if (shouldOverwrite) {
+            return; // User confirmed overwrite
+          }
+        }
+        
         throw createGeneratorError(
           errorCode,
           errorMessage || `Directory is not empty and overwrite is not enabled: ${dirPath}`,

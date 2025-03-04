@@ -126,9 +126,10 @@ class McpServerGenerator {
         options.outputDir,
         options.overwrite || false,
         1002,
-        `Output directory is not empty and overwrite is not enabled: ${options.outputDir}`
+        `Output directory is not empty and overwrite is not enabled: ${options.outputDir}`,
+        true // Enable prompting
       );
-
+      
       // Generate all components
       await this.generateTypesFile(mappedService, options);
       await this.generateHandlerFiles(mappedService, options);

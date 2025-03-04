@@ -50,6 +50,7 @@ program
   .argument('<output-dir>', 'Output directory for generated code')
   .option('-c, --config <file>', 'Configuration file (JSON)')
   .option('-o, --overwrite', 'Overwrite existing files', false)
+  .option('-i, --interactive', 'Enable interactive mode with prompts', false)
   .option('-d, --docs', 'Generate documentation', true)
   .option('-v, --verbose', 'Verbose output with detailed logs', false)
   .option('--no-color', 'Disable colored output')
@@ -102,6 +103,7 @@ program
         outputDir: outDir,
         configFile,
         overwrite: cmdOptions.overwrite,
+        interactive: cmdOptions.interactive,
         generateDocs: cmdOptions.docs,
         verbose: cmdOptions.verbose
       };
@@ -109,6 +111,7 @@ program
       // Log options in verbose mode
       logger.debug(`Generator Options: ${JSON.stringify({
         overwrite: options.overwrite,
+        interactive: options.interactive,
         generateDocs: options.generateDocs,
         verbose: options.verbose
       }, null, 2)}`);
