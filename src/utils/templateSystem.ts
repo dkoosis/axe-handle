@@ -26,7 +26,7 @@ export class TemplateSystem {
   private static instance: TemplateSystem;
   private baseDir: string;
   private framework?: string;
-  private templateCache: Map<string, string> = new Map();
+//  private templateCache: Map<string, string> = new Map();
   private cache: boolean;
   private initialized: boolean = false;
   

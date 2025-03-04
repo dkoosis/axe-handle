@@ -39,30 +39,29 @@ class McpServerGenerator {
   /**
    * Initialize the generator
    */
-  private async initialize(options: GeneratorOptions): Promise<void> {
-    if (this.initialized) {
-      return;
-    }
-
-    logger.debug('Initializing MCP server generator...', LogCategory.GENERATOR);
-
-    // Get template system (should be already initialized by this point)
-    const templateSystem = getTemplateSystem();
-
-    // Make sure the template system has the helpers it needs
-    templateSystem.registerHelper('isRequestType', (type: string) => type.endsWith('Request'));
-    templateSystem.registerHelper('isResponseType', (type: string) => type.endsWith('Result') || type.endsWith('Response'));
-    templateSystem.registerHelper('getResponseTypeForRequest', (requestType: string) => requestType.replace('Request', 'Result'));
-    templateSystem.registerHelper('getMethodFromRequest', (requestType: string) => {
-      const methodParts = requestType.replace('Request', '').split(/(?=[A-Z])/);
-      return methodParts.map(part => part.toLowerCase()).join('_');
-    });
-
-    await templateSystem.initialize();
-    this.initialized = true;
-    logger.debug('MCP server generator initialized successfully', LogCategory.GENERATOR);
+private async initialize(_options: GeneratorOptions): Promise<void> {
+  if (this.initialized) {
+    return;
   }
 
+  logger.debug('Initializing MCP server generator...', LogCategory.GENERATOR);
+
+  // Get template system (should be already initialized by this point)
+  const templateSystem = getTemplateSystem();
+
+  // Make sure the template system has the helpers it needs
+  templateSystem.registerHelper('isRequestType', (type: string) => type.endsWith('Request'));
+  templateSystem.registerHelper('isResponseType', (type: string) => type.endsWith('Result') || type.endsWith('Response'));
+  templateSystem.registerHelper('getResponseTypeForRequest', (requestType: string) => requestType.replace('Request', 'Result'));
+  templateSystem.registerHelper('getMethodFromRequest', (requestType: string) => {
+    const methodParts = requestType.replace('Request', '').split(/(?=[A-Z])/);
+    return methodParts.map(part => part.toLowerCase()).join('_');
+  });
+
+  await templateSystem.initialize();
+  this.initialized = true;
+  logger.debug('MCP server generator initialized successfully', LogCategory.GENERATOR);
+}
   /**
    * Generates server code for the mapped service.
    * @param mappedService The mapped service

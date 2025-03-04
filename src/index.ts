@@ -12,7 +12,6 @@ import { createAsyncErrorBoundary } from './utils/errorBoundary';
 import { logger, LogCategory, LogLevel } from './utils/logger';
 import { performance } from './utils/performanceUtils';
 import { ValidationUtils } from './utils/validationUtils';
-import fs from 'fs';
 
 /**
  * Initialize the application by setting up the template system
