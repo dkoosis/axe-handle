@@ -33,9 +33,8 @@ export function initialize(options: { verbose?: boolean } = {}): void {
   const templatesDir = path.resolve(__dirname, '../templates');
   getTemplateSystem({
     baseDir: templatesDir,
-    framework: 'express', // Default framework
     cache: true,
-    helpers: {
+    helpers: { 
       // Register common helpers
       isRequestType: (type: string) => type.endsWith('Request'),
       isResponseType: (type: string) => type.endsWith('Result') || type.endsWith('Response'),

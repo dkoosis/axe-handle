@@ -59,10 +59,7 @@
 │       ├── errorUtils.ts
 │       ├── logger.ts
 │       ├── performanceUtils.ts
-│       ├── resultTypes.ts
 │       ├── resultUtils.ts
-│       ├── templateEngine.ts
-│       ├── templateManager.ts
 │       ├── templateSystem.ts
 │       └── validationUtils.ts
 ├── templates
@@ -97,4 +94,4 @@
 ├── tree.txt
 └── tsconfig.json
 
-25 directories, 73 files
+25 directories, 70 files
