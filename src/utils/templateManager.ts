@@ -3,7 +3,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as ejs from 'ejs';
+import * as eta from 'eta';
 import { createGeneratorError } from './errorUtils';
 
 /**
@@ -76,11 +76,11 @@ export class TemplateManager {
     
     // Build framework-specific path if specified
     if (framework) {
-      return path.join(this.templatesDir, framework, `${category}/${name}.ejs`);
+      return path.join(this.templatesDir, framework, `${category}/${name}.eta`);
     }
     
     // Build generic path
-    return path.join(this.templatesDir, `${category}/${name}.ejs`);
+    return path.join(this.templatesDir, `${category}/${name}.eta`);
   }
   
   /**
@@ -137,7 +137,7 @@ export class TemplateManager {
       const templateContent = await this.loadTemplate(templatePath);
       
       // Render the template
-      return await ejs.render(templateContent, data, { async: true });
+      return await eta.render(templateContent, data, { async: true });
     } catch (error) {
       throw createGeneratorError(
         2002,
@@ -202,10 +202,10 @@ export class TemplateManager {
       // Get all files in the directory
       const files = await fs.readdir(templatesDir);
       
-      // Filter out files that don't end with .ejs
+      // Filter out files that don't end with .eta
       return files
-        .filter(file => file.endsWith('.ejs'))
-        .map(file => file.replace('.ejs', ''));
+        .filter(file => file.endsWith('.eta'))
+        .map(file => file.replace('.eta', ''));
     } catch (error) {
       throw createGeneratorError(
         2004,

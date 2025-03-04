@@ -3,12 +3,12 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ejs from 'ejs';
+import * as eta from 'eta';
 import { createGeneratorError } from './errorUtils';
 
 /**
  * Template Engine.
- * Handles the loading and rendering of EJS templates.
+ * Handles the loading and rendering of ETA templates.
  */
 export default class TemplateEngine {
   private templateDir: string;
@@ -45,9 +45,9 @@ export default class TemplateEngine {
       const dirContents = fs.readdirSync(this.templateDir);
       console.log(`Template directory contents: ${dirContents.join(', ')}`);
 
-      // Get all .ejs files in the template directory
+      // Get all .eta files in the template directory
       this.walkDir(this.templateDir, (filePath) => {
-        if (filePath.endsWith('.ejs')) {
+        if (filePath.endsWith('.eta')) {
           const relativePath = path.relative(this.templateDir, filePath);
           try {
             const templateContent = fs.readFileSync(filePath, 'utf-8');
@@ -202,7 +202,7 @@ export default class TemplateEngine {
       };
 
       // Render the template
-      const result = ejs.render(templateContent, context, {
+      const result = eta.render(templateContent, context, {
         filename: path.join(this.templateDir, templateName) // For including other templates
       });
       
