@@ -55,7 +55,9 @@ export interface GeneratorOptions {
   configFile?: string;
   /** Whether to overwrite existing files */
   overwrite?: boolean;
-  /** Whether to generate documentation */
+  /** Whether to enable interactive mode with prompts */
+  interactive?: boolean;
+  /** Whether to generate documentation */  
   generateDocs?: boolean;
   /** Verbose output */
   verbose?: boolean;
