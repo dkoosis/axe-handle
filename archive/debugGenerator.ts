@@ -1,12 +1,12 @@
 // Path: src/debugGenerator.ts
 import * as path from 'path';
 import * as fs from 'fs';
-import { mapper } from './mcp/mapper';
-import { serviceParser } from './parser/serviceParser';
-import { mcpProtocolParser } from './parser/mcpProtocolParser';
-import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
-import { mcpServerGenerator } from './generator/mcpServerGenerator';
-import { GeneratorOptions } from './types';
+import { mapper } from '../src/mcp/mapper';
+import { serviceParser } from '../src/parser/serviceParser';
+import { mcpProtocolParser } from '../src/parser/mcpProtocolParser';
+import { extractMcpProtocol } from '../src/parser/mcpSchemaAdapter';
+import { mcpServerGenerator } from '../src/generator/mcpServerGenerator';
+import { GeneratorOptions } from '../src/types';
 
 // Configure the paths
 const schemaFile = path.resolve(process.cwd(), 'schemas/examples/calendar.proto');

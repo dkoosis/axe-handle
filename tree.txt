@@ -1,0 +1,94 @@
+.
+├── README.md
+├── archive
+│   ├── debug.js
+│   ├── debug.ts
+│   ├── debugGenerator.js
+│   ├── debugGenerator.ts
+│   ├── debugUtils.ts
+│   ├── ejs2eta.sh
+│   ├── generatorDebugger.js
+│   ├── generatorDebugger.ts
+│   ├── setupTemplates.js
+│   ├── setupTemplates.ts
+│   ├── templateSetupScript.ts
+│   ├── verify-templates.ts
+│   └── verify-templates.ts.bak
+├── assets
+│   ├── axe-handle-100x100.svg
+│   ├── axe-handle.svg
+│   └── schema.ts
+├── fix-typescript-errors.js
+├── fixr.sh
+├── package-lock.json
+├── package.json
+├── schemas
+│   ├── examples
+│   │   └── calendar.proto
+│   └── mcp-spec
+│       ├── protocol.json
+│       ├── protocol.ts
+│       └── schema.json
+├── src
+│   ├── cli.ts
+│   ├── docs
+│   │   └── gts-integration.md
+│   ├── ensureProjectStructure.ts
+│   ├── generator
+│   │   ├── mcpServerGenerator.ts
+│   │   └── plan.md
+│   ├── index.ts
+│   ├── mcp
+│   │   └── mapper.ts
+│   ├── parser
+│   │   ├── mcpProtocolParser.ts
+│   │   ├── mcpSchemaAdapter.ts
+│   │   └── serviceParser.ts
+│   ├── types
+│   │   └── schemaTypes.ts
+│   ├── types.ts
+│   └── utils
+│       ├── configManager.ts
+│       ├── errorBoundary.ts
+│       ├── errorUtils.ts
+│       ├── logger.ts
+│       ├── performanceUtils.ts
+│       ├── scripts
+│       ├── templateEngine.ts
+│       ├── templateEngine.ts.bak
+│       ├── templateManager.ts
+│       ├── templateSystem.ts
+│       └── validationUtils.ts
+├── templates
+│   ├── api.eta
+│   ├── express
+│   │   ├── api
+│   │   │   └── api.eta
+│   │   ├── handler
+│   │   │   └── handler.eta
+│   │   ├── index
+│   │   │   └── index.eta
+│   │   ├── package.json.eta
+│   │   ├── server
+│   │   │   └── server.eta
+│   │   ├── src
+│   │   │   ├── cli.ts
+│   │   │   ├── handlers
+│   │   │   │   ├── connectionHandler.ts.eta
+│   │   │   │   ├── messageHandler.ts.eta
+│   │   │   │   └── request-handler.ts.eta
+│   │   │   ├── mcpServerGenerator.ts
+│   │   │   ├── models
+│   │   │   └── utils
+│   │   │       ├── errorHandler.ts.eta
+│   │   │       └── logger.ts.eta
+│   │   └── types
+│   │       └── types.eta
+│   ├── handler.eta
+│   ├── index.eta
+│   ├── server.eta
+│   └── types.eta
+├── tree.txt
+└── tsconfig.json
+
+25 directories, 67 files

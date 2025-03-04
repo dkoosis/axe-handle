@@ -4,15 +4,15 @@
 import path from 'path';
 import fs from 'fs/promises';
 import chalk from 'chalk';
-import { generateMcpServer } from './index';
-import { GeneratorOptions } from './types';
-import { getConfigManager } from './utils/configManager';
-import { getTemplateManager } from './utils/templateManager';
-import { mcpProtocolParser } from './parser/mcpProtocolParser';
-import { extractMcpProtocol } from './parser/mcpSchemaAdapter';
-import { serviceParser } from './parser/serviceParser';
-import { mapper } from './mcp/mapper';
-import { mcpServerGenerator } from './generator/mcpServerGenerator';
+import { generateMcpServer } from '../src/index';
+import { GeneratorOptions } from '../src/types';
+import { getConfigManager } from '../src/utils/configManager';
+import { getTemplateManager } from '../src/utils/templateManager';
+import { mcpProtocolParser } from '../src/parser/mcpProtocolParser';
+import { extractMcpProtocol } from '../src/parser/mcpSchemaAdapter';
+import { serviceParser } from '../src/parser/serviceParser';
+import { mapper } from '../src/mcp/mapper';
+import { mcpServerGenerator } from '../src/generator/mcpServerGenerator';
 
 // Hardcoded paths for easier debugging
 const schemaFile = path.resolve(__dirname, '../schemas/examples/calendar.proto');
