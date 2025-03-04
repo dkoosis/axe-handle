@@ -35,9 +35,7 @@ async function maybeFailAsync(shouldSucceed: boolean): Promise<number> {
  */
 function exampleWithResult(shouldSucceed: boolean): AxeResult<number> {
   return runOperation(
-    'exampleWithResult',
     () => {
-      // This could throw an error, but runOperation will catch it
       return maybeFailSync(shouldSucceed);
     },
     LogCategory.GENERAL,
@@ -51,7 +49,6 @@ function exampleWithResult(shouldSucceed: boolean): AxeResult<number> {
  */
 function exampleWithResultAsync(shouldSucceed: boolean): AxeResultAsync<number> {
   return runAsyncOperation(
-    'exampleWithResultAsync',
     () => maybeFailAsync(shouldSucceed),
     LogCategory.GENERAL,
     103

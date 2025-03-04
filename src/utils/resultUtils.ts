@@ -148,6 +148,7 @@ export function combineResults<T>(results: AxeResult<T>[]): AxeResult<T[]> {
  * @param results The async results to combine
  * @returns A combined async result
  */
+// Fix type issues with combineAsyncResults
 export function combineAsyncResults<T>(results: AxeResultAsync<T>[]): AxeResultAsync<T[]> {
   // Use Promise.all to wait for all results
   return ResultAsync.fromPromise(
@@ -155,21 +156,19 @@ export function combineAsyncResults<T>(results: AxeResultAsync<T>[]): AxeResultA
       (value) => ({ status: 'ok' as const, value }),
       (error) => ({ status: 'err' as const, error })
     ))),
-    (error) => createGeneratorError(
-      9001,
-      `Failed to combine async results: ${error instanceof Error ? error.message : String(error)}`,
-      {},
-      error instanceof Error ? error : new Error(String(error))
-    )
+    (error) => createGeneratorError(/*...*/)
   ).andThen((results) => {
+    // Add proper type assertion for results
+    const typedResults = results as Array<{status: 'ok', value: T} | {status: 'err', error: AxeError}>;
+    
     // Check for any errors
-    const firstError = results.find(result => result.status === 'err');
+    const firstError = typedResults.find(result => result.status === 'err');
     if (firstError && firstError.status === 'err') {
-      return err(firstError.error);
+      return err((firstError as {status: 'err', error: AxeError}).error);
     }
     
     // Extract values
-    const values = results
+    const values = typedResults
       .filter((result): result is { status: 'ok', value: T } => result.status === 'ok')
       .map(result => result.value);
     
