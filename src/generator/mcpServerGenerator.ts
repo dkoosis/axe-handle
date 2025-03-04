@@ -672,3 +672,7 @@ npm start
       }
     });
   }
+}
+
+// Export singleton instance
+export const mcpServerGenerator = McpServerGenerator.getInstance();

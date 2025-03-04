@@ -4,7 +4,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
-import TemplateEngine from '../../utils/templateEngine';
+import TemplateEngine from './utils/templateEngine';
 
 /**
  * Verify the template directory structure and contents
@@ -93,13 +93,13 @@ async function verifyTemplates(): Promise<void> {
     
     if (templates.length > 0) {
       console.log(chalk.green('First 5 templates:'));
-      templates.slice(0, 5).forEach((template: string) => {
+      templates.slice(0, 5).forEach(template => {
         console.log(`  - ${template}`);
       });
     }
   } catch (error) {
-    console.log(chalk.red(`✗ Error loading templates: ${error instanceof Error ? error.message : String(error)}`));
-    console.log(error instanceof Error ? error.stack : String(error));
+    console.log(chalk.red(`✗ Error loading templates: ${error.message}`));
+    console.log(error.stack);
   }
   
   console.log(chalk.cyan('\n==== Verification Complete ===='));

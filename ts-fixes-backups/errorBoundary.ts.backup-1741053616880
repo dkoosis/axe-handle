@@ -83,8 +83,8 @@ export function createAsyncErrorBoundary<T, Args extends any[]>(
           if (error !== null && typeof error === 'object') {
             for (const key in error) {
               try {
-                if (key !== 'stack' && key !== 'message' && typeof error === 'object' && error !== null && key in error) {
-                  errorDetails[key] = (error as Record<string, unknown>)[key];
+                if (key !== 'stack' && key !== 'message') {
+                  errorDetails[key] = error[key];
                 }
               } catch {
                 // Ignore property access errors
@@ -175,8 +175,8 @@ export function createSyncErrorBoundary<T, Args extends any[]>(
           if (error !== null && typeof error === 'object') {
             for (const key in error) {
               try {
-                if (key !== 'stack' && key !== 'message' && typeof error === 'object' && error !== null && key in error) {
-                  errorDetails[key] = (error as Record<string, unknown>)[key];
+                if (key !== 'stack' && key !== 'message') {
+                  errorDetails[key] = error[key];
                 }
               } catch {
                 // Ignore property access errors

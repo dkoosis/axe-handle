@@ -157,8 +157,7 @@ export default class TemplateEngine {
    */
   private findTemplate(templateName: string): { path: string; content: string } | null {
     // Check for various forms of the template name
-    // Main template path, will be determined by findTemplate
-    // let templatePath = templateName;
+    let templatePath = templateName;
     let templateContent: string | undefined;
     
     // Step 1: Direct lookup in cache
@@ -309,15 +308,15 @@ export default class TemplateEngine {
         
         throw createGeneratorError(
           3004,
-          `Failed to render template: ${renderError instanceof Error ? renderError.message : String(renderError)}`,
+          `Failed to render template: ${renderError.message}`,
           { 
             templateName,
             templatePath: template.path,
             templatePreview,
             availableData: dataKeys,
-            renderError: renderError instanceof Error ? renderError.message : String(renderError)
+            renderError: renderError.message
           },
-          renderError instanceof Error ? renderError : new Error(String(renderError))
+          renderError
         );
       }
     } catch (error) {
