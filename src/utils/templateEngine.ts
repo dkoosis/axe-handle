@@ -1,5 +1,5 @@
 // Path: src/utils/templateEngine.ts
-// Provides a template engine for generating code from EJS templates.
+// Provides a template engine for generating code from Eta templates.
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -8,20 +8,39 @@ import { createGeneratorError } from './errorUtils';
 
 /**
  * Template Engine.
- * Handles the loading and rendering of ETA templates.
+ * Handles the loading and rendering of Eta templates.
  */
 export default class TemplateEngine {
   private templateDir: string;
   private templates: Map<string, string> = new Map();
   private helpers: Record<string, Function> = {};
+  private verbose: boolean = false;
 
   /**
    * Creates a new Template Engine.
    * @param templateDir Directory containing templates
+   * @param verbose Whether to enable verbose logging
    */
-  constructor(templateDir: string) {
+  constructor(templateDir: string, verbose: boolean = false) {
     this.templateDir = templateDir;
-    console.log(`TemplateEngine initialized with directory: ${templateDir}`);
+    this.verbose = verbose;
+    this.log(`TemplateEngine initialized with directory: ${templateDir}`);
+
+    // Configure Eta
+    eta.configure({
+      cache: true,
+      autoEscape: false,
+      views: templateDir
+    });
+  }
+
+  /**
+   * Logs a message if verbose logging is enabled
+   */
+  private log(message: string, isError: boolean = false): void {
+    if (this.verbose || isError) {
+      console[isError ? 'error' : 'log'](message);
+    }
   }
 
   /**
@@ -29,11 +48,11 @@ export default class TemplateEngine {
    */
   public loadTemplates(): void {
     try {
-      console.log(`Loading templates from directory: ${this.templateDir}`);
+      this.log(`Loading templates from directory: ${this.templateDir}`);
       
       // Check if template directory exists
       if (!fs.existsSync(this.templateDir)) {
-        console.error(`Template directory not found: ${this.templateDir}`);
+        this.log(`Template directory not found: ${this.templateDir}`, true);
         throw createGeneratorError(
           3001,
           `Template directory not found: ${this.templateDir}`,
@@ -43,28 +62,40 @@ export default class TemplateEngine {
 
       // List all files in the directory to verify access
       const dirContents = fs.readdirSync(this.templateDir);
-      console.log(`Template directory contents: ${dirContents.join(', ')}`);
+      this.log(`Template directory contents: ${dirContents.join(', ')}`);
 
-      // Get all .eta files in the template directory
+      // Get all templates in the directory structure - supporting both .eta and .ejs
       this.walkDir(this.templateDir, (filePath) => {
-        if (filePath.endsWith('.eta')) {
+        if (filePath.endsWith('.eta') || filePath.endsWith('.ejs')) {
           const relativePath = path.relative(this.templateDir, filePath);
           try {
             const templateContent = fs.readFileSync(filePath, 'utf-8');
             this.templates.set(relativePath, templateContent);
-            console.log(`Loaded template: ${relativePath}`);
+            
+            // Also store a version without the extension for easier lookup
+            const baseNameWithoutExt = path.basename(relativePath, path.extname(relativePath));
+            const dirName = path.dirname(relativePath);
+            if (dirName === '.') {
+              // Root template
+              this.templates.set(baseNameWithoutExt, templateContent);
+            } else {
+              // Template in subdirectory
+              this.templates.set(path.join(dirName, baseNameWithoutExt), templateContent);
+            }
+            
+            this.log(`Loaded template: ${relativePath}`);
           } catch (err) {
-            console.warn(`Failed to read template file: ${filePath}`, err);
+            this.log(`Failed to read template file: ${filePath}, error: ${err}`, true);
           }
         }
       });
 
-      console.log(`Loaded ${this.templates.size} templates`);
+      this.log(`Loaded ${this.templates.size} templates`);
       if (this.templates.size === 0) {
-        console.warn('No templates found. This may cause errors during generation.');
+        this.log('No templates found. This may cause errors during generation.', true);
       }
     } catch (error) {
-      console.error(`Template loading error:`, error);
+      this.log(`Template loading error: ${error}`, true);
       
       if (error instanceof Error && 'code' in error) {
         // Error is already a generator error, rethrow
@@ -100,11 +131,11 @@ export default class TemplateEngine {
             callback(filePath);
           }
         } catch (err) {
-          console.warn(`Error accessing path: ${filePath}`, err);
+          this.log(`Error accessing path: ${filePath}, error: ${err}`, true);
         }
       }
     } catch (err) {
-      console.warn(`Error reading directory: ${dir}`, err);
+      this.log(`Error reading directory: ${dir}, error: ${err}`, true);
     }
   }
 
@@ -115,7 +146,100 @@ export default class TemplateEngine {
    */
   public registerHelper(name: string, fn: Function): void {
     this.helpers[name] = fn;
-    console.log(`Registered helper function: ${name}`);
+    this.log(`Registered helper function: ${name}`);
+  }
+
+  /**
+   * Finds the best template match for the given name.
+   * Searches in various locations to accommodate different template organization styles.
+   * @param templateName Template name (with or without extension)
+   * @returns The template path and content, or null if not found
+   */
+  private findTemplate(templateName: string): { path: string; content: string } | null {
+    // Check for various forms of the template name
+    let templatePath = templateName;
+    let templateContent: string | undefined;
+    
+    // Step 1: Direct lookup in cache
+    templateContent = this.templates.get(templateName);
+    if (templateContent) {
+      return { path: templateName, content: templateContent };
+    }
+    
+    // Step 2: Try with extensions
+    if (!templateName.endsWith('.eta') && !templateName.endsWith('.ejs')) {
+      templateContent = this.templates.get(`${templateName}.eta`);
+      if (templateContent) {
+        return { path: `${templateName}.eta`, content: templateContent };
+      }
+      
+      templateContent = this.templates.get(`${templateName}.ejs`);
+      if (templateContent) {
+        return { path: `${templateName}.ejs`, content: templateContent };
+      }
+    }
+    
+    // Step 3: Look for framework-specific paths (e.g., express/category/template)
+    // Look for templates in express subdirectory
+    for (const key of this.templates.keys()) {
+      // Look for matches like "express/server/server" or "express/server/server.eta"
+      if (
+        key.includes(`/${templateName}`) || 
+        key.includes(`/${templateName}.`) ||
+        key.endsWith(`/${templateName}`)
+      ) {
+        templateContent = this.templates.get(key);
+        if (templateContent) {
+          return { path: key, content: templateContent };
+        }
+      }
+      
+      // Also try matching just the base name
+      const baseName = path.basename(key, path.extname(key));
+      if (baseName === templateName) {
+        templateContent = this.templates.get(key);
+        if (templateContent) {
+          return { path: key, content: templateContent };
+        }
+      }
+    }
+    
+    // Step 4: Try the file system directly
+    const expressDir = path.join(this.templateDir, 'express');
+    
+    // Try several potential locations
+    const potentialLocations = [
+      path.join(this.templateDir, templateName),
+      path.join(this.templateDir, `${templateName}.eta`),
+      path.join(this.templateDir, `${templateName}.ejs`),
+      // Try direct in express directory
+      path.join(expressDir, templateName),
+      path.join(expressDir, `${templateName}.eta`),
+      path.join(expressDir, `${templateName}.ejs`),
+      // Try in category subdirectory
+      path.join(expressDir, templateName, `${templateName}.eta`),
+      path.join(expressDir, templateName, `${templateName}.ejs`),
+      // Try as a subdirectory of category
+      path.join(expressDir, path.dirname(templateName), path.basename(templateName), `${path.basename(templateName)}.eta`),
+      path.join(expressDir, path.dirname(templateName), path.basename(templateName), `${path.basename(templateName)}.ejs`)
+    ];
+    
+    for (const location of potentialLocations) {
+      if (fs.existsSync(location)) {
+        try {
+          templateContent = fs.readFileSync(location, 'utf-8');
+          // Cache for future use
+          this.templates.set(templateName, templateContent);
+          this.log(`Found template at: ${location}`);
+          return { path: location, content: templateContent };
+        } catch (err) {
+          this.log(`Error reading template file ${location}: ${err}`, true);
+        }
+      }
+    }
+    
+    // Template not found
+    return null;
   }
 
   /**
@@ -126,61 +250,21 @@ export default class TemplateEngine {
    */
   public renderTemplate(templateName: string, data: any): string {
     try {
-      console.log(`Rendering template: ${templateName}`);
+      this.log(`Rendering template: ${templateName}`);
       
-      // First, try to get the template by exact name
-      let templateContent = this.templates.get(templateName);
-      let templateSource = 'cache';
+      // Find the template
+      const template = this.findTemplate(templateName);
       
-      // If not found, try framework-specific directory structure
-      if (!templateContent) {
-        // Look for files that end with the template name
-        const matchingTemplates = Array.from(this.templates.keys())
-          .filter(key => {
-            const basename = path.basename(key);
-            return basename === templateName || key.endsWith(`/${templateName}`) || key.endsWith(`\\${templateName}`);
-          });
+      if (!template) {
+        this.log(`Template not found: ${templateName}`, true);
         
-        if (matchingTemplates.length > 0) {
-          templateContent = this.templates.get(matchingTemplates[0])!;
-          templateSource = `matched as ${matchingTemplates[0]}`;
-        }
-      }
-      
-      // If still not found, try to load from file directly
-      if (!templateContent) {
-        const templatePath = path.join(this.templateDir, templateName);
-        
-        if (fs.existsSync(templatePath)) {
-          try {
-            templateContent = fs.readFileSync(templatePath, 'utf-8');
-            this.templates.set(templateName, templateContent);
-            templateSource = 'file';
-          } catch (err) {
-            console.warn(`Failed to read template file: ${templatePath}`, err);
-          }
-        }
-      }
-      
-      // If still not found, search all subdirectories
-      if (!templateContent) {
-        // Search for the template in all subdirectories
-        const possiblePaths = this.findFileInDir(this.templateDir, templateName);
-        
-        if (possiblePaths.length > 0) {
-          try {
-            templateContent = fs.readFileSync(possiblePaths[0], 'utf-8');
-            this.templates.set(templateName, templateContent);
-            templateSource = `found at ${possiblePaths[0]}`;
-          } catch (err) {
-            console.warn(`Failed to read template file: ${possiblePaths[0]}`, err);
-          }
-        }
-      }
-      
-      if (!templateContent) {
-        console.error(`Template not found: ${templateName}`);
-        console.error(`Available templates: ${Array.from(this.templates.keys()).join(', ')}`);
+        // List available templates to help with debugging
+        const availableTemplates = Array.from(this.templates.keys())
+          .filter(t => !t.includes('/node_modules/'))
+          .sort();
+          
+        this.log(`Available templates (${availableTemplates.length}):`, true);
+        availableTemplates.forEach(t => this.log(`  - ${t}`, true));
         
         throw createGeneratorError(
           3003,
@@ -188,12 +272,12 @@ export default class TemplateEngine {
           { 
             templateName, 
             templateDir: this.templateDir,
-            availableTemplates: Array.from(this.templates.keys()).join(', ')
+            availableTemplates: availableTemplates.slice(0, 20) // List first 20 templates
           }
         );
       }
 
-      console.log(`Found template ${templateName} (source: ${templateSource})`);
+      this.log(`Using template: ${template.path}`);
 
       // Create a context with helpers
       const context = {
@@ -202,61 +286,52 @@ export default class TemplateEngine {
       };
 
       // Render the template
-      const result = eta.render(templateContent, context, {
-        filename: path.join(this.templateDir, templateName) // For including other templates
-      });
-      
-      console.log(`Successfully rendered template: ${templateName}`);
-      return result;
-    } catch (error) {
-      console.error(`Error rendering template ${templateName}:`, error);
-      
-      if (error instanceof Error && 'code' in error) {
-        // Error is already a generator error, rethrow
-        throw error;
-      }
-
-      throw createGeneratorError(
-        3004,
-        `Failed to render template: ${templateName}`,
-        { templateName },
-        error instanceof Error ? error : new Error(String(error))
-      );
-    }
-  }
-
-  /**
-   * Find a file by name in a directory recursively.
-   * @param dir Directory to search
-   * @param filename Filename to find
-   * @returns Array of matching file paths
-   */
-  private findFileInDir(dir: string, filename: string): string[] {
-    let results: string[] = [];
-    
-    try {
-      const files = fs.readdirSync(dir);
-      
-      for (const file of files) {
-        const filePath = path.join(dir, file);
+      try {
+        // Attempt to render with Eta
+        const result = eta.render(template.content, context);
         
-        try {
-          const stat = fs.statSync(filePath);
-          
-          if (stat.isDirectory()) {
-            results = results.concat(this.findFileInDir(filePath, filename));
-          } else if (file === filename || file.endsWith('/' + filename) || file.endsWith('\\' + filename)) {
-            results.push(filePath);
-          }
-        } catch (err) {
-          // Ignore errors for individual files
+        if (result === undefined || result === null) {
+          throw new Error('Eta rendering returned undefined or null');
         }
+        
+        this.log(`Successfully rendered template: ${templateName}`);
+        return result;
+      } catch (renderError) {
+        this.log(`Error during Eta rendering: ${renderError}`, true);
+        
+        // Try rendering with a more basic approach as fallback
+        this.log('Attempting fallback rendering...', true);
+        
+        // Extract some template details for error context
+        const templatePreview = template.content.substring(0, 100) + '...';
+        const dataKeys = Object.keys(data);
+        
+        throw createGeneratorError(
+          3004,
+          `Failed to render template: ${renderError.message}`,
+          { 
+            templateName,
+            templatePath: template.path,
+            templatePreview,
+            availableData: dataKeys,
+            renderError: renderError.message
+          },
+          renderError
+        );
       }
-    } catch (err) {
-      // Ignore errors for directories
+    } catch (error) {
+      // If error is not already a generator error, wrap it
+      if (error instanceof Error && !('code' in error)) {
+        throw createGeneratorError(
+          3005,
+          `Template rendering error: ${error.message}`,
+          { templateName },
+          error
+        );
+      }
+      
+      throw error;
     }
-    
-    return results;
   }
 
   /**
@@ -267,7 +342,7 @@ export default class TemplateEngine {
    */
   public renderToFile(templateName: string, outputPath: string, data: any): void {
     try {
-      console.log(`Rendering template ${templateName} to file: ${outputPath}`);
+      this.log(`Rendering template ${templateName} to file: ${outputPath}`);
       
       // Render the template
       const output = this.renderTemplate(templateName, data);
@@ -275,27 +350,26 @@ export default class TemplateEngine {
       // Create the output directory if it doesn't exist
       const outputDir = path.dirname(outputPath);
       if (!fs.existsSync(outputDir)) {
-        console.log(`Creating output directory: ${outputDir}`);
+        this.log(`Creating output directory: ${outputDir}`);
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
       // Write the rendered output to the file
       fs.writeFileSync(outputPath, output, 'utf-8');
-      console.log(`Successfully wrote file: ${outputPath}`);
+      this.log(`Successfully wrote file: ${outputPath}`);
     } catch (error) {
-      console.error(`Error writing template to file:`, error);
+      this.log(`Error writing template to file: ${error}`, true);
       
-      if (error instanceof Error && 'code' in error) {
-        // Error is already a generator error, rethrow
-        throw error;
+      if (error instanceof Error && !('code' in error)) {
+        throw createGeneratorError(
+          3006,
+          `Failed to render template to file: ${outputPath}`,
+          { templateName, outputPath },
+          error
+        );
       }
-
-      throw createGeneratorError(
-        3005,
-        `Failed to render template to file: ${outputPath}`,
-        { templateName, outputPath },
-        error instanceof Error ? error : new Error(String(error))
-      );
+      
+      throw error;
     }
   }
 
@@ -305,5 +379,12 @@ export default class TemplateEngine {
    */
   public listLoadedTemplates(): string[] {
     return Array.from(this.templates.keys());
+  }
+  
+  /**
+   * Enable verbose logging
+   */
+  public enableVerboseLogging(): void {
+    this.verbose = true;
   }
 }

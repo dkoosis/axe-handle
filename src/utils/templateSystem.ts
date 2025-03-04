@@ -26,9 +26,10 @@ export class TemplateSystem {
   private static instance: TemplateSystem;
   private baseDir: string;
   private framework?: string;
-//  private templateCache: Map<string, string> = new Map();
   private cache: boolean;
   private initialized: boolean = false;
+  // Create a local helpers object
+  private helpers: Record<string, Function> = {};
   
   private constructor(options: TemplateOptions) {
     this.baseDir = options.baseDir;
@@ -47,7 +48,7 @@ export class TemplateSystem {
     // Register helpers
     if (options.helpers) {
       for (const [name, fn] of Object.entries(options.helpers)) {
-        eta.helpers[name] = fn;
+        this.registerHelper(name, fn);
       }
     }
     
@@ -215,8 +216,14 @@ export class TemplateSystem {
       // Log the template path for debugging
       logger.debug(`Rendering template: ${templatePath}`, LogCategory.TEMPLATE);
       
+      // Merge our helper functions with the template data
+      const templateData = {
+        ...data,
+        ...this.helpers
+      };
+      
       // Use Eta's file rendering
-      const result = await eta.renderFileAsync(templatePath, data, {
+      const result = await eta.renderFileAsync(templatePath, templateData, {
         cache: this.cache,
         views: this.baseDir
       });
@@ -265,7 +272,8 @@ export class TemplateSystem {
    * Register a helper function
    */
   public registerHelper(name: string, fn: Function): void {
-    eta.helpers[name] = fn;
+    // Store the helper in our local collection
+    this.helpers[name] = fn;
     logger.debug(`Registered helper function: ${name}`, LogCategory.TEMPLATE);
   }
   
@@ -273,7 +281,18 @@ export class TemplateSystem {
    * Clear the template cache
    */
   public clearCache(): void {
-    eta.cache.clear();
+    // Clear Eta's template cache
+    eta.configure({
+      cache: false
+    });
+    
+    // Re-enable caching if it was enabled
+    if (this.cache) {
+      eta.configure({
+        cache: true
+      });
+    }
+    
     logger.debug('Template cache cleared', LogCategory.TEMPLATE);
   }
   

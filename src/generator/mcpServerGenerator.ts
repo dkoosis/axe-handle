@@ -2,10 +2,11 @@
 // Core code generation functionality for the Axe Handle tool.
 
 import * as path from 'path';
+import * as fs from 'fs';
 import { MappedService, GeneratorOptions } from '../types';
 import { logger, LogCategory } from '../utils/logger';
 import { createGeneratorError } from '../utils/errorUtils';
-import { getTemplateSystem } from '../utils/templateSystem';
+import TemplateEngine from '../utils/templateEngine';
 import { ValidationUtils } from '../utils/validationUtils';
 import { performance } from '../utils/performanceUtils';
 import { createAsyncErrorBoundary } from '../utils/errorBoundary';
@@ -18,6 +19,7 @@ import { createAsyncErrorBoundary } from '../utils/errorBoundary';
 class McpServerGenerator {
   private static instance: McpServerGenerator;
   private initialized: boolean = false;
+  private templateEngine: TemplateEngine | null = null;
 
   /**
    * Creates a new Generator instance.
@@ -37,31 +39,47 @@ class McpServerGenerator {
   }
 
   /**
-   * Initialize the generator
+   * Initialize the generator with template engine setup
    */
-private async initialize(_options: GeneratorOptions): Promise<void> {
-  if (this.initialized) {
-    return;
+  private async initialize(options: GeneratorOptions): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+
+    logger.debug('Initializing MCP server generator...', LogCategory.GENERATOR);
+
+    // Set up template engine
+    const projectRoot = path.resolve(__dirname, '../..');
+    const templatesDir = path.join(projectRoot, 'templates');
+    
+    if (!fs.existsSync(templatesDir)) {
+      logger.error(`Templates directory not found: ${templatesDir}`, LogCategory.GENERATOR);
+      throw createGeneratorError(
+        1100,
+        'Templates directory not found. Run prebuild script to create it.',
+        { templatesDir }
+      );
+    }
+    
+    // Create template engine with verbose mode if requested
+    this.templateEngine = new TemplateEngine(templatesDir, options.verbose || false);
+    
+    // Register common helper functions for templates
+    this.templateEngine.registerHelper('isRequestType', (type: string) => type.endsWith('Request'));
+    this.templateEngine.registerHelper('isResponseType', (type: string) => type.endsWith('Result') || type.endsWith('Response'));
+    this.templateEngine.registerHelper('getResponseTypeForRequest', (requestType: string) => requestType.replace('Request', 'Result'));
+    this.templateEngine.registerHelper('getMethodFromRequest', (requestType: string) => {
+      const methodParts = requestType.replace('Request', '').split(/(?=[A-Z])/);
+      return methodParts.map(part => part.toLowerCase()).join('_');
+    });
+    
+    // Load all templates
+    this.templateEngine.loadTemplates();
+    
+    this.initialized = true;
+    logger.debug('MCP server generator initialized successfully', LogCategory.GENERATOR);
   }
 
-  logger.debug('Initializing MCP server generator...', LogCategory.GENERATOR);
-
-  // Get template system (should be already initialized by this point)
-  const templateSystem = getTemplateSystem();
-
-  // Make sure the template system has the helpers it needs
-  templateSystem.registerHelper('isRequestType', (type: string) => type.endsWith('Request'));
-  templateSystem.registerHelper('isResponseType', (type: string) => type.endsWith('Result') || type.endsWith('Response'));
-  templateSystem.registerHelper('getResponseTypeForRequest', (requestType: string) => requestType.replace('Request', 'Result'));
-  templateSystem.registerHelper('getMethodFromRequest', (requestType: string) => {
-    const methodParts = requestType.replace('Request', '').split(/(?=[A-Z])/);
-    return methodParts.map(part => part.toLowerCase()).join('_');
-  });
-
-  await templateSystem.initialize();
-  this.initialized = true;
-  logger.debug('MCP server generator initialized successfully', LogCategory.GENERATOR);
-}
   /**
    * Generates server code for the mapped service.
    * @param mappedService The mapped service
@@ -85,6 +103,15 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
 
       // Initialize the generator
       await this.initialize(options);
+      
+      // Ensure we have a template engine
+      if (!this.templateEngine) {
+        throw createGeneratorError(
+          1101,
+          'Template engine not initialized',
+          { options }
+        );
+      }
       
       // Create output directory
       await ValidationUtils.validateDirectory(
@@ -188,14 +215,35 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
         version: '0.1.0'
       };
 
-      // Get template system
-      const templateSystem = getTemplateSystem();
+      // Ensure template engine is initialized
+      if (!this.templateEngine) {
+        throw createGeneratorError(
+          1102,
+          'Template engine not initialized',
+          { operation: 'generateTypesFile' }
+        );
+      }
 
-      // Render and write the file
-      const typesPath = path.join(options.outputDir, 'types.ts');
-      await templateSystem.renderToFile('types', typesPath, templateData);
+      try {
+        // Render and write the file
+        const typesPath = path.join(options.outputDir, 'types.ts');
+        this.templateEngine.renderToFile('types', typesPath, templateData);
 
-      logger.success(`Generated types file: ${path.basename(typesPath)}`, LogCategory.GENERATOR);
+        logger.success(`Generated types file: ${path.basename(typesPath)}`, LogCategory.GENERATOR);
+      } catch (error) {
+        // Add more context to the error
+        logger.error(`Failed to generate types file: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+        
+        throw createGeneratorError(
+          1200,
+          'Failed to generate types file',
+          { 
+            service: mappedService.name,
+            templateName: 'types'
+          },
+          error instanceof Error ? error : new Error(String(error))
+        );
+      }
     });
   }
 
@@ -210,27 +258,48 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
       const handlersDir = path.join(options.outputDir, 'handlers');
       await ValidationUtils.validateDirectory(handlersDir, 1007, undefined, true);
 
-      // Get template system
-      const templateSystem = getTemplateSystem();
+      // Ensure template engine is initialized
+      if (!this.templateEngine) {
+        throw createGeneratorError(
+          1103,
+          'Template engine not initialized',
+          { operation: 'generateHandlerFiles' }
+        );
+      }
 
       // Generate a handler file for each resource
       for (const resource of mappedService.resources) {
         await performance.track(`generate-handler-${resource.name.toLowerCase()}`, async () => {
           logger.info(`Generating handler for resource: ${resource.name}`, LogCategory.GENERATOR);
 
-          // Prepare template data
-          const templateData = {
-            resource,
-            service: mappedService,
-            date: new Date().toISOString(),
-            version: '0.1.0'
-          };
+          try {
+            // Prepare template data
+            const templateData = {
+              resource,
+              service: mappedService,
+              date: new Date().toISOString(),
+              version: '0.1.0'
+            };
 
-          // Render and write the file
-          const handlerPath = path.join(handlersDir, `${resource.name.toLowerCase()}.ts`);
-          await templateSystem.renderToFile('handler', handlerPath, templateData);
+            // Render and write the file
+            const handlerPath = path.join(handlersDir, `${resource.name.toLowerCase()}.ts`);
+            this.templateEngine!.renderToFile('handler', handlerPath, templateData);
 
-          logger.success(`Generated handler file: ${path.basename(handlerPath)}`, LogCategory.GENERATOR);
+            logger.success(`Generated handler file: ${path.basename(handlerPath)}`, LogCategory.GENERATOR);
+          } catch (error) {
+            logger.error(`Failed to generate handler for ${resource.name}: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+            
+            throw createGeneratorError(
+              1201,
+              `Failed to generate handler for ${resource.name}`,
+              { 
+                service: mappedService.name,
+                resource: resource.name,
+                templateName: 'handler'
+              },
+              error instanceof Error ? error : new Error(String(error))
+            );
+          }
         });
       }
     });
@@ -243,24 +312,44 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
     return performance.track('generate-server-file', async () => {
       logger.info('Generating server file...', LogCategory.GENERATOR);
 
-      // Prepare template data
-      const templateData = {
-        service: mappedService,
-        date: new Date().toISOString(),
-        version: '0.1.0'
-      };
+      // Ensure template engine is initialized
+      if (!this.templateEngine) {
+        throw createGeneratorError(
+          1104,
+          'Template engine not initialized',
+          { operation: 'generateServerFile' }
+        );
+      }
 
-      // Get template system
-      const templateSystem = getTemplateSystem();
+      try {
+        // Prepare template data
+        const templateData = {
+          service: mappedService,
+          date: new Date().toISOString(),
+          version: '0.1.0'
+        };
 
-      // Render and write the file
-      const serverPath = path.join(options.outputDir, 'server.ts');
-      await templateSystem.renderToFile('server', serverPath, templateData);
+        // Render and write the file
+        const serverPath = path.join(options.outputDir, 'server.ts');
+        this.templateEngine.renderToFile('server', serverPath, templateData);
 
-      logger.success(`Generated server file: ${path.basename(serverPath)}`, LogCategory.GENERATOR);
+        logger.success(`Generated server file: ${path.basename(serverPath)}`, LogCategory.GENERATOR);
 
-      // Generate utility files
-      await this.generateUtilFiles(options);
+        // Generate utility files
+        await this.generateUtilFiles(options);
+      } catch (error) {
+        logger.error(`Failed to generate server file: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+        
+        throw createGeneratorError(
+          1202,
+          'Failed to generate server file',
+          { 
+            service: mappedService.name,
+            templateName: 'server'
+          },
+          error instanceof Error ? error : new Error(String(error))
+        );
+      }
     });
   }
 
@@ -275,8 +364,14 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
       const utilsDir = path.join(options.outputDir, 'utils');
       await ValidationUtils.validateDirectory(utilsDir, 1008, undefined, true);
 
-      // Get template system
-      const templateSystem = getTemplateSystem();
+      // Ensure template engine is initialized
+      if (!this.templateEngine) {
+        throw createGeneratorError(
+          1105,
+          'Template engine not initialized',
+          { operation: 'generateUtilFiles' }
+        );
+      }
 
       // Prepare template data
       const templateData = {
@@ -284,24 +379,68 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
         version: '0.1.0'
       };
 
-      // Try to generate logger utility
+      // Create a minimal logger utility if template isn't available
       try {
         const loggerPath = path.join(utilsDir, 'logger.ts');
-        await templateSystem.renderToFile('utils/logger', loggerPath, templateData);
-        logger.success('Generated logger utility', LogCategory.GENERATOR);
+        try {
+          // Try to use template
+          this.templateEngine.renderToFile('utils/logger', loggerPath, templateData);
+          logger.success('Generated logger utility', LogCategory.GENERATOR);
+        } catch (error) {
+          // Create a basic logger
+          const basicLogger = `// Generated by Axe Handle MCP Server Generator
+// Date: ${new Date().toISOString()}
+
+/**
+ * Simple logger utility
+ */
+export const logger = {
+  info: (message: string) => console.log(\`[INFO] \${message}\`),
+  warn: (message: string) => console.warn(\`[WARN] \${message}\`),
+  error: (message: string) => console.error(\`[ERROR] \${message}\`)
+};
+`;
+          fs.writeFileSync(loggerPath, basicLogger);
+          logger.success('Generated basic logger utility', LogCategory.GENERATOR);
+        }
       } catch (error) {
-        // Continue even if this fails
-        logger.warn(`Optional logger utility not generated: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+        // Non-fatal error
+        logger.warn(`Could not generate logger utility: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
       }
 
-      // Try to generate error handler utility
+      // Basic error handler
       try {
         const errorHandlerPath = path.join(utilsDir, 'errorHandler.ts');
-        await templateSystem.renderToFile('utils/errorHandler', errorHandlerPath, templateData);
-        logger.success('Generated error handler utility', LogCategory.GENERATOR);
+        try {
+          this.templateEngine.renderToFile('utils/errorHandler', errorHandlerPath, templateData);
+          logger.success('Generated error handler utility', LogCategory.GENERATOR);
+        } catch (error) {
+          // Create a basic error handler
+          const basicErrorHandler = `// Generated by Axe Handle MCP Server Generator
+// Date: ${new Date().toISOString()}
+
+/**
+ * Error response interface
+ */
+export interface ErrorResponse {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+/**
+ * Creates an error response object
+ */
+export function createErrorResponse(code: string, message: string, details?: Record<string, unknown>): ErrorResponse {
+  return { code, message, details };
+}
+`;
+          fs.writeFileSync(errorHandlerPath, basicErrorHandler);
+          logger.success('Generated basic error handler utility', LogCategory.GENERATOR);
+        }
       } catch (error) {
-        // Continue even if this fails
-        logger.warn(`Optional error handler utility not generated: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+        // Non-fatal error
+        logger.warn(`Could not generate error handler utility: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
       }
     });
   }
@@ -313,21 +452,41 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
     return performance.track('generate-index-file', async () => {
       logger.info('Generating index file...', LogCategory.GENERATOR);
 
-      // Prepare template data
-      const templateData = {
-        service: mappedService,
-        date: new Date().toISOString(),
-        version: '0.1.0'
-      };
+      // Ensure template engine is initialized
+      if (!this.templateEngine) {
+        throw createGeneratorError(
+          1106,
+          'Template engine not initialized',
+          { operation: 'generateIndexFile' }
+        );
+      }
 
-      // Get template system
-      const templateSystem = getTemplateSystem();
+      try {
+        // Prepare template data
+        const templateData = {
+          service: mappedService,
+          date: new Date().toISOString(),
+          version: '0.1.0'
+        };
 
-      // Render and write the file
-      const indexPath = path.join(options.outputDir, 'index.ts');
-      await templateSystem.renderToFile('index', indexPath, templateData);
+        // Render and write the file
+        const indexPath = path.join(options.outputDir, 'index.ts');
+        this.templateEngine.renderToFile('index', indexPath, templateData);
 
-      logger.success(`Generated index file: ${path.basename(indexPath)}`, LogCategory.GENERATOR);
+        logger.success(`Generated index file: ${path.basename(indexPath)}`, LogCategory.GENERATOR);
+      } catch (error) {
+        logger.error(`Failed to generate index file: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+        
+        throw createGeneratorError(
+          1203,
+          'Failed to generate index file',
+          { 
+            service: mappedService.name,
+            templateName: 'index'
+          },
+          error instanceof Error ? error : new Error(String(error))
+        );
+      }
     });
   }
 
@@ -338,13 +497,22 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
     return performance.track('generate-project-files', async () => {
       logger.info('Generating project files...', LogCategory.GENERATOR);
 
+      // Ensure template engine is initialized
+      if (!this.templateEngine) {
+        throw createGeneratorError(
+          1107,
+          'Template engine not initialized',
+          { operation: 'generateProjectFiles' }
+        );
+      }
+
       // Prepare template data
       const templateData = {
         service: mappedService,
         date: new Date().toISOString(),
         version: '0.1.0',
         config: {
-          projectName: mappedService.name.toLowerCase(),
+          projectName: mappedService.name.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
           author: process.env.USER || 'MCP Generator User',
           version: '0.1.0',
           description: `MCP server for ${mappedService.name}`,
@@ -352,34 +520,113 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
         }
       };
 
-      // Get template system
-      const templateSystem = getTemplateSystem();
-
       try {
         // Generate package.json
-        const packageJsonPath = path.join(options.outputDir, 'package.json');
-        await templateSystem.renderToFile('package.json', packageJsonPath, templateData);
-        logger.success('Generated package.json', LogCategory.GENERATOR);
-      } catch (error) {
-        logger.warn(`Failed to generate package.json: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
-      }
+        try {
+          const packageJsonPath = path.join(options.outputDir, 'package.json');
+          this.templateEngine.renderToFile('package.json', packageJsonPath, templateData);
+          logger.success('Generated package.json', LogCategory.GENERATOR);
+        } catch (error) {
+          // Create a minimal package.json
+          const packageJson = {
+            name: mappedService.name.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+            version: '0.1.0',
+            description: `MCP server for ${mappedService.name}`,
+            main: 'dist/index.js',
+            scripts: {
+              build: 'tsc',
+              start: 'node dist/index.js',
+              dev: 'ts-node src/index.ts'
+            },
+            dependencies: {
+              express: '^4.18.2',
+              uuid: '^9.0.0'
+            },
+            devDependencies: {
+              typescript: '^5.0.0',
+              '@types/express': '^4.17.17',
+              '@types/node': '^18.0.0',
+              '@types/uuid': '^9.0.0',
+              'ts-node': '^10.9.1'
+            }
+          };
+          
+          fs.writeFileSync(
+            path.join(options.outputDir, 'package.json'),
+            JSON.stringify(packageJson, null, 2)
+          );
+          
+          logger.success('Generated basic package.json', LogCategory.GENERATOR);
+        }
 
-      try {
         // Generate tsconfig.json
-        const tsconfigPath = path.join(options.outputDir, 'tsconfig.json');
-        await templateSystem.renderToFile('tsconfig.json', tsconfigPath, templateData);
-        logger.success('Generated tsconfig.json', LogCategory.GENERATOR);
-      } catch (error) {
-        logger.warn(`Failed to generate tsconfig.json: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
-      }
+        try {
+          const tsconfigPath = path.join(options.outputDir, 'tsconfig.json');
+          this.templateEngine.renderToFile('tsconfig.json', tsconfigPath, templateData);
+          logger.success('Generated tsconfig.json', LogCategory.GENERATOR);
+        } catch (error) {
+          // Create a minimal tsconfig.json
+          const tsconfig = {
+            compilerOptions: {
+              target: 'ES2020',
+              module: 'commonjs',
+              esModuleInterop: true,
+              strict: true,
+              skipLibCheck: true,
+              outDir: './dist',
+              sourceMap: true
+            },
+            include: ['src/**/*'],
+            exclude: ['node_modules']
+          };
+          
+          fs.writeFileSync(
+            path.join(options.outputDir, 'tsconfig.json'),
+            JSON.stringify(tsconfig, null, 2)
+          );
+          
+          logger.success('Generated basic tsconfig.json', LogCategory.GENERATOR);
+        }
 
-      try {
         // Generate README.md
-        const readmePath = path.join(options.outputDir, 'README.md');
-        await templateSystem.renderToFile('README.md', readmePath, templateData);
-        logger.success('Generated README.md', LogCategory.GENERATOR);
+        try {
+          const readmePath = path.join(options.outputDir, 'README.md');
+          this.templateEngine.renderToFile('README.md', readmePath, templateData);
+          logger.success('Generated README.md', LogCategory.GENERATOR);
+        } catch (error) {
+          // Create a minimal README.md
+          const readme = `# ${mappedService.name} MCP Server
+
+Generated by Axe Handle MCP Server Generator
+
+## Getting Started
+
+### Installation
+
+\`\`\`bash
+npm install
+\`\`\`
+
+### Running the Server
+
+\`\`\`bash
+# Development
+npm run dev
+
+# Production
+npm run build
+npm start
+\`\`\`
+`;
+          
+          fs.writeFileSync(path.join(options.outputDir, 'README.md'), readme);
+          logger.success('Generated basic README.md', LogCategory.GENERATOR);
+        }
       } catch (error) {
-        logger.warn(`Failed to generate README.md: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+        logger.error(`Failed to generate project files: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+        
+        // This is a non-critical error, so we'll just log it and continue
+        logger.warn('Some project files may be missing or incomplete', LogCategory.GENERATOR);
       }
     });
   }
@@ -391,28 +638,37 @@ private async initialize(_options: GeneratorOptions): Promise<void> {
     return performance.track('generate-documentation', async () => {
       logger.info('Generating API documentation...', LogCategory.GENERATOR);
 
-      // Create docs directory
-      const docsDir = path.join(options.outputDir, 'docs');
-      await ValidationUtils.validateDirectory(docsDir, 1009, undefined, true);
+      // Ensure template engine is initialized
+      if (!this.templateEngine) {
+        throw createGeneratorError(
+          1108,
+          'Template engine not initialized',
+          { operation: 'generateDocumentation' }
+        );
+      }
 
-      // Prepare template data
-      const templateData = {
-        service: mappedService,
-        date: new Date().toISOString(),
-        version: '0.1.0'
-      };
+      try {
+        // Create docs directory
+        const docsDir = path.join(options.outputDir, 'docs');
+        await ValidationUtils.validateDirectory(docsDir, 1009, undefined, true);
 
-      // Get template system
-      const templateSystem = getTemplateSystem();
+        // Prepare template data
+        const templateData = {
+          service: mappedService,
+          date: new Date().toISOString(),
+          version: '0.1.0'
+        };
 
-      // Render and write the file
-      const apiDocPath = path.join(docsDir, 'api.md');
-      await templateSystem.renderToFile('api', apiDocPath, templateData);
+        // Render and write the file
+        const apiDocPath = path.join(docsDir, 'api.md');
+        this.templateEngine.renderToFile('api', apiDocPath, templateData);
 
-      logger.success(`Generated API documentation: ${path.relative(options.outputDir, apiDocPath)}`, LogCategory.GENERATOR);
+        logger.success(`Generated API documentation: ${path.relative(options.outputDir, apiDocPath)}`, LogCategory.GENERATOR);
+      } catch (error) {
+        logger.error(`Failed to generate API documentation: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+        
+        // This is not critical, so just log the error and continue
+        logger.warn('API documentation may be missing or incomplete', LogCategory.GENERATOR);
+      }
     });
   }
-}
-
-// Export the singleton instance
-export const mcpServerGenerator = McpServerGenerator.getInstance();

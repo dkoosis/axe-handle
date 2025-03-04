@@ -8,12 +8,14 @@
     "axe-handle": "dist/cli.js"
   },
   "scripts": {
+    "prebuild": "ts-node src/prebuild.ts",
     "build": "tsc",
+    "pregenerate": "ts-node src/prebuild.ts",
+    "generate": "ts-node src/cli.ts",
+    "start:generated": "node generated/server.js",
     "watch": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watch",
-    "generate": "ts-node src/cli.ts",
-    "start:generated": "node generated/server.js",
     "dev": "concurrently \"npm:watch\" \"npm:test:watch\"",
     "preinstall": "npx only-allow pnpm",
     "lint": "eslint . --ext .ts",
