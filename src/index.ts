@@ -32,6 +32,7 @@ export function initialize(options: { verbose?: boolean } = {}): void {
   const templatesDir = path.resolve(__dirname, '../templates');
   getTemplateSystem({
     baseDir: templatesDir,
+    framework: 'express', // Default framework
     cache: true,
     helpers: {
       // Register common helpers
@@ -129,6 +130,58 @@ export const generateMcpServer = createAsyncErrorBoundary(
     errorCode: 2000
   }
 );
+
+/**
+ * Creates a template conversion script that can be used to convert
+ * all .ejs templates to .eta templates. This is helpful during the migration.
+ * 
+ * @param templatesDir Directory containing templates
+ * @param deleteOldFiles Whether to delete old .ejs files after conversion
+ */
+export async function convertTemplates(
+  templatesDir: string = path.resolve(__dirname, '../templates'), 
+  deleteOldFiles: boolean = false
+): Promise<void> {
+  logger.section('Converting Templates from EJS to Eta');
+  
+  try {
+    // Check if directory exists
+    await ValidationUtils.validateDirectory(templatesDir, 3000, undefined, false);
+    
+    // Function to recursively walk directories
+    const walkDir = async (dir: string) => {
+      const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+      
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        
+        if (entry.isDirectory()) {
+          await walkDir(fullPath);
+        } else if (entry.isFile() && entry.name.endsWith('.ejs')) {
+          const targetPath = fullPath.replace('.ejs', '.eta');
+          
+          logger.info(`Converting ${path.relative(templatesDir, fullPath)} -> ${path.relative(templatesDir, targetPath)}`, LogCategory.TEMPLATE);
+          
+          // Read and write
+          const content = await fs.promises.readFile(fullPath, 'utf-8');
+          await fs.promises.writeFile(targetPath, content, 'utf-8');
+          
+          // Delete old file if requested
+          if (deleteOldFiles) {
+            await fs.promises.unlink(fullPath);
+            logger.debug(`Deleted old file: ${path.relative(templatesDir, fullPath)}`, LogCategory.TEMPLATE);
+          }
+        }
+      }
+    };
+    
+    await walkDir(templatesDir);
+    logger.success(`Template conversion complete`, LogCategory.TEMPLATE);
+  } catch (error) {
+    logger.error(`Template conversion failed: ${error instanceof Error ? error.message : String(error)}`, LogCategory.TEMPLATE);
+    throw error;
+  }
+}
 
 // Export public modules and utilities
 export * from './types';

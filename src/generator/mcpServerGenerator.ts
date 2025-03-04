@@ -194,7 +194,7 @@ class McpServerGenerator {
 
       // Render and write the file
       const typesPath = path.join(options.outputDir, 'types.ts');
-      await templateSystem.renderToFile('types.ejs', typesPath, templateData);
+      await templateSystem.renderToFile('types', typesPath, templateData);
 
       logger.success(`Generated types file: ${path.basename(typesPath)}`, LogCategory.GENERATOR);
     });
@@ -229,7 +229,7 @@ class McpServerGenerator {
 
           // Render and write the file
           const handlerPath = path.join(handlersDir, `${resource.name.toLowerCase()}.ts`);
-          await templateSystem.renderToFile('handler.ejs', handlerPath, templateData);
+          await templateSystem.renderToFile('handler', handlerPath, templateData);
 
           logger.success(`Generated handler file: ${path.basename(handlerPath)}`, LogCategory.GENERATOR);
         });
@@ -256,7 +256,7 @@ class McpServerGenerator {
 
       // Render and write the file
       const serverPath = path.join(options.outputDir, 'server.ts');
-      await templateSystem.renderToFile('server.ejs', serverPath, templateData);
+      await templateSystem.renderToFile('server', serverPath, templateData);
 
       logger.success(`Generated server file: ${path.basename(serverPath)}`, LogCategory.GENERATOR);
 
@@ -288,7 +288,7 @@ class McpServerGenerator {
       // Try to generate logger utility
       try {
         const loggerPath = path.join(utilsDir, 'logger.ts');
-        await templateSystem.renderToFile('utils/logger.ts.ejs', loggerPath, templateData);
+        await templateSystem.renderToFile('utils/logger', loggerPath, templateData);
         logger.success('Generated logger utility', LogCategory.GENERATOR);
       } catch (error) {
         // Continue even if this fails
@@ -298,7 +298,7 @@ class McpServerGenerator {
       // Try to generate error handler utility
       try {
         const errorHandlerPath = path.join(utilsDir, 'errorHandler.ts');
-        await templateSystem.renderToFile('utils/errorHandler.ts.ejs', errorHandlerPath, templateData);
+        await templateSystem.renderToFile('utils/errorHandler', errorHandlerPath, templateData);
         logger.success('Generated error handler utility', LogCategory.GENERATOR);
       } catch (error) {
         // Continue even if this fails
@@ -326,7 +326,7 @@ class McpServerGenerator {
 
       // Render and write the file
       const indexPath = path.join(options.outputDir, 'index.ts');
-      await templateSystem.renderToFile('index.ejs', indexPath, templateData);
+      await templateSystem.renderToFile('index', indexPath, templateData);
 
       logger.success(`Generated index file: ${path.basename(indexPath)}`, LogCategory.GENERATOR);
     });
@@ -359,7 +359,7 @@ class McpServerGenerator {
       try {
         // Generate package.json
         const packageJsonPath = path.join(options.outputDir, 'package.json');
-        await templateSystem.renderToFile('package.json.ejs', packageJsonPath, templateData);
+        await templateSystem.renderToFile('package.json', packageJsonPath, templateData);
         logger.success('Generated package.json', LogCategory.GENERATOR);
       } catch (error) {
         logger.warn(`Failed to generate package.json: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
@@ -368,7 +368,7 @@ class McpServerGenerator {
       try {
         // Generate tsconfig.json
         const tsconfigPath = path.join(options.outputDir, 'tsconfig.json');
-        await templateSystem.renderToFile('tsconfig.json.ejs', tsconfigPath, templateData);
+        await templateSystem.renderToFile('tsconfig.json', tsconfigPath, templateData);
         logger.success('Generated tsconfig.json', LogCategory.GENERATOR);
       } catch (error) {
         logger.warn(`Failed to generate tsconfig.json: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
@@ -377,7 +377,7 @@ class McpServerGenerator {
       try {
         // Generate README.md
         const readmePath = path.join(options.outputDir, 'README.md');
-        await templateSystem.renderToFile('README.md.ejs', readmePath, templateData);
+        await templateSystem.renderToFile('README.md', readmePath, templateData);
         logger.success('Generated README.md', LogCategory.GENERATOR);
       } catch (error) {
         logger.warn(`Failed to generate README.md: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
@@ -408,7 +408,7 @@ class McpServerGenerator {
 
       // Render and write the file
       const apiDocPath = path.join(docsDir, 'api.md');
-      await templateSystem.renderToFile('api.ejs', apiDocPath, templateData);
+      await templateSystem.renderToFile('api', apiDocPath, templateData);
 
       logger.success(`Generated API documentation: ${path.relative(options.outputDir, apiDocPath)}`, LogCategory.GENERATOR);
     });

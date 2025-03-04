@@ -71,18 +71,18 @@ axe-handle/
 │   │   ├── serviceParser.ts  # Parses .proto (protobufjs, detailed validation)
 │   │   └── openapiParser.ts  # Parses OpenAPI (conversion, with warnings)
 │   ├── generator/
-│   │   └── mcpServerGenerator.ts     # Core generation (ejs, error handling)
+│   │   └── mcpServerGenerator.ts     # Core generation (eta, error handling)
 │   ├── mcp/
 │   │   └── mapper.ts        # Maps user schema to MCP
 │   ├── cli.ts             # Command-line interface (commander)
 │   ├── index.ts           # Main entry point
 │   └── types.ts           # Shared TypeScript types
 ├── templates/             # EJS templates
-│   ├── server.ejs
-│   ├── handler.ejs
-│   ├── types.ejs
-│   ├── index.ejs
-│   └── api.ejs
+│   ├── server.eta
+│   ├── handler.eta
+│   ├── types.eta
+│   ├── index.eta
+│   └── api.eta
 ├── test/                  # Unit and integration tests
 ├── schemas/
 │   ├── mcp-spec/         # MCP protocol

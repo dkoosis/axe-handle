@@ -1,11 +1,12 @@
 // src/utils/templateSystem.ts
+
 import * as fs from 'fs';
 import * as fsPromises from 'fs/promises';
 import * as path from 'path';
-// Import eta with require to avoid type issues
-const eta = require('eta');
+// Use a direct import for better TypeScript support
+import * as eta from 'eta';
 import { createGeneratorError } from './errorUtils';
-import { logger } from './logger';
+import { logger, LogCategory } from './logger';
 
 export interface TemplateOptions {
   /** Base directory for templates */
@@ -50,7 +51,7 @@ export class TemplateSystem {
       }
     }
     
-    logger.debug(`Template system initialized with base directory: ${this.baseDir}`);
+    logger.debug(`Template system initialized with base directory: ${this.baseDir}`, LogCategory.TEMPLATE);
   }
   
   /**
@@ -63,25 +64,34 @@ export class TemplateSystem {
       throw new Error('Template system not initialized');
     } else if (options) {
       // Update existing instance
-      if (options.baseDir) {
-        TemplateSystem.instance.baseDir = options.baseDir;
-      }
-      if (options.framework !== undefined) {
-        TemplateSystem.instance.framework = options.framework;
-      }
-      if (options.cache !== undefined) {
-        TemplateSystem.instance.cache = options.cache;
-      }
-      if (options.helpers) {
-        for (const [name, fn] of Object.entries(options.helpers)) {
-          eta.helpers[name] = fn;
-        }
-      }
+      TemplateSystem.instance.updateConfig(options);
     }
     
     return TemplateSystem.instance;
   }
   
+  /**
+   * Update configuration
+   */
+  public updateConfig(options: Partial<TemplateOptions>): void {
+    if (options.baseDir) {
+      this.baseDir = options.baseDir;
+      eta.configure({ views: this.baseDir });
+    }
+    if (options.framework !== undefined) {
+      this.framework = options.framework;
+    }
+    if (options.cache !== undefined) {
+      this.cache = options.cache;
+      eta.configure({ cache: this.cache });
+    }
+    if (options.helpers) {
+      for (const [name, fn] of Object.entries(options.helpers)) {
+        this.registerHelper(name, fn);
+      }
+    }
+  }
+
   /**
    * Initialize the template system by loading templates
    */
@@ -91,7 +101,7 @@ export class TemplateSystem {
     }
     
     try {
-      logger.debug('Initializing template system...');
+      logger.debug('Initializing template system...', LogCategory.TEMPLATE);
       
       // Check if base directory exists
       await fsPromises.access(this.baseDir);
@@ -103,7 +113,7 @@ export class TemplateSystem {
       }
       
       this.initialized = true;
-      logger.debug('Template system initialized successfully');
+      logger.debug('Template system initialized successfully', LogCategory.TEMPLATE);
     } catch (error) {
       throw createGeneratorError(
         3001,
@@ -118,16 +128,74 @@ export class TemplateSystem {
    * Resolve a template path
    */
   public resolveTemplatePath(templateName: string): string {
+    // Check if template already has the correct extension
+    const hasEtaExtension = templateName.endsWith('.eta');
+    const hasEjsExtension = templateName.endsWith('.ejs');
+    
+    // Create template name with correct extension
+    let templateNameWithExt = templateName;
+    if (!hasEtaExtension && !hasEjsExtension) {
+      // During migration, try both extensions with preference for .eta
+      templateNameWithExt = `${templateName}.eta`;
+    }
+    
     // Try framework-specific path first if framework is specified
     if (this.framework) {
-      const frameworkPath = path.join(this.baseDir, this.framework, templateName);
+      // First try direct path
+      const frameworkPath = path.join(this.baseDir, this.framework, templateNameWithExt);
       if (fs.existsSync(frameworkPath)) {
         return frameworkPath;
+      }
+      
+      // If that fails, try looking in a category subdirectory
+      // This handles paths like "handler.eta" -> "express/handler/handler.eta"
+      const templateBaseName = path.basename(templateNameWithExt, path.extname(templateNameWithExt));
+      const categoryPath = path.join(this.baseDir, this.framework, templateBaseName, templateNameWithExt);
+      if (fs.existsSync(categoryPath)) {
+        return categoryPath;
+      }
+      
+      // If that fails, check if we have directories named after categories that contain templates
+      // This handles paths like "server/server.eta" -> "express/server/server.eta"
+      const parts = templateName.split('/');
+      if (parts.length > 1) {
+        const category = parts[0];
+        const name = parts[parts.length - 1];
+        const nameWithExt = name.endsWith('.eta') || name.endsWith('.ejs') ? name : `${name}.eta`;
+        
+        const categoryWithNamePath = path.join(this.baseDir, this.framework, category, nameWithExt);
+        if (fs.existsSync(categoryWithNamePath)) {
+          return categoryWithNamePath;
+        }
+      }
+      
+      // During migration, try with .ejs extension as fallback
+      if (hasEtaExtension) {
+        const ejsPath = path.join(this.baseDir, this.framework, templateName.replace('.eta', '.ejs'));
+        if (fs.existsSync(ejsPath)) {
+          logger.debug(`Found template with .ejs extension: ${ejsPath}`, LogCategory.TEMPLATE);
+          return ejsPath;
+        }
       }
     }
     
     // Fallback to base path
-    return path.join(this.baseDir, templateName);
+    const basePath = path.join(this.baseDir, templateNameWithExt);
+    if (fs.existsSync(basePath)) {
+      return basePath;
+    }
+    
+    // During migration, try with .ejs extension as fallback
+    if (hasEtaExtension) {
+      const ejsPath = path.join(this.baseDir, templateName.replace('.eta', '.ejs'));
+      if (fs.existsSync(ejsPath)) {
+        logger.debug(`Found template with .ejs extension: ${ejsPath}`, LogCategory.TEMPLATE);
+        return ejsPath;
+      }
+    }
+    
+    // If no file was found, return the most likely path so we get a clear error
+    return path.join(this.baseDir, templateNameWithExt);
   }
   
   /**
@@ -144,24 +212,20 @@ export class TemplateSystem {
       // Check if template exists
       await fsPromises.access(templatePath);
       
-      // Load the template content
-      let templateContent: string;
+      // Log the template path for debugging
+      logger.debug(`Rendering template: ${templatePath}`, LogCategory.TEMPLATE);
       
-      if (this.cache && this.templateCache.has(templatePath)) {
-        templateContent = this.templateCache.get(templatePath)!;
-      } else {
-        templateContent = await fsPromises.readFile(templatePath, 'utf-8');
-        if (this.cache) {
-          this.templateCache.set(templatePath, templateContent);
-        }
-      }
-      
-      // Render the template
-      const result = await eta.renderAsync(templateContent, data, {
-        filename: templatePath
+      // Use Eta's file rendering
+      const result = await eta.renderFileAsync(templatePath, data, {
+        cache: this.cache,
+        views: this.baseDir
       });
       
-      return result || '';
+      if (result === undefined) {
+        throw new Error(`Template rendering returned undefined: ${templatePath}`);
+      }
+      
+      return result;
     } catch (error) {
       throw createGeneratorError(
         3002,
@@ -186,7 +250,7 @@ export class TemplateSystem {
       // Write the file
       await fsPromises.writeFile(outputPath, content, 'utf-8');
       
-      logger.debug(`Rendered template ${templateName} to ${outputPath}`);
+      logger.debug(`Rendered template ${templateName} to ${outputPath}`, LogCategory.TEMPLATE);
     } catch (error) {
       throw createGeneratorError(
         3003,
@@ -202,16 +266,15 @@ export class TemplateSystem {
    */
   public registerHelper(name: string, fn: Function): void {
     eta.helpers[name] = fn;
-    logger.debug(`Registered helper function: ${name}`);
+    logger.debug(`Registered helper function: ${name}`, LogCategory.TEMPLATE);
   }
   
   /**
    * Clear the template cache
    */
   public clearCache(): void {
-    this.templateCache.clear();
     eta.cache.clear();
-    logger.debug('Template cache cleared');
+    logger.debug('Template cache cleared', LogCategory.TEMPLATE);
   }
   
   /**
@@ -222,6 +285,18 @@ export class TemplateSystem {
       const dir = path.join(this.baseDir, directory);
       const files = await fsPromises.readdir(dir);
       return files.filter(file => file.endsWith('.eta') || file.endsWith('.ejs'));
+    } catch (error) {
+      return [];
+    }
+  }
+
+  /**
+   * Find templates matching a pattern
+   */
+  public async findTemplates(pattern: RegExp, directory: string = ''): Promise<string[]> {
+    try {
+      const templates = await this.listTemplates(directory);
+      return templates.filter(template => pattern.test(template));
     } catch (error) {
       return [];
     }

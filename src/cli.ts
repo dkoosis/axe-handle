@@ -8,7 +8,7 @@ import fs from 'fs/promises';
 import chalk from 'chalk';
 import { generateMcpServer } from './index';
 import { AxeError, GeneratorOptions } from './types';
-import { logger } from './utils/logger';
+import { logger, LogLevel } from './utils/logger';
 
 // Create CLI program
 const program = new Command();

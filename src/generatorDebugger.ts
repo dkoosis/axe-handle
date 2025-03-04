@@ -121,7 +121,7 @@ async function debugStepByStep() {
     ];
     
     for (const template of essentialTemplates) {
-      const templatePath = path.join(templatesDir, template.framework, `${template.category}/${template.name}.ejs`);
+      const templatePath = path.join(templatesDir, template.framework, `${template.category}/${template.name}.eta`);
       try {
         await fs.access(templatePath);
         console.log(chalk.green(`✓ Template exists: ${templatePath}`));
