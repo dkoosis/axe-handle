@@ -1,7 +1,7 @@
 // Path: src/generator/generators/handlerGenerator.ts
 // Generator for resource handler files
 
-import { BaseGenerator } from './baseGenerator';
+import { BaseGenerator } from '@generators/express/baseGenerator';
 import { MappedService, MappedResource, GeneratorOptions } from '../../types';
 import { logger, LogCategory } from '../../utils/logger';
 import { performance } from '../../utils/performanceUtils';

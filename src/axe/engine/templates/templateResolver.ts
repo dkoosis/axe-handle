@@ -4,7 +4,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { ok, err } from 'neverthrow';
-import { logger, LogCategory } from '../logger';
+import { logger, LogCategory } from '@utils/logger';
 import { TemplateResult } from './templateTypes';
 import { TemplateNotFoundError } from './templateError';
 

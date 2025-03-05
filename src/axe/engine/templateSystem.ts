@@ -7,7 +7,7 @@ import { TemplateResolver } from './templates/templateResolver';
 import { TemplateLoader } from './templates/templateLoader';
 import { TemplateRenderer } from './templates/templateRenderer';
 import { TemplateSystemOptions, TemplateResult } from './templates/templateTypes';
-import { logger, LogCategory } from './logger';
+import { logger, LogCategory } from '@utils/logger';
 
 /**
  * Template system singleton instance

@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as fsPromises from 'fs/promises';
 import * as path from 'path';
 import { ok, err } from 'neverthrow';
-import { logger, LogCategory } from '../logger';
+import { logger, LogCategory } from '@utils/logger';
 import { Template, TemplateResult } from './templateTypes';
 import { TemplateLoadError } from './templateError';
 import { TemplateResolver } from './templateResolver';

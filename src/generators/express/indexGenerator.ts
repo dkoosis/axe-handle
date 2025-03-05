@@ -1,5 +1,5 @@
 // src/generator/generators/indexGenerator.ts
-import { BaseGenerator } from './baseGenerator';
+import { BaseGenerator } from '@generators/express/baseGenerator';
 import { MappedService, GeneratorOptions } from '../../types';
 import { logger, LogCategory } from '../../utils/logger';
 import { performance } from '../../utils/performanceUtils';

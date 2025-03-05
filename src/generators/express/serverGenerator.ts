@@ -1,7 +1,7 @@
 // Path: src/generator/generators/serverGenerator.ts
 // Generator for server-related files
 
-import { BaseGenerator } from './baseGenerator';
+import { BaseGenerator } from '@generators/express/baseGenerator';
 import { MappedService, GeneratorOptions } from '../../types';
 import { logger, LogCategory } from '../../utils/logger';
 import { performance } from '../../utils/performanceUtils';

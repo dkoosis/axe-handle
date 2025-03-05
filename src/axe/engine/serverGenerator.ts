@@ -14,14 +14,14 @@ import {
   IndexGenerator, 
   ProjectFilesGenerator, 
   DocumentationGenerator 
-} from './generators';
+} from '@axe/engine/generators';
 
 /**
  * MCP Server Generator.
  * Coordinates specialized generators to produce a complete MCP server.
  */
 class AxeServerGenerator {
-  private static instance: McpServerGenerator;
+  private static instance: AxeServerGenerator;
   private typesGenerator: TypesGenerator;
   private handlerGenerator: HandlerGenerator;
   private serverGenerator: ServerGenerator;
@@ -46,11 +46,11 @@ class AxeServerGenerator {
    * Gets the singleton instance of the Generator.
    * @returns The Generator instance
    */
-  public static getInstance(): McpServerGenerator {
-    if (!McpServerGenerator.instance) {
-      McpServerGenerator.instance = new McpServerGenerator();
+  public static getInstance(): AxeServerGenerator {
+    if (!AxeServerGenerator.instance) {
+      AxeServerGenerator.instance = new AxeServerGenerator();
     }
-    return McpServerGenerator.instance;
+    return AxeServerGenerator.instance;
   }
 
   /**
