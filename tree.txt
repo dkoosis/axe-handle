@@ -26,7 +26,15 @@
 │   │   ├── resultExample.ts
 │   │   └── resultUtilsExamples.ts
 │   ├── generator
-│   │   ├── baseGenerator.ts
+│   │   ├── generators
+│   │   │   ├── baseGenerator.ts
+│   │   │   ├── documentationGenerator.ts
+│   │   │   ├── handlerGenerator.ts
+│   │   │   ├── index.ts
+│   │   │   ├── indexGenerator.ts
+│   │   │   ├── projectFilesGenerator.ts
+│   │   │   ├── serverGenerator.ts
+│   │   │   └── typesGenerator.ts
 │   │   ├── mcpServerGenerator.ts
 │   │   └── plan.md
 │   ├── index.ts
@@ -36,6 +44,8 @@
 │   │   ├── mcpProtocolParser.ts
 │   │   ├── mcpSchemaAdapter.ts
 │   │   ├── protocol
+│   │   │   ├── index.ts
+│   │   │   ├── protocolAdapter.ts
 │   │   │   └── protocolCache.ts
 │   │   └── serviceParser.ts
 │   ├── types
@@ -88,4 +98,4 @@
 ├── tree.txt
 └── tsconfig.json
 
-26 directories, 63 files
+27 directories, 72 files
