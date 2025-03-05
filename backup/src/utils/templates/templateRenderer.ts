@@ -77,7 +77,7 @@ export class TemplateRenderer {
    */
   public renderTemplate(template: Template, data: any): TemplateResult<string> {
     logger.debug(`Rendering template: ${template.name}`, LogCategory.TEMPLATE);
-    
+    console.log("Template data:", JSON.stringify(data, null, 2)); //dk    
     try {
       // Create a context with helpers
       const context = {
