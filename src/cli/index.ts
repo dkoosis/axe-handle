@@ -1,3 +1,4 @@
+// Path: src/cli/index.ts
 #!/usr/bin/env node
 // Path: src/cli.ts
 // Provides the command-line interface for the Axe Handle code generator.
@@ -7,8 +8,8 @@ import path from 'path';
 import fs from 'fs/promises';
 const chalk = require('chalk');
 import { generateMcpServer } from './index';
-import { AxeError, GeneratorOptions } from './types';
-import { logger, LogLevel } from './utils/logger';
+import { AxeError, GeneratorOptions } from '@types';
+import { logger, LogLevel } from '@utils/logger';
 
 // Create CLI program
 const program = new Command();

@@ -1,3 +1,4 @@
+// Path: src/utils/performanceUtils.ts
 // src/utils/performanceUtils.ts
 import { logger, LogCategory } from './logger';
 

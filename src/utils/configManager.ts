@@ -1,3 +1,4 @@
+// Path: src/utils/configManager.ts
 // src/utils/configManager.ts
 import * as fs from 'fs/promises';
 import * as path from 'path';

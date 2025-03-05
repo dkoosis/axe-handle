@@ -1,3 +1,4 @@
+// Path: templates/express/src/cli.ts
 #!/usr/bin/env node
 
 /**
@@ -8,7 +9,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { program } from 'commander';
-import chalk from 'chalk';
+const chalk = require('chalk');
 import inquirer from 'inquirer';
 import { MCPServerGenerator, MCPServerGeneratorOptions } from './mcpServerGenerator';
 import { parseMCPSchema, generateMarkdownDocumentation, SchemaAnalysisResult } from './mcpSchemaParser';

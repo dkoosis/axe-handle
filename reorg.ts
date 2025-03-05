@@ -2,7 +2,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as chalk from 'chalk';
+const chalk = require('chalk');
 
 // Progress tracking
 let totalFiles = 0;

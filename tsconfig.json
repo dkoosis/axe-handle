@@ -2,40 +2,53 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@axe/*": ["src/axe/*"],
-      "@generators/*": ["src/generators/*"],
-      "@utils/*": ["src/utils/*"],
-      "@templates/*": ["templates/*"]
+      "@cli/*": [
+        "src/cli/*"
+      ],
+      "@engine/*": [
+        "src/engine/*"
+      ],
+      "@parser/*": [
+        "src/parser/*"
+      ],
+      "@types/*": [
+        "src/types/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@templates/*": [
+        "templates/*"
+      ]
     },
     "target": "ES2020",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "strict": true,
     "declaration": true,
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": ".", // Corrected rootDir
+    "rootDir": ".",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictNullChecks": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src/**/*",
-    "templates/**/*" // Correctly includes templates
+    "templates/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "test",
-    "generated",
-    "backup",
-    "archive/*",
-    "**/*.spec.ts", // Correctly excludes test files
-    "**/*.test.ts"  // Correctly excludes test files
+    "generated-servers",
+    "**/*.spec.ts",
+    "**/*.test.ts"
   ]
 }

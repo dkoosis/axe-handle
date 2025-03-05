@@ -1,16 +1,16 @@
 // Path: src/index.ts
 // Main entry point for the Axe Handle code generator
 
-import { GeneratorOptions } from './types';
-import { parseProtocol } from './parser/protocol';
-import { serviceParser } from './parser/serviceParser';
+import { GeneratorOptions } from '@types';
+import { parseProtocol } from '@parser/protocol';
+import { serviceParser } from '@parser/serviceParser';
 import { mapper } from './mcp/mapper';
 import { mcpServerGenerator } from './generator/mcpServerGenerator';
-import { getConfigManager } from './utils/configManager';
-import { logger, LogCategory, LogLevel } from './utils/logger';
-import { performance } from './utils/performanceUtils';
-import { runAsyncOperation } from './utils/resultUtils';
-import { AxeResult } from './utils/resultUtils';
+import { getConfigManager } from '@utils/configManager';
+import { logger, LogCategory, LogLevel } from '@utils/logger';
+import { performance } from '@utils/performanceUtils';
+import { runAsyncOperation } from '@utils/resultUtils';
+import { AxeResult } from '@utils/resultUtils';
 
 /**
  * Initialize the application by setting up the template system

@@ -1,3 +1,4 @@
+// Path: templates/express/src/mcpServerGenerator.ts
 import path from 'path';
 import fs from 'fs';
 import { parseMCPSchema, MCPInterface } from './mcpSchemaParser'; // Rule 1, 3: Descriptive filename

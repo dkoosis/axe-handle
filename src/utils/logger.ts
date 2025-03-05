@@ -1,5 +1,6 @@
+// Path: src/utils/logger.ts
 // src/utils/logger.ts
-import chalk from 'chalk';
+const chalk = require('chalk');
 
 /**
  * Log levels
