@@ -1,4 +1,6 @@
-// src/generator/generators/handlerGenerator.ts
+// Path: src/generator/generators/handlerGenerator.ts
+// Generator for resource handler files
+
 import { BaseGenerator } from './baseGenerator';
 import { MappedService, MappedResource, GeneratorOptions } from '../../types';
 import { logger, LogCategory } from '../../utils/logger';
@@ -37,8 +39,7 @@ export class HandlerGenerator extends BaseGenerator {
         await this.generateResourceHandler(
           resource, 
           mappedService, 
-          handlersDir, 
-          options
+          handlersDir
         );
       }
     });
@@ -50,8 +51,7 @@ export class HandlerGenerator extends BaseGenerator {
   private async generateResourceHandler(
     resource: MappedResource,
     service: MappedService,
-    handlersDir: string,
-    options: GeneratorOptions
+    handlersDir: string
   ): Promise<void> {
     return performance.track(`generate-handler-${resource.name.toLowerCase()}`, async () => {
       logger.info(`Generating handler for resource: ${resource.name}`, LogCategory.GENERATOR);

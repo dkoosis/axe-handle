@@ -2,7 +2,6 @@
 // Handles rendering of templates
 
 import * as fs from 'fs';
-import * as fsPromises from 'fs/promises';
 import * as path from 'path';
 import * as eta from 'eta';
 import { ok, err } from 'neverthrow';

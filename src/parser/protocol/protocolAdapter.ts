@@ -1,10 +1,9 @@
 // Path: src/parser/protocol/protocolAdapter.ts
-// Creates a simplified MCP protocol from protocol.ts using a more flexible approach.
+// Creates a simplified MCP protocol from protocol.ts
 
 import * as fs from 'fs/promises';
 import * as ts from 'typescript';
-import * as path from 'path';
-import { McpProtocol, McpOperation, McpType, McpCapability } from '../../types';
+import { McpProtocol, McpOperation, McpType } from '../../types';
 import { createParserError } from '../../utils/errorUtils';
 import { logger, LogCategory } from '../../utils/logger';
 import { performance } from '../../utils/performanceUtils';
@@ -122,8 +121,6 @@ export async function extractMcpProtocol(schemaPath: string): Promise<McpProtoco
 
 /**
  * Finds the protocol version declaration in the source file.
- * @param sourceFile The TypeScript source file
- * @returns The protocol version or undefined if not found
  */
 function findVersionDeclaration(sourceFile: ts.SourceFile): string | undefined {
   let version: string | undefined;
@@ -150,8 +147,6 @@ function findVersionDeclaration(sourceFile: ts.SourceFile): string | undefined {
 
 /**
  * Finds all Request interfaces in the source file.
- * @param sourceFile The TypeScript source file
- * @returns Array of request interface names
  */
 function findRequestInterfaces(sourceFile: ts.SourceFile): string[] {
   const requestInterfaces: string[] = [];
@@ -172,9 +167,6 @@ function findRequestInterfaces(sourceFile: ts.SourceFile): string[] {
 
 /**
  * Finds all type interfaces (excluding request interfaces) in the source file.
- * @param sourceFile The TypeScript source file
- * @param requestInterfaces Previously found request interfaces
- * @returns Array of type interface names
  */
 function findTypeInterfaces(sourceFile: ts.SourceFile, requestInterfaces: string[]): string[] {
   const typeInterfaces: string[] = [];
@@ -199,8 +191,6 @@ function findTypeInterfaces(sourceFile: ts.SourceFile, requestInterfaces: string
 
 /**
  * Enriches a basic protocol with additional inferred information.
- * @param protocol Basic protocol to enrich
- * @returns Enriched protocol
  */
 function enrichProtocol(protocol: McpProtocol): McpProtocol {
   // Add standard CRUD operations if none exist
@@ -216,7 +206,6 @@ function enrichProtocol(protocol: McpProtocol): McpProtocol {
 
 /**
  * Adds standard CRUD operations to a protocol.
- * @param protocol Protocol to add operations to
  */
 function addStandardCrudOperations(protocol: McpProtocol): void {
   const standardOperations: McpOperation[] = [
@@ -263,7 +252,6 @@ function addStandardCrudOperations(protocol: McpProtocol): void {
 
 /**
  * Ensures basic types exist in a protocol.
- * @param protocol Protocol to add types to
  */
 function ensureBasicTypes(protocol: McpProtocol): void {
   // Check if we need to add basic types

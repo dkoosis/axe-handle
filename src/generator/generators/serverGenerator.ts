@@ -1,10 +1,11 @@
-// src/generator/generators/serverGenerator.ts
+// Path: src/generator/generators/serverGenerator.ts
+// Generator for server-related files
+
 import { BaseGenerator } from './baseGenerator';
 import { MappedService, GeneratorOptions } from '../../types';
 import { logger, LogCategory } from '../../utils/logger';
 import { performance } from '../../utils/performanceUtils';
 import * as path from 'path';
-import * as fs from 'fs';
 import { ValidationUtils } from '../../utils/validationUtils';
 
 /**
