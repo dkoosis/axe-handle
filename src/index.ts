@@ -1,7 +1,6 @@
 // Path: src/index.ts
 // Main entry point for the Axe Handle code generator
 
-import 'module-alias/register';
 import { GeneratorOptions } from './types';
 import { parseProtocol } from './parser/protocol';
 import { serviceParser } from './parser/serviceParser';

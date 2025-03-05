@@ -1,9 +1,12 @@
 .
+├── ORGANIZATION.md
 ├── README.md
 ├── assets
 │   ├── axe-handle-100x100.svg
 │   ├── axe-handle.svg
 │   └── schema.ts
+├── examples
+│   └── schemas
 ├── package-lock.json
 ├── package.json
 ├── schemas
@@ -14,17 +17,36 @@
 │       ├── protocol.ts
 │       └── schema.json
 ├── src
+│   ├── axe
+│   │   ├── engine
+│   │   │   ├── serverGenerator.ts
+│   │   │   ├── serverGenerator.ts.bak
+│   │   │   ├── templateSystem.ts
+│   │   │   ├── templateSystem.ts.bak
+│   │   │   └── templates
+│   │   │       ├── templateError.ts
+│   │   │       ├── templateError.ts.bak
+│   │   │       ├── templateLoader.ts
+│   │   │       ├── templateLoader.ts.bak
+│   │   │       ├── templateRenderer.ts
+│   │   │       ├── templateRenderer.ts.bak
+│   │   │       ├── templateResolver.ts
+│   │   │       ├── templateResolver.ts.bak
+│   │   │       ├── templateTypes.ts
+│   │   │       └── templateTypes.ts.bak
+│   │   ├── mappings
+│   │   │   └── resourceMapper.ts
+│   │   └── schema
+│   │       ├── protocolAdapter.ts
+│   │       ├── protocolCache.ts
+│   │       ├── protocolParser.ts
+│   │       ├── schemaAdapter.ts
+│   │       ├── serviceParser.ts
+│   │       └── types.ts
 │   ├── cli.ts
-│   ├── direct-refactoring-approach.txt
 │   ├── docs
-│   │   ├── gts-integration.md
-│   │   ├── neverthrow-implementation-plan.md
-│   │   └── neverthrow-readme.md
 │   ├── ensureProjectStructure.ts
 │   ├── examples
-│   │   ├── resultCli.ts
-│   │   ├── resultExample.ts
-│   │   └── resultUtilsExamples.ts
 │   ├── generator
 │   │   ├── generators
 │   │   │   ├── baseGenerator.ts
@@ -35,19 +57,35 @@
 │   │   │   ├── projectFilesGenerator.ts
 │   │   │   ├── serverGenerator.ts
 │   │   │   └── typesGenerator.ts
-│   │   ├── mcpServerGenerator.ts
-│   │   └── plan.md
+│   │   └── mcpServerGenerator.ts
+│   ├── generators
+│   │   ├── common
+│   │   │   └── baseGenerator.ts
+│   │   └── express
+│   │       ├── documentationGenerator.ts
+│   │       ├── documentationGenerator.ts.bak
+│   │       ├── handlerGenerator.ts
+│   │       ├── handlerGenerator.ts.bak
+│   │       ├── index.ts
+│   │       ├── index.ts.bak
+│   │       ├── indexGenerator.ts
+│   │       ├── indexGenerator.ts.bak
+│   │       ├── projectFilesGenerator.ts
+│   │       ├── serverGenerator.ts
+│   │       ├── serverGenerator.ts.bak
+│   │       ├── typesGenerator.ts
+│   │       └── typesGenerator.ts.bak
 │   ├── index.ts
 │   ├── mcp
 │   │   └── mapper.ts
 │   ├── parser
-│   │   ├── mcpProtocolParser.ts
 │   │   ├── mcpSchemaAdapter.ts
 │   │   ├── protocol
 │   │   │   ├── index.ts
 │   │   │   ├── protocolAdapter.ts
 │   │   │   └── protocolCache.ts
 │   │   └── serviceParser.ts
+│   ├── registerAliases.ts
 │   ├── types
 │   │   └── schemaTypes.ts
 │   ├── types.ts
@@ -57,6 +95,7 @@
 │       ├── errorUtils.ts
 │       ├── logger.ts
 │       ├── performanceUtils.ts
+│       ├── refixp.sh
 │       ├── resultUtils.ts
 │       ├── templateSystem.ts
 │       ├── templates
@@ -68,6 +107,7 @@
 │       └── validationUtils.ts
 ├── templates
 │   ├── api.eta
+│   ├── common
 │   ├── express
 │   │   ├── api
 │   │   │   └── api.eta
@@ -93,9 +133,33 @@
 │   │       └── types.eta
 │   ├── handler.eta
 │   ├── index.eta
+│   ├── mcp-server
+│   │   └── express
+│   │       ├── config
+│   │       ├── docs
+│   │       │   └── api.eta
+│   │       ├── package.json.eta
+│   │       └── src
+│   │           ├── handlers
+│   │           │   ├── connectionHandler.eta
+│   │           │   ├── handler.eta
+│   │           │   ├── messageHandler.eta
+│   │           │   └── requestHandler.eta
+│   │           ├── index.eta
+│   │           ├── models
+│   │           ├── server.eta
+│   │           ├── types.eta
+│   │           └── utils
+│   │               ├── errorHandler.eta
+│   │               └── logger.eta
 │   ├── server.eta
 │   └── types.eta
 ├── tree.txt
-└── tsconfig.json
+├── tsconfig.json
+└── utils
+    ├── fixit.sh
+    ├── fixit1.sh
+    ├── fixit2.sh
+    └── fixpath.sh
 
-27 directories, 72 files
+47 directories, 116 files

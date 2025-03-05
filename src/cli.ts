@@ -2,7 +2,6 @@
 // Path: src/cli.ts
 // Provides the command-line interface for the Axe Handle code generator.
 
-import 'module-alias/register';
 import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs/promises';
