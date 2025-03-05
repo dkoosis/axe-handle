@@ -1,12 +1,12 @@
-// Path: src/generator/axeServerGenerator.ts
+// Path: src/generator/mcpServerGenerator.ts
 // Main generator that coordinates specialized generators to create a complete MCP server.
 
-import { MappedService, GeneratorOptions } from "@axe/schema/types";
-import { logger, LogCategory } from "@utils/logger";
-import { createGeneratorError } from "@utils/errorUtils";
-import { ValidationUtils } from "@utils/validationUtils";
-import { performance } from "@utils/performanceUtils";
-import { createAsyncErrorBoundary } from "@utils/errorBoundary";
+import { MappedService, GeneratorOptions } from "../types";
+import { logger, LogCategory } from "../utils/logger";
+import { createGeneratorError } from "../utils/errorUtils";
+import { ValidationUtils } from "../utils/validationUtils";
+import { performance } from "../utils/performanceUtils";
+import { createAsyncErrorBoundary } from "../utils/errorBoundary";
 import { 
   TypesGenerator, 
   HandlerGenerator, 
@@ -20,7 +20,7 @@ import {
  * MCP Server Generator.
  * Coordinates specialized generators to produce a complete MCP server.
  */
-class AxeServerGenerator {
+class McpServerGenerator {
   private static instance: McpServerGenerator;
   private typesGenerator: TypesGenerator;
   private handlerGenerator: HandlerGenerator;
@@ -168,4 +168,4 @@ class AxeServerGenerator {
 }
 
 // Export singleton instance
-export const axeServerGenerator = AxeServerGenerator.getInstance();
+export const mcpServerGenerator = McpServerGenerator.getInstance();

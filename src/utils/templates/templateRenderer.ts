@@ -33,7 +33,7 @@ export class TemplateRenderer {
     
     // Configure Eta
     eta.configure({
-      useWith: false,
+      useWith: true, // Changed from false to true to fix variable scoping
       cache: this.cache,
       views: this.baseDir,
       autoEscape: false,
@@ -79,10 +79,13 @@ export class TemplateRenderer {
     logger.debug(`Rendering template: ${template.name}`, LogCategory.TEMPLATE);
     
     try {
-      // Create a context with helpers
+      // Create a context with helpers and data in a data property
       const context = {
-        ...data,
-        ...this.helpers
+        ...this.helpers,
+        data: {
+          ...data,
+          ...this.helpers
+        }
       };
       
       // Render the template
