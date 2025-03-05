@@ -2,10 +2,36 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-        "@axe/*": ["src/axe/*"],
-        "@generators/*": ["src/generators/*"],
-        "@utils/*": ["src/utils/*"],
-        "@templates/*": ["templates/*"]      
+      "@axe/*": [
+        "src/axe/*"
+      ],
+      "@generators/*": [
+        "src/generators/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@templates/*": [
+        "templates/*"
+      ],
+      "@parser/*": [
+        "src/parser/*"
+      ],
+      "@parser/protocol": [
+        "src/parser/protocol/index.ts"
+      ],
+      "@parser/serviceParser": [
+        "src/parser/serviceParser.ts"
+      ],
+      "@generators/express/baseGenerator": [
+        "src/generators/common/baseGenerator.ts"
+      ],
+      "@generators/express/*": [
+        "src/generators/express/*"
+      ],
+      "@generators/common/*": [
+        "src/generators/common/*"
+      ]
     },
     "target": "ES2020",
     "module": "CommonJS",
