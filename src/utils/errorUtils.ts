@@ -1,7 +1,7 @@
 // Path: src/utils/errorUtils.ts
 // Provides centralized error handling utilities for the Axe Handle code generator.
 
-import { AxeError, ErrorPrefix, AxeErrorCategory, McpErrorCategory } from "../axe/schema/types";
+import { AxeError, ErrorPrefix, AxeErrorCategory, McpErrorCategory } from "@axe/schema/types";
 import { logger, LogCategory } from './logger';
 
 /**

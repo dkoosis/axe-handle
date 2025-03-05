@@ -3,8 +3,8 @@
 
 import * as fs from 'fs/promises';
 import * as ts from 'typescript';
-import { McpProtocol } from "../axe/schema/types";
-import { createParserError } from '../utils/errorUtils';
+import { McpProtocol } from "@axe/schema/types";
+import { createParserError } from "@utils/errorUtils";
 
 /**
  * Extracts a simplified MCP protocol from the protocol.ts file.

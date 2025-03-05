@@ -11,9 +11,9 @@ import {
   MappedType,
   MappedField,
   MappedOperation,
-} from "../axe/schema/types";
-import { logger, LogCategory } from '../utils/logger';
-import { createMapperError } from '../utils/errorUtils';
+} from "@axe/schema/types";
+import { logger, LogCategory } from "@utils/logger";
+import { createMapperError } from "@utils/errorUtils";
 
 /**
  * MCP Mapper.

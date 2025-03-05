@@ -13,7 +13,7 @@ import {
   AxeError,
   ErrorPrefix,
   AxeErrorCategory
-} from "../axe/schema/types";
+} from "@axe/schema/types";
 
 /**
  * Creates an AxeError specific to the service parser.

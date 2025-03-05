@@ -1,12 +1,12 @@
-// Path: src/generator/mcpServerGenerator.ts
+// Path: src/generator/axeServerGenerator.ts
 // Main generator that coordinates specialized generators to create a complete MCP server.
 
-import { MappedService, GeneratorOptions } from "../axe/schema/types";
-import { logger, LogCategory } from '../utils/logger';
-import { createGeneratorError } from '../utils/errorUtils';
-import { ValidationUtils } from '../utils/validationUtils';
-import { performance } from '../utils/performanceUtils';
-import { createAsyncErrorBoundary } from '../utils/errorBoundary';
+import { MappedService, GeneratorOptions } from "@axe/schema/types";
+import { logger, LogCategory } from "@utils/logger";
+import { createGeneratorError } from "@utils/errorUtils";
+import { ValidationUtils } from "@utils/validationUtils";
+import { performance } from "@utils/performanceUtils";
+import { createAsyncErrorBoundary } from "@utils/errorBoundary";
 import { 
   TypesGenerator, 
   HandlerGenerator, 

@@ -2,7 +2,7 @@
 // Provides utilities for working with the Result pattern from neverthrow.
 
 import { Result, ResultAsync, err, ok } from 'neverthrow';
-import { AxeError } from '../types';
+import { AxeError } from "../axe/schema/types";
 import { createGeneratorError } from './errorUtils';
 import { logger, LogCategory } from './logger';
 

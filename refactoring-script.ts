@@ -2,6 +2,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
+import { execSync } from 'child_process';
 
 // Configuration
 const rootDir = path.resolve(__dirname);
@@ -111,45 +112,59 @@ const filesToDelete = [
   'src/examples/resultUtilsExamples.ts',
 ];
 
-// Path mappings to update in all source files
+// Path mappings to update in all source files - convert to path aliases
 const pathMappings = [
-  // Parser imports
-  { from: /from ['"]\.\.\/parser\/protocol['"]/g, to: 'from "../axe/schema/protocolParser"' },
-  { from: /from ['"]\.\.\/parser\/serviceParser['"]/g, to: 'from "../axe/schema/serviceParser"' },
-  { from: /import \{ mcpProtocolParser \} from ['"]\.\.\/parser\/protocol\/protocolCache['"]/g, to: 'import { mcpProtocolParser } from "../axe/schema/protocolCache"' },
+  // Convert relative to path aliases
+  { from: /from ['"]\.\.\/axe\/schema\/types['"]/g, to: 'from "@axe/schema/types"' },
+  { from: /from ['"]\.\.\/axe\/engine\/serverGenerator['"]/g, to: 'from "@axe/engine/serverGenerator"' },
+  { from: /from ['"]\.\.\/axe\/engine\/templateSystem['"]/g, to: 'from "@axe/engine/templateSystem"' },
+  { from: /from ['"]\.\.\/axe\/engine\/templates\/templateTypes['"]/g, to: 'from "@axe/engine/templates/templateTypes"' },
+  { from: /from ['"]\.\.\/axe\/engine\/templates\/templateError['"]/g, to: 'from "@axe/engine/templates/templateError"' },
+  { from: /from ['"]\.\.\/axe\/mappings\/resourceMapper['"]/g, to: 'from "@axe/mappings/resourceMapper"' },
+  { from: /from ['"]\.\.\/utils\/logger['"]/g, to: 'from "@utils/logger"' },
+  { from: /from ['"]\.\.\/utils\/errorUtils['"]/g, to: 'from "@utils/errorUtils"' },
+  { from: /from ['"]\.\.\/utils\/validationUtils['"]/g, to: 'from "@utils/validationUtils"' },
+  { from: /from ['"]\.\.\/utils\/performanceUtils['"]/g, to: 'from "@utils/performanceUtils"' },
+  { from: /from ['"]\.\.\/utils\/errorBoundary['"]/g, to: 'from "@utils/errorBoundary"' },
+  { from: /from ['"]\.\.\/utils\/resultUtils['"]/g, to: 'from "@utils/resultUtils"' },
+  { from: /from ['"]\.\.\/utils\/configManager['"]/g, to: 'from "@utils/configManager"' },
+  { from: /from ['"]\.\.\/generators\/express['"]/g, to: 'from "@generators/express"' },
+  { from: /from ['"]\.\.\/generators\/common\/baseGenerator['"]/g, to: 'from "@generators/common/baseGenerator"' },
   
-  // Mapper imports
-  { from: /from ['"]\.\.\/mcp\/mapper['"]/g, to: 'from "../axe/mappings/resourceMapper"' },
-  { from: /import \{ mapper \} from ['"]\.\.\/mcp\/mapper['"]/g, to: 'import { mapper } from "../axe/mappings/resourceMapper"' },
+  // Old parser paths
+  { from: /from ['"]\.\.\/parser\/protocol['"]/g, to: 'from "@axe/schema/protocolParser"' },
+  { from: /from ['"]\.\.\/parser\/serviceParser['"]/g, to: 'from "@axe/schema/serviceParser"' },
+  { from: /from ['"]\.\.\/parser\/mcpSchemaAdapter['"]/g, to: 'from "@axe/schema/schemaAdapter"' },
   
-  // Generator imports
-  { from: /from ['"]\.\.\/generator\/mcpServerGenerator['"]/g, to: 'from "../axe/engine/serverGenerator"' },
-  { from: /import \{ mcpServerGenerator \} from ['"]\.\.\/generator\/mcpServerGenerator['"]/g, to: 'import { mcpServerGenerator } from "../axe/engine/serverGenerator"' },
+  // Old mapper paths
+  { from: /from ['"]\.\.\/mcp\/mapper['"]/g, to: 'from "@axe/mappings/resourceMapper"' },
   
-  // Generator component imports
-  { from: /from ['"]\.\.\/generator\/generators['"]/g, to: 'from "../generators/express"' },
-  { from: /from ['"]\.\.\/generator\/generators\/baseGenerator['"]/g, to: 'from "../generators/common/baseGenerator"' },
+  // Old generator paths
+  { from: /from ['"]\.\.\/generator\/mcpServerGenerator['"]/g, to: 'from "@axe/engine/serverGenerator"' },
+  { from: /from ['"]\.\.\/generator\/generators['"]/g, to: 'from "@generators/express"' },
   
-  // Types imports
-  { from: /from ['"]\.\.\/types['"]/g, to: 'from "../axe/schema/types"' },
+  // Old template system paths
+  { from: /from ['"]\.\.\/utils\/templateSystem['"]/g, to: 'from "@axe/engine/templateSystem"' },
+  { from: /from ['"]\.\.\/utils\/templates['"]/g, to: 'from "@axe/engine/templates"' },
   
-  // Template system imports
-  { from: /from ['"]\.\.\/utils\/templateSystem['"]/g, to: 'from "../axe/engine/templateSystem"' },
-  { from: /from ['"]\.\.\/utils\/templates['"]/g, to: 'from "../axe/engine/templates"' },
-  { from: /import \{ TemplateSystem, getTemplateSystem \} from ['"]\.\.\/utils\/templateSystem['"]/g, to: 'import { TemplateSystem, getTemplateSystem } from "../axe/engine/templateSystem"' },
+  // Types import
+  { from: /from ['"]\.\.\/types['"]/g, to: 'from "@axe/schema/types"' },
   
-  // Template component imports
-  { from: /from ['"]\.\.\/utils\/templates\/templateTypes['"]/g, to: 'from "../axe/engine/templates/templateTypes"' },
-  { from: /from ['"]\.\.\/utils\/templates\/templateError['"]/g, to: 'from "../axe/engine/templates/templateError"' },
+  // Import declarations
+  { from: /import \{ mcpProtocolParser \} from ['"](\.\.\/)?parser\/protocol\/protocolCache['"]/g, to: 'import { mcpProtocolParser } from "@axe/schema/protocolCache"' },
+  { from: /import \{ extractMcpProtocol \} from ['"](\.\.\/)?parser\/protocol\/protocolAdapter['"]/g, to: 'import { extractMcpProtocol } from "@axe/schema/protocolAdapter"' },
+  { from: /import \{ serviceParser \} from ['"](\.\.\/)?parser\/serviceParser['"]/g, to: 'import { serviceParser } from "@axe/schema/serviceParser"' },
+  { from: /import \{ mapper \} from ['"](\.\.\/)?mcp\/mapper['"]/g, to: 'import { mapper } from "@axe/mappings/resourceMapper"' },
+  { from: /import \{ mcpServerGenerator \} from ['"](\.\.\/)?generator\/mcpServerGenerator['"]/g, to: 'import { axeServerGenerator } from "@axe/engine/serverGenerator"' },
+  { from: /import \{ TemplateSystem, getTemplateSystem \} from ['"](\.\.\/)?utils\/templateSystem['"]/g, to: 'import { TemplateSystem, getTemplateSystem } from "@axe/engine/templateSystem"' },
   
-  // Update class names
+  // Update class names and instances
   { from: /class McpServerGenerator/g, to: 'class AxeServerGenerator' },
   { from: /McpServerGenerator\.getInstance/g, to: 'AxeServerGenerator.getInstance' },
   { from: /export const mcpServerGenerator/g, to: 'export const axeServerGenerator' },
-  
-  // Update variable/instance names
   { from: /const mcpServerGenerator/g, to: 'const axeServerGenerator' },
   { from: /await mcpServerGenerator/g, to: 'await axeServerGenerator' },
+  { from: /mcpServerGenerator\./g, to: 'axeServerGenerator.' },
 ];
 
 // Create a backup of the current codebase
@@ -204,6 +219,55 @@ function moveFiles() {
   });
 }
 
+// Create module alias registration file
+function createModuleAliasRegistration() {
+  console.log('Creating module alias registration...');
+  const registrationContent = `// src/registerAliases.ts
+// Registers module aliases for development with ts-node
+import moduleAlias from 'module-alias';
+import path from 'path';
+
+// Register module aliases
+moduleAlias.addAliases({
+  '@axe': path.join(__dirname, 'axe'),
+  '@generators': path.join(__dirname, 'generators'),
+  '@utils': path.join(__dirname, 'utils'),
+  '@templates': path.join(__dirname, '../templates')
+});
+
+export {};
+`;
+
+  fs.writeFileSync(path.join(srcDir, 'registerAliases.ts'), registrationContent, 'utf8');
+  console.log('Created src/registerAliases.ts');
+}
+
+// Update index.ts and cli.ts to include module alias registration
+function updateEntryFiles() {
+  console.log('Updating entry files to use module aliases...');
+  
+  const entryFiles = ['src/index.ts', 'src/cli.ts'];
+  
+  entryFiles.forEach(file => {
+    const fullPath = path.join(rootDir, file);
+    if (fs.existsSync(fullPath)) {
+      let content = fs.readFileSync(fullPath, 'utf8');
+      
+      // Add import for module aliases registration if not present
+      if (!content.includes('registerAliases')) {
+        content = `// Register module aliases for path resolution
+import './registerAliases';
+
+${content}`;
+        fs.writeFileSync(fullPath, content, 'utf8');
+        console.log(`Updated ${file} to use module aliases`);
+      }
+    } else {
+      console.warn(`Warning: Entry file not found: ${file}`);
+    }
+  });
+}
+
 // Update path references within files
 function updatePathReferences() {
   console.log('Updating path references in files...');
@@ -231,6 +295,118 @@ function updatePathReferences() {
       console.log(`Updated references in: ${file}`);
     }
   });
+}
+
+// Update tsconfig.json with path aliases
+function updateTsConfig() {
+  console.log('Updating tsconfig.json with path aliases...');
+  const tsconfigPath = path.join(rootDir, 'tsconfig.json');
+  
+  if (fs.existsSync(tsconfigPath)) {
+    let tsconfig;
+    try {
+      tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, 'utf8'));
+    } catch (error) {
+      console.error('Error parsing tsconfig.json:', error);
+      return;
+    }
+    
+    // Add or update paths configuration
+    tsconfig.compilerOptions = tsconfig.compilerOptions || {};
+    tsconfig.compilerOptions.baseUrl = '.';
+    tsconfig.compilerOptions.paths = {
+      '@axe/*': ['src/axe/*'],
+      '@generators/*': ['src/generators/*'],
+      '@utils/*': ['src/utils/*'],
+      '@templates/*': ['templates/*']
+    };
+    
+    fs.writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2), 'utf8');
+    console.log('Updated tsconfig.json with path aliases');
+  } else {
+    console.warn('Warning: tsconfig.json not found');
+    
+    // Create a new tsconfig.json file with path aliases
+    const tsconfig = {
+      "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+          "@axe/*": ["src/axe/*"],
+          "@generators/*": ["src/generators/*"],
+          "@utils/*": ["src/utils/*"],
+          "@templates/*": ["templates/*"]
+        },
+        "target": "ES2020",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "esModuleInterop": true,
+        "strict": true,
+        "declaration": true,
+        "sourceMap": true,
+        "outDir": "dist",
+        "rootDir": "src",
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strictNullChecks": true,
+        "resolveJsonModule": true
+      },
+      "include": ["src/**/*"],
+      "exclude": ["node_modules", "dist", "test", "generated", "backup", "archive/*"]
+    };
+    
+    fs.writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2), 'utf8');
+    console.log('Created new tsconfig.json with path aliases');
+  }
+}
+
+// Update package.json with module aliases and scripts
+function updatePackageJson() {
+  console.log('Updating package.json...');
+  const packageJsonPath = path.join(rootDir, 'package.json');
+  
+  if (fs.existsSync(packageJsonPath)) {
+    let packageJson;
+    try {
+      packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    } catch (error) {
+      console.error('Error parsing package.json:', error);
+      return;
+    }
+    
+    // Add or update module aliases
+    packageJson._moduleAliases = {
+      '@axe': 'dist/axe',
+      '@generators': 'dist/generators',
+      '@utils': 'dist/utils',
+      '@templates': 'templates'
+    };
+    
+    // Update scripts to use module-alias
+    if (packageJson.scripts) {
+      if (packageJson.scripts.dev) {
+        packageJson.scripts.dev = 'ts-node -r module-alias/register src/index.ts';
+      }
+      if (packageJson.scripts.generate) {
+        packageJson.scripts.generate = 'ts-node -r module-alias/register src/cli.ts';
+      }
+    }
+    
+    // Add module-alias dependency if not already present
+    packageJson.dependencies = packageJson.dependencies || {};
+    packageJson.dependencies['module-alias'] = '^2.2.3';
+    
+    // Add required dev dependencies if not already present
+    packageJson.devDependencies = packageJson.devDependencies || {};
+    packageJson.devDependencies['@types/module-alias'] = '^2.0.4';
+    
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
+    console.log('Updated package.json with module aliases and scripts');
+  } else {
+    console.warn('Warning: package.json not found');
+  }
 }
 
 // Clean up old files
@@ -274,52 +450,6 @@ function cleanupOldFiles() {
         console.log(`Removed empty directory: ${dir}`);
       } catch (error) {
         console.log(`Directory not empty or error: ${dir}`);
-      }
-    }
-  });
-}
-
-// Update import handling in files with regex transformations
-function fixCircularDependencies() {
-  console.log('Fixing potential circular dependencies...');
-  
-  // Special handling for specific files
-  const fixups = {
-    'src/index.ts': [
-      { 
-        from: /import \{ mcpServerGenerator \} from ['"]\.\.\/axe\/engine\/serverGenerator['"]/g, 
-        to: 'import { axeServerGenerator } from "./axe/engine/serverGenerator"' 
-      },
-      {
-        from: /await mcpServerGenerator\.generateServer/g,
-        to: 'await axeServerGenerator.generateServer'
-      }
-    ],
-    'src/cli.ts': [
-      {
-        from: /import \{ mcpServerGenerator \} from ['"]\.\.\/axe\/engine\/serverGenerator['"]/g,
-        to: 'import { axeServerGenerator } from "./axe/engine/serverGenerator"'
-      }
-    ]
-  };
-  
-  Object.entries(fixups).forEach(([file, replacements]) => {
-    const fullPath = path.join(rootDir, file);
-    if (fs.existsSync(fullPath)) {
-      let content = fs.readFileSync(fullPath, 'utf8');
-      let modified = false;
-      
-      replacements.forEach(replacement => {
-        const originalContent = content;
-        content = content.replace(replacement.from, replacement.to);
-        if (content !== originalContent) {
-          modified = true;
-        }
-      });
-      
-      if (modified) {
-        fs.writeFileSync(fullPath, content, 'utf8');
-        console.log(`Applied special fixes to: ${file}`);
       }
     }
   });
@@ -387,10 +517,27 @@ axe-handle/
   console.log('Created organization summary: ORGANIZATION.md');
 }
 
+// Install required dependencies
+function installDependencies() {
+  console.log('Installing required dependencies...');
+  
+  try {
+    execSync('npm install module-alias @types/module-alias --save', { stdio: 'inherit' });
+    console.log('Dependencies installed successfully');
+  } catch (error) {
+    console.error('Error installing dependencies:', error);
+    console.log('Please manually install dependencies:');
+    console.log('npm install module-alias @types/module-alias --save');
+  }
+}
+
 // Run the refactoring
 async function runRefactoring() {
   try {
     console.log('Starting Axe Handle refactoring...');
+    
+    // Install dependencies first
+    installDependencies();
     
     // Backup the current codebase
     createBackup();
@@ -401,11 +548,20 @@ async function runRefactoring() {
     // Move files to their new locations
     moveFiles();
     
+    // Create module alias registration
+    createModuleAliasRegistration();
+    
+    // Update entry files
+    updateEntryFiles();
+    
+    // Update tsconfig.json
+    updateTsConfig();
+    
+    // Update package.json
+    updatePackageJson();
+    
     // Update path references
     updatePathReferences();
-    
-    // Fix potential circular dependencies
-    fixCircularDependencies();
     
     // Create organization summary
     createOrganizationSummary();
@@ -414,6 +570,10 @@ async function runRefactoring() {
     cleanupOldFiles();
     
     console.log('Refactoring completed successfully!');
+    console.log('Next steps:');
+    console.log('1. Run "npm install" to ensure all dependencies are installed');
+    console.log('2. Fix any remaining import issues manually if needed');
+    console.log('3. Run "npm run dev" to test the refactored codebase');
   } catch (error) {
     console.error('Error during refactoring:', error);
     console.log('You can restore from the backup if needed.');

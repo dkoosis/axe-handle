@@ -1,5 +1,26 @@
+// Register module aliases for path resolution
+import './registerAliases';
+
 // Path: src/index.ts
 // Main entry point for the Axe Handle code generator
+// Add this at the beginning of src/index.ts and src/cli.ts
+
+import 'module-alias/register';
+
+// For development environments, register paths directly:
+
+import moduleAlias from 'module-alias';
+
+moduleAlias.addAliases({
+  '@axe': __dirname + '/axe',
+  '@generators': __dirname + '/generators',
+  '@utils': __dirname + '/utils',
+  '@templates': __dirname + '/../templates'
+});
+
+// This approach will:
+// 1. Work during development with ts-node
+// 2. Defer to the _moduleAliases in package.json when running the built code
 
 import { GeneratorOptions } from './types';
 import { parseProtocol } from './parser/protocol';
