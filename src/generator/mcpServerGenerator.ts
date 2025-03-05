@@ -77,7 +77,7 @@ class McpServerGenerator {
     });
     
     // Load all templates
-    this.templateSystem.preloadTemplates(); 
+    this.templateSystem.preloadTemplates();
     
     this.initialized = true;
     logger.debug('MCP server generator initialized successfully', LogCategory.GENERATOR);
@@ -133,16 +133,30 @@ class McpServerGenerator {
         true // Enable prompting
       );
 
+      // Create a base template data object with common fields
+      const baseTemplateData = {
+        service: mappedService,
+        date: new Date().toISOString(),
+        version: '0.1.0',
+        config: {
+          projectName: mappedService.name.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+          author: process.env.USER || 'MCP Generator User',
+          version: '0.1.0',
+          description: `MCP server for ${mappedService.name}`,
+          license: 'MIT'
+        }
+      };
+
       // Generate all components
-      await this.generateTypesFile(mappedService, options);
-      await this.generateHandlerFiles(mappedService, options);
-      await this.generateServerFile(mappedService, options);
-      await this.generateIndexFile(mappedService, options);
-      await this.generateProjectFiles(mappedService, options);
+      await this.generateTypesFile(mappedService, options, baseTemplateData);
+      await this.generateHandlerFiles(mappedService, options, baseTemplateData);
+      await this.generateServerFile(mappedService, options, baseTemplateData);
+      await this.generateIndexFile(mappedService, options, baseTemplateData);
+      await this.generateProjectFiles(mappedService, options, baseTemplateData);
 
       // Generate documentation (if enabled)
       if (options.generateDocs) {
-        await this.generateDocumentation(mappedService, options);
+        await this.generateDocumentation(mappedService, options, baseTemplateData);
       }
 
       // End performance tracking
@@ -208,16 +222,13 @@ class McpServerGenerator {
   /**
    * Generates the types file.
    */
-  private async generateTypesFile(mappedService: MappedService, options: GeneratorOptions): Promise<void> {
+  private async generateTypesFile(
+    mappedService: MappedService, 
+    options: GeneratorOptions,
+    baseTemplateData: any
+  ): Promise<void> {
     return performance.track('generate-types-file', async () => {
       logger.info('Generating types file...', LogCategory.GENERATOR);
-
-      // Prepare template data
-      const templateData = {
-        service: mappedService,
-        date: new Date().toISOString(),
-        version: '0.1.0'
-      };
 
       // Ensure template engine is initialized
       if (!this.templateSystem) {
@@ -231,7 +242,7 @@ class McpServerGenerator {
       try {
         // Render and write the file
         const typesPath = path.join(options.outputDir, 'types.ts');
-        this.templateSystem.renderToFile('types', typesPath, templateData);
+        this.templateSystem.renderToFile('types', typesPath, baseTemplateData);
 
         logger.success(`Generated types file: ${path.basename(typesPath)}`, LogCategory.GENERATOR);
       } catch (error) {
@@ -254,7 +265,11 @@ class McpServerGenerator {
   /**
    * Generates handler files for each resource.
    */
-  private async generateHandlerFiles(mappedService: MappedService, options: GeneratorOptions): Promise<void> {
+  private async generateHandlerFiles(
+    mappedService: MappedService, 
+    options: GeneratorOptions,
+    baseTemplateData: any
+  ): Promise<void> {
     return performance.track('generate-handler-files', async () => {
       logger.info('Generating handler files...', LogCategory.GENERATOR);
 
@@ -277,12 +292,10 @@ class McpServerGenerator {
           logger.info(`Generating handler for resource: ${resource.name}`, LogCategory.GENERATOR);
 
           try {
-            // Prepare template data
+            // Prepare template data by extending base data
             const templateData = {
-              resource,
-              service: mappedService,
-              date: new Date().toISOString(),
-              version: '0.1.0'
+              ...baseTemplateData,
+              resource
             };
 
             // Render and write the file
@@ -312,7 +325,11 @@ class McpServerGenerator {
   /**
    * Generates the server file.
    */
-  private async generateServerFile(mappedService: MappedService, options: GeneratorOptions): Promise<void> {
+  private async generateServerFile(
+    mappedService: MappedService, 
+    options: GeneratorOptions,
+    baseTemplateData: any
+  ): Promise<void> {
     return performance.track('generate-server-file', async () => {
       logger.info('Generating server file...', LogCategory.GENERATOR);
 
@@ -326,21 +343,14 @@ class McpServerGenerator {
       }
 
       try {
-        // Prepare template data
-        const templateData = {
-          service: mappedService,
-          date: new Date().toISOString(),
-          version: '0.1.0'
-        };
-
         // Render and write the file
         const serverPath = path.join(options.outputDir, 'server.ts');
-        this.templateSystem.renderToFile('server', serverPath, templateData);
+        this.templateSystem.renderToFile('server', serverPath, baseTemplateData);
 
         logger.success(`Generated server file: ${path.basename(serverPath)}`, LogCategory.GENERATOR);
 
         // Generate utility files
-        await this.generateUtilFiles(options);
+        await this.generateUtilFiles(options, baseTemplateData);
       } catch (error) {
         logger.error(`Failed to generate server file: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
         
@@ -360,7 +370,10 @@ class McpServerGenerator {
   /**
    * Generates utility files.
    */
-  private async generateUtilFiles(options: GeneratorOptions): Promise<void> {
+  private async generateUtilFiles(
+    options: GeneratorOptions,
+    baseTemplateData: any
+  ): Promise<void> {
     return performance.track('generate-util-files', async () => {
       logger.info('Generating utility files...', LogCategory.GENERATOR);
 
@@ -377,23 +390,17 @@ class McpServerGenerator {
         );
       }
 
-      // Prepare template data
-      const templateData = {
-        date: new Date().toISOString(),
-        version: '0.1.0'
-      };
-
       // Create a minimal logger utility if template isn't available
       try {
         const loggerPath = path.join(utilsDir, 'logger.ts');
         try {
           // Try to use template
-          this.templateSystem.renderToFile('utils/logger', loggerPath, templateData);
+          this.templateSystem.renderToFile('utils/logger', loggerPath, baseTemplateData);
           logger.success('Generated logger utility', LogCategory.GENERATOR);
         } catch (error) {
           // Create a basic logger
           const basicLogger = `// Generated by Axe Handle MCP Server Generator
-// Date: ${new Date().toISOString()}
+// Date: ${baseTemplateData.date}
 
 /**
  * Simple logger utility
@@ -416,12 +423,12 @@ export const logger = {
       try {
         const errorHandlerPath = path.join(utilsDir, 'errorHandler.ts');
         try {
-          this.templateSystem.renderToFile('utils/errorHandler', errorHandlerPath, templateData);
+          this.templateSystem.renderToFile('utils/errorHandler', errorHandlerPath, baseTemplateData);
           logger.success('Generated error handler utility', LogCategory.GENERATOR);
         } catch (error) {
           // Create a basic error handler
           const basicErrorHandler = `// Generated by Axe Handle MCP Server Generator
-// Date: ${new Date().toISOString()}
+// Date: ${baseTemplateData.date}
 
 /**
  * Error response interface
@@ -452,7 +459,11 @@ export function createErrorResponse(code: string, message: string, details?: Rec
   /**
    * Generates the index file.
    */
-  private async generateIndexFile(mappedService: MappedService, options: GeneratorOptions): Promise<void> {
+  private async generateIndexFile(
+    mappedService: MappedService, 
+    options: GeneratorOptions,
+    baseTemplateData: any
+  ): Promise<void> {
     return performance.track('generate-index-file', async () => {
       logger.info('Generating index file...', LogCategory.GENERATOR);
 
@@ -466,16 +477,9 @@ export function createErrorResponse(code: string, message: string, details?: Rec
       }
 
       try {
-        // Prepare template data
-        const templateData = {
-          service: mappedService,
-          date: new Date().toISOString(),
-          version: '0.1.0'
-        };
-
         // Render and write the file
         const indexPath = path.join(options.outputDir, 'index.ts');
-        this.templateSystem.renderToFile('index', indexPath, templateData);
+        this.templateSystem.renderToFile('index', indexPath, baseTemplateData);
 
         logger.success(`Generated index file: ${path.basename(indexPath)}`, LogCategory.GENERATOR);
       } catch (error) {
@@ -497,7 +501,11 @@ export function createErrorResponse(code: string, message: string, details?: Rec
   /**
    * Generates project files (package.json, tsconfig.json, etc.)
    */
-  private async generateProjectFiles(mappedService: MappedService, options: GeneratorOptions): Promise<void> {
+  private async generateProjectFiles(
+    _mappedService: MappedService, 
+    options: GeneratorOptions,
+    baseTemplateData: any
+  ): Promise<void> {
     return performance.track('generate-project-files', async () => {
       logger.info('Generating project files...', LogCategory.GENERATOR);
 
@@ -510,32 +518,18 @@ export function createErrorResponse(code: string, message: string, details?: Rec
         );
       }
 
-      // Prepare template data
-      const templateData = {
-        service: mappedService,
-        date: new Date().toISOString(),
-        version: '0.1.0',
-        config: {
-          projectName: mappedService.name.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
-          author: process.env.USER || 'MCP Generator User',
-          version: '0.1.0',
-          description: `MCP server for ${mappedService.name}`,
-          license: 'MIT'
-        }
-      };
-
       try {
         // Generate package.json
         try {
           const packageJsonPath = path.join(options.outputDir, 'package.json');
-          this.templateSystem.renderToFile('package.json', packageJsonPath, templateData);
+          this.templateSystem.renderToFile('package.json', packageJsonPath, baseTemplateData);
           logger.success('Generated package.json', LogCategory.GENERATOR);
         } catch (error) {
           // Create a minimal package.json
           const packageJson = {
-            name: mappedService.name.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
-            version: '0.1.0',
-            description: `MCP server for ${mappedService.name}`,
+            name: baseTemplateData.config.projectName,
+            version: baseTemplateData.config.version,
+            description: baseTemplateData.config.description,
             main: 'dist/index.js',
             scripts: {
               build: 'tsc',
@@ -566,7 +560,7 @@ export function createErrorResponse(code: string, message: string, details?: Rec
         // Generate tsconfig.json
         try {
           const tsconfigPath = path.join(options.outputDir, 'tsconfig.json');
-          this.templateSystem.renderToFile('tsconfig.json', tsconfigPath, templateData);
+          this.templateSystem.renderToFile('tsconfig.json', tsconfigPath, baseTemplateData);
           logger.success('Generated tsconfig.json', LogCategory.GENERATOR);
         } catch (error) {
           // Create a minimal tsconfig.json
@@ -595,13 +589,13 @@ export function createErrorResponse(code: string, message: string, details?: Rec
         // Generate README.md
         try {
           const readmePath = path.join(options.outputDir, 'README.md');
-          this.templateSystem.renderToFile('README.md', readmePath, templateData);
+          this.templateSystem.renderToFile('README.md', readmePath, baseTemplateData);
           logger.success('Generated README.md', LogCategory.GENERATOR);
         } catch (error) {
           // Create a minimal README.md
-          const readme = `# ${mappedService.name} MCP Server
+          const readme = `# ${baseTemplateData.service.name} MCP Server
 
-Generated by Axe Handle MCP Server Generator
+Generated by Axe Handle MCP Server Generator on ${baseTemplateData.date}
 
 ## Getting Started
 
@@ -638,7 +632,11 @@ npm start
   /**
    * Generates API documentation.
    */
-  private async generateDocumentation(mappedService: MappedService, options: GeneratorOptions): Promise<void> {
+  private async generateDocumentation(
+    _mappedService: MappedService, 
+    options: GeneratorOptions,
+    baseTemplateData: any
+  ): Promise<void> {
     return performance.track('generate-documentation', async () => {
       logger.info('Generating API documentation...', LogCategory.GENERATOR);
 
@@ -656,16 +654,9 @@ npm start
         const docsDir = path.join(options.outputDir, 'docs');
         await ValidationUtils.validateDirectory(docsDir, 1009, undefined, true);
 
-        // Prepare template data
-        const templateData = {
-          service: mappedService,
-          date: new Date().toISOString(),
-          version: '0.1.0'
-        };
-
         // Render and write the file
         const apiDocPath = path.join(docsDir, 'api.md');
-        this.templateSystem.renderToFile('api', apiDocPath, templateData);
+        this.templateSystem.renderToFile('api', apiDocPath, baseTemplateData);
 
         logger.success(`Generated API documentation: ${path.relative(options.outputDir, apiDocPath)}`, LogCategory.GENERATOR);
       } catch (error) {

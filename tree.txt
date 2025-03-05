@@ -1,25 +1,9 @@
 .
 ├── README.md
-├── archive
-│   ├── debug.js
-│   ├── debug.ts
-│   ├── debugGenerator.js
-│   ├── debugGenerator.ts
-│   ├── debugUtils.ts
-│   ├── ejs2eta.sh
-│   ├── generatorDebugger.js
-│   ├── generatorDebugger.ts
-│   ├── setupTemplates.js
-│   ├── setupTemplates.ts
-│   ├── templateSetupScript.ts
-│   ├── verify-templates.ts
-│   └── verify-templates.ts.bak
 ├── assets
 │   ├── axe-handle-100x100.svg
 │   ├── axe-handle.svg
 │   └── schema.ts
-├── fix-typescript-errors.js
-├── fixr.sh
 ├── package-lock.json
 ├── package.json
 ├── schemas
@@ -31,6 +15,7 @@
 │       └── schema.json
 ├── src
 │   ├── cli.ts
+│   ├── direct-refactoring-approach.txt
 │   ├── docs
 │   │   ├── gts-integration.md
 │   │   ├── neverthrow-implementation-plan.md
@@ -41,6 +26,7 @@
 │   │   ├── resultExample.ts
 │   │   └── resultUtilsExamples.ts
 │   ├── generator
+│   │   ├── baseGenerator.ts
 │   │   ├── mcpServerGenerator.ts
 │   │   └── plan.md
 │   ├── index.ts
@@ -49,6 +35,8 @@
 │   ├── parser
 │   │   ├── mcpProtocolParser.ts
 │   │   ├── mcpSchemaAdapter.ts
+│   │   ├── protocol
+│   │   │   └── protocolCache.ts
 │   │   └── serviceParser.ts
 │   ├── types
 │   │   └── schemaTypes.ts
@@ -61,6 +49,12 @@
 │       ├── performanceUtils.ts
 │       ├── resultUtils.ts
 │       ├── templateSystem.ts
+│       ├── templates
+│       │   ├── templateError.ts
+│       │   ├── templateLoader.ts
+│       │   ├── templateRenderer.ts
+│       │   ├── templateResolver.ts
+│       │   └── templateTypes.ts
 │       └── validationUtils.ts
 ├── templates
 │   ├── api.eta
@@ -94,4 +88,4 @@
 ├── tree.txt
 └── tsconfig.json
 
-25 directories, 70 files
+26 directories, 63 files

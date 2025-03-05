@@ -1,0 +1,34 @@
+# Direct Refactoring Implementation Steps
+
+## 1. Create New Directory Structure
+```bash
+mkdir -p src/generator/generators
+mkdir -p src/parser/protocol
+mkdir -p src/utils/templates
+```
+
+## 2. Copy New Files
+1. Copy all the refactored code into the new file structure
+2. Ensure all imports are correctly updated in each file
+3. No need to create backups
+
+## 3. Update Entry Points and Imports
+1. Update main entry files (index.ts) to export from new locations
+2. Update all import statements in existing files to point to new modules
+
+## 4. Delete Old Files
+Once the new structure is in place and tested, delete the original monolithic files:
+```bash
+rm src/generator/mcpServerGenerator.ts
+rm src/parser/mcpProtocolParser.ts
+rm src/utils/templateSystem.ts
+```
+
+## 5. Run Tests
+Run the test suite to ensure everything works with the new structure
+
+## 6. Update Documentation
+Update any documentation to reflect the new structure
+
+## 7. Update Package References
+If any external code depends on specific file paths, update those references
