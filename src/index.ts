@@ -54,7 +54,7 @@ export async function generateMcpServer(options: GeneratorOptions): Promise<void
     const mappedService = mapper.mapServiceToMcp(userService);
     
     // Generate code
-    await mcpServerGenerator.generateServer(mappedService, options);
+    await axeServerGenerator.generateServer(mappedService, options);
     
     return;
   } catch (error) {

@@ -99,7 +99,7 @@ import {
 <% } %>
 <% } %>
   McpErrorResponse
-} from '../types';
+} from "../axe/schema/types";
 
 // Store for <%= resource.name %> resources
 const <%= resource.name.toLowerCase() %>Store: Record<string, <%= resource.name %>> = {};
