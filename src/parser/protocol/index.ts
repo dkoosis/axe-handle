@@ -1,12 +1,12 @@
 // Path: src/parser/protocol/index.ts
-// Unified module entry point for MCP protocol parsing functionality.
+// Result-based protocol parser
 
 import { McpProtocol } from '../../types';
 import { mcpProtocolParser } from './protocolCache';
 import { extractMcpProtocol } from './protocolAdapter';
 import { createParserError } from '../../utils/errorUtils';
 import { logger, LogCategory } from '../../utils/logger';
-import { AxeResult } from '../../utils/resultUtils';
+import { AxeResult, runAsyncOperation } from '../../utils/resultUtils';
 import path from 'path';
 
 /**
@@ -51,23 +51,13 @@ export async function parseProtocol(schemaPath?: string): Promise<McpProtocol> {
  * @param schemaPath Optional custom path to the protocol schema file
  * @returns Promise with a Result containing the protocol or an error
  */
-export async function parseProtocolResult(schemaPath?: string): Promise<AxeResult<McpProtocol>> {
-  try {
-    const protocol = await parseProtocol(schemaPath);
-    return { ok: true, value: protocol };
-  } catch (error) {
-    return { 
-      ok: false, 
-      error: error instanceof Error && 'code' in error 
-        ? error 
-        : createParserError(
-            1011,
-            'Unexpected error parsing MCP protocol',
-            { schemaPath },
-            error instanceof Error ? error : undefined
-          )
-    };
-  }
+export async function parseProtocolResult(schemaPath?: string): Promise<AxeResult<MccpProtocol>> {
+  return runAsyncOperation(
+    async () => await parseProtocol(schemaPath),
+    'parse-protocol-result',
+    1011,
+    LogCategory.PARSER
+  );
 }
 
 // Export components for direct use when needed

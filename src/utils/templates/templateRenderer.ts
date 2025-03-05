@@ -126,62 +126,6 @@ export class TemplateRenderer {
   }
 
   /**
-   * Asynchronously renders a template with data
-   * @param template The template to render
-   * @param data Data to render the template with
-   * @returns Promise with Result containing the rendered content or an error
-   */
-  public async renderTemplateAsync(template: Template, data: any): Promise<TemplateResult<string>> {
-    logger.debug(`Rendering template asynchronously: ${template.name}`, LogCategory.TEMPLATE);
-    
-    try {
-      // Create a context with helpers
-      const context = {
-        ...data,
-        ...this.helpers
-      };
-      
-      // Render the template asynchronously
-      const rendered = await eta.renderAsync(template.content, context, {
-        filename: template.absolutePath,
-        root: this.baseDir,
-        debug: this.verbose,
-        cache: this.cache,
-        async: true
-      });
-      
-      if (rendered === undefined) {
-        return err(
-          new TemplateRenderError(template.name, {
-            reason: 'Rendering returned undefined',
-            templatePath: template.absolutePath
-          })
-        );
-      }
-      
-      logger.debug(`Template rendered successfully: ${template.name}`, LogCategory.TEMPLATE);
-      return ok(rendered);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error(`Failed to render template: ${errorMessage}`, LogCategory.TEMPLATE);
-      
-      // Analyze available data for diagnostics
-      const availableDataKeys = Object.keys(data || {});
-      const templatePreview = template.content.substring(0, 300) + 
-        (template.content.length > 300 ? '...' : '');
-      
-      return err(
-        new TemplateRenderError(template.name, {
-          reason: errorMessage,
-          templatePath: template.absolutePath,
-          availableDataKeys,
-          templatePreview
-        }, error instanceof Error ? error : undefined)
-      );
-    }
-  }
-
-  /**
    * Writes content to a file
    * @param content The content to write
    * @param outputPath The file path to write to
@@ -204,45 +148,6 @@ export class TemplateRenderer {
       
       // Write the file
       fs.writeFileSync(outputPath, content, 'utf-8');
-      
-      logger.debug(`File written successfully: ${outputPath}`, LogCategory.TEMPLATE);
-      return ok(undefined);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error(`Failed to write file: ${errorMessage}`, LogCategory.TEMPLATE);
-      
-      return err(
-        new TemplateWriteError(
-          templateName || 'unknown',
-          outputPath,
-          {},
-          error instanceof Error ? error : undefined
-        )
-      );
-    }
-  }
-
-  /**
-   * Asynchronously writes content to a file
-   * @param content The content to write
-   * @param outputPath The file path to write to
-   * @param templateName Optional template name for error reporting
-   * @returns Promise with Result containing void on success or an error
-   */
-  public async writeToFileAsync(
-    content: string, 
-    outputPath: string, 
-    templateName?: string
-  ): Promise<TemplateResult<void>> {
-    logger.debug(`Writing to file asynchronously: ${outputPath}`, LogCategory.TEMPLATE);
-    
-    try {
-      // Ensure output directory exists
-      const outputDir = path.dirname(outputPath);
-      await fsPromises.mkdir(outputDir, { recursive: true });
-      
-      // Write the file
-      await fsPromises.writeFile(outputPath, content, 'utf-8');
       
       logger.debug(`File written successfully: ${outputPath}`, LogCategory.TEMPLATE);
       return ok(undefined);

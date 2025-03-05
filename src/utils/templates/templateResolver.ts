@@ -12,7 +12,10 @@ import { TemplateNotFoundError } from './templateError';
  * Responsible for resolving template paths
  */
 export class TemplateResolver {
-  private baseDir: string;
+  /**
+   * Base directory for templates
+   */
+  public readonly baseDir: string;
 
   /**
    * Creates a new TemplateResolver

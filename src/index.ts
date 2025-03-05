@@ -1,21 +1,23 @@
-// src/index.ts import update
+// Path: src/index.ts
+// Main entry point for the Axe Handle code generator
+
 import * as path from 'path';
 import { GeneratorOptions, AxeError } from './types';
-import { parseProtocol } from './parser/protocol'; // Updated import
+import { parseProtocol } from './parser/protocol';
 import { serviceParser } from './parser/serviceParser';
 import { mapper } from './mcp/mapper';
 import { mcpServerGenerator } from './generator/mcpServerGenerator';
 import { getConfigManager } from './utils/configManager';
-import { getTemplateSystem } from './utils/templateSystem';
-import { createAsyncErrorBoundary } from './utils/errorBoundary';
 import { logger, LogCategory, LogLevel } from './utils/logger';
 import { performance } from './utils/performanceUtils';
 import { ValidationUtils } from './utils/validationUtils';
 import { runAsyncOperation } from './utils/resultUtils';
+import { AxeResult } from './utils/resultUtils';
 
 /**
  * Initialize the application by setting up the template system
  * and config manager with proper paths.
+ * @param options Initialization options
  */
 export function initialize(options: { verbose?: boolean } = {}): void {
   // Configure logger
@@ -28,26 +30,56 @@ export function initialize(options: { verbose?: boolean } = {}): void {
   // Enable performance tracking if verbose
   performance.setEnabled(options.verbose || false);
   
-  // Initialize the template system with the default templates directory
-  const templatesDir = path.resolve(__dirname, '../templates');
-  getTemplateSystem({
-    baseDir: templatesDir,
-    cache: true,
-    helpers: { 
-      // Register common helpers
-      isRequestType: (type: string) => type.endsWith('Request'),
-      isResponseType: (type: string) => type.endsWith('Result') || type.endsWith('Response'),
-      getResponseTypeForRequest: (requestType: string) => requestType.replace('Request', 'Result'),
-      getMethodFromRequest: (requestType: string) => {
-        const methodParts = requestType.replace('Request', '').split(/(?=[A-Z])/);
-        return methodParts.map(part => part.toLowerCase()).join('_');
-      }
-    }
-  });
-  
-  // Initialize the config manager (no action needed, just ensures it's created)
+  // Initialize the config manager
   getConfigManager();
   
   logger.debug('Application initialized', LogCategory.GENERAL);
 }
+
+/**
+ * Generate an MCP server from a schema file
+ * @param options Generator options
+ * @returns Promise that resolves when generation is complete
+ */
+export async function generateMcpServer(options: GeneratorOptions): Promise<void> {
+  // Initialize
+  initialize({ verbose: options.verbose });
   
+  try {
+    // Parse MCP protocol
+    const mcpProtocol = await parseProtocol();
+    
+    // Parse service
+    const userService = await serviceParser.parseService(options.inputFile, mcpProtocol);
+    
+    // Map service to MCP concepts
+    const mappedService = mapper.mapServiceToMcp(userService);
+    
+    // Generate code
+    await mcpServerGenerator.generateServer(mappedService, options);
+    
+    return;
+  } catch (error) {
+    logger.error(`Generation failed: ${error instanceof Error ? error.message : String(error)}`, LogCategory.GENERATOR);
+    throw error;
+  }
+}
+
+/**
+ * Generate an MCP server with Result-based error handling
+ * @param options Generator options
+ * @returns Promise that resolves to a Result
+ */
+export async function generateMcpServerResult(options: GeneratorOptions): Promise<AxeResult<void>> {
+  return runAsyncOperation(
+    async () => {
+      await generateMcpServer(options);
+    },
+    'generate-mcp-server',
+    9000,
+    LogCategory.GENERATOR
+  );
+}
+
+// Re-export types
+export { GeneratorOptions } from './types';

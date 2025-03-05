@@ -1,11 +1,12 @@
-// src/generator/generators/baseGenerator.ts
-import { GeneratorOptions, AxeError } from '../../types';
-import { logger, LogCategory } from '../../utils/logger';
-import { createGeneratorError } from '../../utils/errorUtils';
-import { getTemplateSystem, TemplateSystem } from '../../utils/templateSystem';
-import { performance } from '../../utils/performanceUtils';
+// Path: src/generator/generators/baseGenerator.ts
+// Base Generator class with common functionality for all generators
+
 import * as path from 'path';
 import * as fs from 'fs';
+import { GeneratorOptions } from '../../types';
+import { logger, LogCategory } from '../../utils/logger';
+import { createGeneratorError } from '../../utils/errorUtils';
+import { TemplateSystem, getTemplateSystem } from '../../utils/templateSystem';
 
 /**
  * Base Generator class that provides common functionality for all generators.
@@ -16,6 +17,7 @@ export abstract class BaseGenerator {
 
   /**
    * Initialize the generator with template engine setup
+   * @param options Generator options
    */
   protected async initialize(options: GeneratorOptions): Promise<void> {
     if (this.initialized) {
@@ -46,8 +48,10 @@ export abstract class BaseGenerator {
     // Register common helper functions
     this.registerTemplateHelpers();
     
-    // Load all templates
-    this.templateSystem.preloadTemplates();
+    // Preload templates
+    if (this.templateSystem) {
+      this.templateSystem.preloadTemplates();
+    }
     
     this.initialized = true;
     logger.debug('Generator initialized successfully', LogCategory.GENERATOR);
@@ -76,6 +80,9 @@ export abstract class BaseGenerator {
 
   /**
    * Render a template to a file
+   * @param templateName Template name to render
+   * @param outputPath Path to write the rendered template
+   * @param data Data for template rendering
    */
   protected async renderTemplate(
     templateName: string, 
@@ -97,8 +104,12 @@ export abstract class BaseGenerator {
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
-      // Render and write the file
-      this.templateSystem.renderToFile(templateName, outputPath, data);
+      // Render the template and write to file
+      const result = this.templateSystem.renderToFile(templateName, outputPath, data);
+      
+      if (result.isErr()) {
+        throw result.error;
+      }
       
       logger.debug(`Generated file: ${path.basename(outputPath)}`, LogCategory.GENERATOR);
     } catch (error) {
@@ -113,6 +124,8 @@ export abstract class BaseGenerator {
 
   /**
    * Generate a basic text file when a template is not available
+   * @param outputPath Path to write the file
+   * @param content Content to write
    */
   protected generateBasicFile(outputPath: string, content: string): void {
     try {
@@ -138,6 +151,8 @@ export abstract class BaseGenerator {
 
   /**
    * Create a base template data object with common fields
+   * @param additionalData Additional data to include
+   * @returns Template data object
    */
   protected createBaseTemplateData(additionalData: Record<string, any> = {}): Record<string, any> {
     return {
