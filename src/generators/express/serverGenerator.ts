@@ -2,11 +2,11 @@
 // Generator for server-related files
 
 import { BaseGenerator } from '@generators/express/baseGenerator';
-import { MappedService, GeneratorOptions } from '../../types';
-import { logger, LogCategory } from '../../utils/logger';
-import { performance } from '../../utils/performanceUtils';
+import { MappedService, GeneratorOptions } from '@axe/schema/types';
+import { logger, LogCategory } from '@utils/logger';
+import { performance } from '@utils/performanceUtils';
 import * as path from 'path';
-import { ValidationUtils } from '../../utils/validationUtils';
+import { ValidationUtils } from '@utils/validationUtils';
 
 /**
  * Generator for server-related files

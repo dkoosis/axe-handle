@@ -1,8 +1,8 @@
 // src/generator/generators/indexGenerator.ts
 import { BaseGenerator } from '@generators/express/baseGenerator';
-import { MappedService, GeneratorOptions } from '../../types';
-import { logger, LogCategory } from '../../utils/logger';
-import { performance } from '../../utils/performanceUtils';
+import { MappedService, GeneratorOptions } from '@axe/schema/types';
+import { logger, LogCategory } from '@utils/logger';
+import { performance } from '@utils/performanceUtils';
 import * as path from 'path';
 
 /**

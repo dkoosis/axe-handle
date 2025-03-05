@@ -10,10 +10,10 @@ import {
   McpType, 
   McpField, 
   McpCapability
-} from '../../types';
-import { createParserError } from '../../utils/errorUtils';
-import { logger, LogCategory } from '../../utils/logger';
-import { performance } from '../../utils/performanceUtils';
+} from '@axe/schema/types';
+import { createParserError } from '@utils/errorUtils';
+import { logger, LogCategory } from '@utils/logger';
+import { performance } from '@utils/performanceUtils';
 
 /**
  * Path to the MCP protocol definition TypeScript file.

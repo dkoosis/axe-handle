@@ -3,10 +3,10 @@
 
 import * as fs from 'fs/promises';
 import * as ts from 'typescript';
-import { McpProtocol, McpOperation, McpType } from '../../types';
-import { createParserError } from '../../utils/errorUtils';
-import { logger, LogCategory } from '../../utils/logger';
-import { performance } from '../../utils/performanceUtils';
+import { McpProtocol, McpOperation, McpType } from '@axe/schema/types';
+import { createParserError } from '@utils/errorUtils';
+import { logger, LogCategory } from '@utils/logger';
+import { performance } from '@utils/performanceUtils';
 
 /**
  * Default protocol version to use if none is found in the source.

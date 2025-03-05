@@ -2,11 +2,11 @@
 // Generator for resource handler files
 
 import { BaseGenerator } from '@generators/express/baseGenerator';
-import { MappedService, MappedResource, GeneratorOptions } from '../../types';
-import { logger, LogCategory } from '../../utils/logger';
-import { performance } from '../../utils/performanceUtils';
+import { MappedService, MappedResource, GeneratorOptions } from '@axe/schema/types';
+import { logger, LogCategory } from '@utils/logger';
+import { performance } from '@utils/performanceUtils';
 import * as path from 'path';
-import { ValidationUtils } from '../../utils/validationUtils';
+import { ValidationUtils } from '@utils/validationUtils';
 
 /**
  * Generator for resource handler files

@@ -2,7 +2,7 @@
 // Generator for project configuration files
 
 import { BaseGenerator } from '@generators/express/baseGenerator'; // Corrected import
-import { MappedService, GeneratorOptions } from '../../types';
+import { MappedService, GeneratorOptions } from '@axe/schema/types';
 import { logger, LogCategory } from '@utils/logger'; // Corrected import
 import { performance } from '@utils/performanceUtils'; // Corrected import
 import * as path from 'path';

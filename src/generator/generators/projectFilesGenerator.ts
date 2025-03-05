@@ -1,10 +1,10 @@
 // Path: src/generator/generators/projectFilesGenerator.ts
 // Generator for project configuration files
 
-import { BaseGenerator } from './baseGenerator';
-import { MappedService, GeneratorOptions } from '../../types';
-import { logger, LogCategory } from '../../utils/logger';
-import { performance } from '../../utils/performanceUtils';
+import { BaseGenerator } from '@generators/express/baseGenerator';
+import { MappedService, GeneratorOptions } from '@axe/schema/types';
+import { logger, LogCategory } from '@utils/logger';
+import { performance } from '@utils/performanceUtils';
 import * as path from 'path';
 
 /**

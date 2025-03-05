@@ -1,12 +1,12 @@
 // Path: src/parser/protocol/index.ts
 // Result-based protocol parser
 
-import { McpProtocol } from '../../types';
+import { McpProtocol } from '@axe/schema/types';
 import { mcpProtocolParser } from './protocolCache';
 import { extractMcpProtocol } from './protocolAdapter';
-import { createParserError } from '../../utils/errorUtils';
-import { logger, LogCategory } from '../../utils/logger';
-import { AxeResult, runAsyncOperation } from '../../utils/resultUtils';
+import { createParserError } from '@utils/errorUtils';
+import { logger, LogCategory } from '@utils/logger';
+import { AxeResult, runAsyncOperation } from '@utils/resultUtils';
 import path from 'path';
 
 /**

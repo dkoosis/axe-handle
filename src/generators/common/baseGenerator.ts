@@ -3,10 +3,10 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { GeneratorOptions } from '../../types';
-import { logger, LogCategory } from '../../utils/logger';
-import { createGeneratorError } from '../../utils/errorUtils';
-import { TemplateSystem, getTemplateSystem } from '../../utils/templateSystem';
+import { GeneratorOptions } from '@axe/schema/types';
+import { logger, LogCategory } from '@utils/logger';
+import { createGeneratorError } from '@utils/errorUtils';
+import { TemplateSystem, getTemplateSystem } from '@utils/templateSystem';
 
 /**
  * Base Generator class that provides common functionality for all generators.

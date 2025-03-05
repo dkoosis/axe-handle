@@ -1,5 +1,5 @@
 // src/generator/generators/index.ts
-export * from './baseGenerator';
+export * from '@generators/express/baseGenerator';
 export * from './typesGenerator';
 export * from './handlerGenerator';
 export * from './serverGenerator';
