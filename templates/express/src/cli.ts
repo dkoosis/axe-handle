@@ -1,6 +1,5 @@
-// Path: templates/express/src/cli.ts
 #!/usr/bin/env node
-
+// Path: templates/express/src/cli.ts
 /**
  * File: axe-handle/src/cli.ts
  * Main CLI entry point for the Axe Handle MCP server code generator.

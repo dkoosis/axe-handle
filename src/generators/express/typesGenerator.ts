@@ -22,9 +22,10 @@ export class TypesGenerator extends BaseGenerator {
       // Initialize the generator
       await this.initialize(options);
 
-      // Prepare template data
+      // Prepare template data - ensure date is properly formatted
       const templateData = this.createBaseTemplateData({
-        service: mappedService
+        service: mappedService,
+        date: new Date().toISOString()
       });
 
       // Render and write the file

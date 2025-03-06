@@ -1,23 +1,23 @@
 // Path: src/generator/generators/projectFilesGenerator.ts
 // Generator for project configuration files
 
-import { BaseGenerator } from '@generators/express/baseGenerator'; // Corrected import
+import { BaseGenerator } from '@generators/express/baseGenerator';
 import { MappedService, GeneratorOptions } from '@axe/schema/types';
-import { logger, LogCategory } from '@utils/logger'; // Corrected import
-import { performance } from '@utils/performanceUtils'; // Corrected import
+import { logger, LogCategory } from '@utils/logger';
+import { performance } from '@utils/performanceUtils';
 import * as path from 'path';
 
 /**
  * Generator for project configuration files
  */
-export class ProjectFilesGenerator extends BaseGenerator { // Correctly extends BaseGenerator
+export class ProjectFilesGenerator extends BaseGenerator {
   /**
    * Generate project files (package.json, tsconfig.json, etc.)
    */
   public async generate(
-    mappedService: MappedService,
+    mappedService: MappedService, 
     options: GeneratorOptions
-  ): Promise<void> { // Correct return type
+  ): Promise<void> {
     return performance.track('generate-project-files', async () => {
       logger.info('Generating project files...', LogCategory.GENERATOR);
 
@@ -56,7 +56,7 @@ export class ProjectFilesGenerator extends BaseGenerator { // Correctly extends 
     templateData: Record<string, any>
   ): Promise<void> {
     const packageJsonPath = path.join(options.outputDir, 'package.json');
-
+    
     try {
       // Try to use template
       await this.renderTemplate('package.json', packageJsonPath, templateData);
@@ -85,12 +85,12 @@ export class ProjectFilesGenerator extends BaseGenerator { // Correctly extends 
           'ts-node': '^10.9.1'
         }
       };
-
+      
       this.generateBasicFile(
         packageJsonPath,
         JSON.stringify(packageJson, null, 2)
       );
-
+      
       logger.success('Generated basic package.json', LogCategory.GENERATOR);
     }
   }
@@ -103,7 +103,7 @@ export class ProjectFilesGenerator extends BaseGenerator { // Correctly extends 
     templateData: Record<string, any>
   ): Promise<void> {
     const tsconfigPath = path.join(options.outputDir, 'tsconfig.json');
-
+    
     try {
       // Try to use template
       await this.renderTemplate('tsconfig.json', tsconfigPath, templateData);
@@ -123,12 +123,12 @@ export class ProjectFilesGenerator extends BaseGenerator { // Correctly extends 
         include: ['**/*.ts'],
         exclude: ['node_modules']
       };
-
+      
       this.generateBasicFile(
         tsconfigPath,
         JSON.stringify(tsconfig, null, 2)
       );
-
+      
       logger.success('Generated basic tsconfig.json', LogCategory.GENERATOR);
     }
   }
@@ -142,7 +142,7 @@ export class ProjectFilesGenerator extends BaseGenerator { // Correctly extends 
     templateData: Record<string, any>
   ): Promise<void> {
     const readmePath = path.join(options.outputDir, 'README.md');
-
+    
     try {
       // Try to use template
       await this.renderTemplate('README.md', readmePath, templateData);
@@ -172,7 +172,7 @@ npm run build
 npm start
 \`\`\`
 `;
-
+      
       this.generateBasicFile(readmePath, readme);
       logger.success('Generated basic README.md', LogCategory.GENERATOR);
     }

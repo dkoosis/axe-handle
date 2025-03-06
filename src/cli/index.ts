@@ -1,6 +1,5 @@
-// Path: src/cli/index.ts
 #!/usr/bin/env node
-// Path: src/cli.ts
+// Path: src/cli/index.ts
 // Provides the command-line interface for the Axe Handle code generator.
 
 import { Command } from 'commander';

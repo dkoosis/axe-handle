@@ -104,6 +104,15 @@ export abstract class BaseGenerator {
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
+      // Add current date and version if not already provided
+      if (!data.date) {
+        data.date = new Date().toISOString();
+      }
+      
+      if (!data.version) {
+        data.version = '0.1.0';
+      }
+
       // Render the template and write to file
       const result = this.templateSystem.renderToFile(templateName, outputPath, data);
       

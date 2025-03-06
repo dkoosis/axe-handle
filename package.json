@@ -7,7 +7,9 @@
   "bin": {
     "axe-handle": "dist/cli.js"
   },
+
   "scripts": {
+    "prebuild": "node scripts/validate-structure.js",
     "refactor": "ts-node refactoring-script.ts",
     "build": "tsc && tsc-alias",
     "postbuild": "cp -r templates dist/",

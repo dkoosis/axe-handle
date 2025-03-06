@@ -1,123 +1,136 @@
-# Axe Handle: MCP Server Generator
+# Axe-Handle Project Structure
 
-A robust, maintainable, and extensible TypeScript-based code generator for Model Context Protocol (MCP) servers, targeting Express.js.
+This document describes the directory structure and organization of the Axe-Handle project, an MCP server generator.
 
-## Overview
+![Axe-Handle Logo](assets/axe-handle-100x100.svg)
 
-Axe Handle generates Express.js servers from user-provided Protobuf schemas that define the service. The generated code follows MCP protocols and provides a complete, production-ready server implementation.
+## Core Purpose for Axe Handle
 
-## Features
+Axe Handle is a code generation tool designed for developers who want to create Model Context Protocol (MCP) servers rapidly and reliably. It serves developers who want to add MCP interfaces to existing services (like Google Calendar, task managers, or project management tools) or build entirely new MCP-compatible services so that LLM chat agents such as Claude can effectively interact with these services.
 
-- **Schema-Driven Development**: Define your service using Protobuf schemas
-- **MCP Compliance**: Adherence to the official MCP protocol
-- **TypeScript Optimization**: Generated code follows best practices for TypeScript
-- **Robust Error Handling**: Clear, informative, and actionable error messages
-- **Developer-Friendly Workflow**: Easy to build, run, test, and iterate
+By simply defining your service's resources and data structures in a Protobuf schema, Axe Handle generates a complete, production-ready MCP server that wraps your existing APIs. This eliminates the tedious and error-prone process of manually coding MCP interfaces, allowing you to:
 
-## Installation
+1. Quickly enable AI agents to interact with your existing services
+2. Maintain consistent implementation of the MCP specification
+3. Focus on service-specific logic rather than protocol implementation details
 
-```bash
-# Clone the repository
-git clone https://github.com/your-username/axe-handle.git
-cd axe-handle
+While currently generating TypeScript Express.js servers from Protobuf schemas, Axe Handle's architecture is designed to be adaptable to different input formats and output frameworks as requirements evolve.
 
-# Install dependencies
-pnpm install
-
-# Build the project
-pnpm build
-```
-
-## Usage
-
-Generate an MCP server from a Protobuf schema:
-
-```bash
-pnpm run generate schemas/examples/calendar.proto ./generated
-```
-
-Run the generated server:
-
-```bash
-cd generated
-pnpm install
-pnpm start
-```
-
-### Options
-
-- `--config <file>`: Specify a configuration file
-- `--overwrite`: Overwrite existing files
-- `--docs`: Generate documentation (default: true)
-- `--verbose`: Verbose output
-
-## Development
-
-```bash
-# Run development mode (watch + tests)
-pnpm dev
-
-# Run tests
-pnpm test
-```
-
-## Project Structure
+## Top-Level Directories
 
 ```
 axe-handle/
+├── docs/
 ├── src/
-│   ├── parser/
-│   │   ├── mcpProtocolParser.ts  # Parses protocol.ts (TS Compiler API, caching)
-│   │   ├── serviceParser.ts  # Parses .proto (protobufjs, detailed validation)
-│   │   └── openapiParser.ts  # Parses OpenAPI (conversion, with warnings)
-│   ├── generator/
-│   │   └── mcpServerGenerator.ts     # Core generation (eta, error handling)
-│   ├── mcp/
-│   │   └── mapper.ts        # Maps user schema to MCP
-│   ├── cli.ts             # Command-line interface (commander)
-│   ├── index.ts           # Main entry point
-│   └── types.ts           # Shared TypeScript types
-├── templates/             # EJS templates
-│   ├── server.eta
-│   ├── handler.eta
-│   ├── types.eta
-│   ├── index.eta
-│   └── api.eta
-├── test/                  # Unit and integration tests
-├── schemas/
-│   ├── mcp-spec/         # MCP protocol
-│   │   ├── protocol.ts
-│   │   └── schema.json    # CACHED parsed MCP protocol
-│   └── examples/
-│       └── calendar.proto
-└── generated/             # Output (gitignore this)
+│   ├── cli/
+│   ├── mcpServerGenerator/
+│   ├── parsers/
+│   │   └── modelContextProtocol/
+│   ├── templateProcessor/
+│   ├── types/
+│   └── utils/
+├── templates/
+├── tests/
+│   └── fixtures/
+└── README.md
 ```
 
-## Core Principles
+*   **`docs/`**: Contains high-level documentation for the project, such as design documents, user guides, and API references.
+*   **`src/`**: Contains all the source code for the project (written in TypeScript).
+*   **`templates/`**: Contains the actual template files used for code generation. These are `.eta` files (see File Extensions below).
+*   **`tests/`**: Contains the automated tests for the project.  The structure within `tests/` will mirror the `src/` structure as tests are added.
+*    **`tests/fixtures`**: Contains data used for testing, for example example input schemas.
+*   **`README.md`**: The main project README file, providing an overview of the project, build instructions, usage examples, etc.
 
-- **Extensibility**: Hooks/plugins for custom logic injection
-- **Maintainability**: Clean, modular code; extensive testing; clear separation of concerns
-- **Robust Error Handling**: Clear, informative, and actionable error messages
-- **Version Resilience**: Design with MCP versioning in mind
-- **Simplicity**: Prioritize straightforward, easy-to-understand code over complex solutions
+## `src/` Directory Structure
 
-## Error Handling
+```
+src/
+├── cli/
+│   └── index.ts
+├── mcpServerGenerator/
+│   ├── handlerGenerator.ts
+│   └── serverGenerator.ts
+├── parsers/
+│   └── modelContextProtocol/
+│       ├── index.ts
+│       ├── adapter.ts
+│       ├── cache.ts
+│       ├── protocol.ts
+│       └── protocol.json
+├── templateProcessor/
+│   ├── templateProcessor.ts
+│   ├── templateLoader.ts
+│   └── templateRenderer.ts
+├── types/
+│   └── index.ts
+└── utils/
+    ├── errorUtils.ts
+    ├── logger.ts
+    └── ...
+```
 
-Axe Handle uses a hierarchical error classification system:
+![Axe-Handle Data Flow](assets/axe-handle-dataflow-01.png)
 
-- `AXE-`: Errors from the Axe Handle code generator
-  - `AXE-1XXX`: Parser errors
-  - `AXE-2XXX`: CLI errors
-  - `AXE-3XXX`: Generator errors
-  - `AXE-4XXX`: Mapper errors
-- `MCP-`: Errors related to the MCP protocol or generated server
-  - `MCP-1XXX`: MCP protocol violations
-  - `MCP-4XXX`: Runtime errors (e.g., 4004 - Not Found)
 
-## Contributing
+*   **`cli/`**: Contains the code for the command-line interface.
+    *   `index.ts`: The entry point for the CLI. This file handles parsing command-line arguments and invoking the appropriate functionality.
 
-Contributions are welcome! Please follow our coding standards and submit PRs for review.
+*   **`mcpServerGenerator/`**: Contains the code generator for MCP-compliant servers.
+    *   `handlerGenerator.ts`: Generates the request handler code.
+    *   `serverGenerator.ts`: Generates the main server code (currently using Express).
 
-## License
+*   **`parsers/`**: Contains code for parsing input schemas and related data.
+    *   `modelContextProtocol/`:  Specifically handles parsing of the Model-Context Protocol (MCP) related inputs.
+        *   `index.ts`: Main entry point and exports for the MCP parsing module.
+        *   `adapter.ts`: Contains code for adapting the parsed MCP data to a format suitable for code generation.
+        *   `cache.ts`: Implements caching for MCP-related data (e.g., the protocol schema).
+        *   `protocol.ts`:  TypeScript definitions related to the MCP protocol. This is generated from `protocol.json`.
+        *   `protocol.json`:  The MCP protocol schema in JSON format.  This is the *source of truth* for the protocol definition.
 
-MIT
+*   **`templateProcessor/`**: Contains the template engine logic. This is a general-purpose template processor, not specific to MCP or server generation.
+    *   `templateProcessor.ts`: The main template processor class.
+    *   `templateLoader.ts`: Handles loading template files from the filesystem.
+    *   `templateRenderer.ts`: Handles rendering templates (substituting data into templates).
+
+*   **`types/`**: Contains global type definitions used throughout the project.
+    *   `index.ts`: Exports the type definitions.
+
+*   **`utils/`**: Contains utility functions that are used in multiple parts of the codebase.
+    *   `errorUtils.ts`:  Provides utility functions for error handling.
+    *   `logger.ts`:  Provides logging functionality.
+    *   `...`:  Other utility functions can be added here as needed.
+
+## `templates/` Directory
+
+```
+templates/
+├── server.eta
+├── handler.eta
+└── ...
+```
+
+This folder contains the templates used to construct the MCP Server.
+
+*   **`server.eta`**: template used to generate the server
+*   **`handler.eta`**: template used to generate the handlers.
+
+## File Extensions
+
+*   **`.ts`**: TypeScript source code files.
+*   **`.eta`**: Template files using the Eta template engine (see [https://eta.js.org/](https://eta.js.org/)).
+*   **`.json`**: JSON data files (used for the MCP protocol schema).
+*   **`.proto`**: Protocol Buffers schema files (used for example input schemas).
+*    **`.md`**: Markdown files. Used for documentation.
+
+![Axe-Handle Data Flow](assets/axe-handle-architecture-01.png)
+
+## Guidelines for Adding New Code
+
+1.  **Maintain Separation of Concerns:** Each directory and file should have a clear and specific purpose. Avoid mixing unrelated functionality.
+2.  **Follow Existing Naming Conventions:** Use consistent naming conventions (camelCase for variables and functions, PascalCase for classes and interfaces).
+3.  **Write Tests:** Add unit tests for all new code. The test files should be placed in the `tests/` directory, mirroring the structure of the `src/` directory.
+4. **Keep it Simple:** Avoid over-engineering.
+5. **Document as You Go:** Add JSDoc comments and update the necessary documentation in `/docs` or `README.md`
+
+This document provides a comprehensive overview of the Axe-Handle project structure and should serve as a guide for developers working on the project.
