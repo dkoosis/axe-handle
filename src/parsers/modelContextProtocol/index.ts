@@ -1,4 +1,4 @@
-// Path: src/parser/protocol/index.ts
+// Path: src/parsers/modelContextProtocol/index.ts
 // Result-based protocol parser
 
 import { McpProtocol } from '@axe/schema/types';

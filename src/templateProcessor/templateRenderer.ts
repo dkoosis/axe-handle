@@ -1,4 +1,4 @@
-// Path: src/utils/templates/templateRenderer.ts
+// Path: src/templateProcessor/templateRenderer.ts
 // Handles rendering of templates
 
 import * as fs from 'fs';

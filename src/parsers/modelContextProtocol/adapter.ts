@@ -1,4 +1,4 @@
-// Path: src/mcp/mapper.ts
+// Path: src/parsers/modelContextProtocol/adapter.ts
 // Maps the parsed user service definition to an internal representation suitable for code generation.
 
 import {

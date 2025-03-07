@@ -1,0 +1,10 @@
+{
+  "*.ts": [
+    "eslint --fix",
+    "node utils/validate-path-headers.js --fix"
+  ],
+  "*.js": [
+    "eslint --fix",
+    "node utils/validate-path-headers.js --fix"
+  ]
+}

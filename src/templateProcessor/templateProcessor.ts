@@ -1,4 +1,4 @@
-// Path: src/utils/templates/templateSystem.ts
+// Path: src/templateProcessor/templateProcessor.ts
 // Main entry point for the template system
 
 import * as path from 'path';

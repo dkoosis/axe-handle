@@ -1,4 +1,4 @@
-// Path: src/utils/templates/templateError.ts
+// Path: src/templateProcessor/templateError.ts
 // Error types for the template system
 
 /**

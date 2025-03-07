@@ -1,4 +1,4 @@
-// src/generator/generators/documentationGenerator.ts
+// Path: src/mcpServerGenerator/documentationGenerator.ts
 import { BaseGenerator } from '@generators/express/baseGenerator';
 import { MappedService, GeneratorOptions } from '@axe/schema/types';
 import { logger, LogCategory } from '@utils/logger';

@@ -1,4 +1,4 @@
-/**
+// Path: src/parsers/modelContextProtocol/protocol.ts
  * TypeScript interface definitions for the Model Context Protocol (MCP)
  * These are generated from the protocol.json schema definition
  */

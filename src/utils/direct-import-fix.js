@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/**
+// Path: src/utils/direct-import-fix.js
  * Direct import fix for express/index.ts
  */
 

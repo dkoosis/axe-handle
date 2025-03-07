@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/**
+// Path: src/utils/fix-path-mappings.js
  * Script to fix path mappings in tsconfig.json
  */
 

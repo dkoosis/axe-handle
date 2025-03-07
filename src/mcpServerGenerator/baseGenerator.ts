@@ -1,4 +1,4 @@
-// Path: src/generator/generators/baseGenerator.ts
+// Path: src/mcpServerGenerator/baseGenerator.ts
 // Base Generator class with common functionality for all generators
 
 import * as path from 'path';

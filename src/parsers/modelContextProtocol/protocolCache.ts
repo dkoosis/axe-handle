@@ -1,4 +1,4 @@
-// Path: src/parser/protocol/protocolCache.ts
+// Path: src/parsers/modelContextProtocol/protocolCache.ts
 // Parses the MCP protocol definition and provides a cached representation.
 
 import * as ts from 'typescript';

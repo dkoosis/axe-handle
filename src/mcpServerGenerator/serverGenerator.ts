@@ -1,4 +1,4 @@
-// Path: src/generator/generators/serverGenerator.ts
+// Path: src/mcpServerGenerator/serverGenerator.ts
 // Generator for server-related files
 
 import { BaseGenerator } from '@generators/express/baseGenerator';

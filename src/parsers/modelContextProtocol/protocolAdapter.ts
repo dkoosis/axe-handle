@@ -1,4 +1,4 @@
-// Path: src/parser/protocol/protocolAdapter.ts
+// Path: src/parsers/modelContextProtocol/protocolAdapter.ts
 // Creates a simplified MCP protocol from protocol.ts
 
 import * as fs from 'fs/promises';

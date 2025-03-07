@@ -1,4 +1,4 @@
-// Path: src/utils/templates/templateTypes.ts
+// Path: src/templateProcessor/templateTypes.ts
 // Type definitions for the template system
 
 import { Result } from 'neverthrow';

@@ -1,4 +1,4 @@
-// Path: src/utils/templates/templateResolver.ts
+// Path: src/templateProcessor/templateResolver.ts
 // Handles resolving template paths
 
 import * as fs from 'fs';

@@ -1,4 +1,4 @@
-// Path: src/generator/generators/handlerGenerator.ts
+// Path: src/mcpServerGenerator/handlerGenerator.ts
 // Generator for resource handler files
 
 import { BaseGenerator } from '@generators/express/baseGenerator';

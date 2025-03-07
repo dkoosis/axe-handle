@@ -1,4 +1,4 @@
-// File: scripts/validate-structure.js
+// Path: src/utils/validate-structure.js
 const fs = require('fs');
 const path = require('path');
 

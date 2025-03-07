@@ -1,4 +1,4 @@
-// Path: src/utils/templates/templateLoader.ts
+// Path: src/templateProcessor/templateLoader.ts
 // Handles loading template files
 
 import * as fs from 'fs';

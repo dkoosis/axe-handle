@@ -1,4 +1,4 @@
-// src/generator/generators/index.ts
+// Path: src/mcpServerGenerator/index.ts
 export * from '../common/baseGenerator';
 export * from './typesGenerator';
 export * from './handlerGenerator';

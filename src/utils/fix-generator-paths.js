@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/**
+// Path: src/utils/fix-generator-paths.js
  * Script to fix generator path mappings in tsconfig.json
  */
 

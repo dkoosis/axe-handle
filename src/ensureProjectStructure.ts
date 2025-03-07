@@ -1,4 +1,4 @@
-// src/ensureProjectStructure.ts
+// Path: src/ensureProjectStructure.ts
 // This runs before the TypeScript compilation to ensure templates are set up correctly
 
 import * as fs from 'fs';

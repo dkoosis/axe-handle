@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/**
+// Path: src/utils/project-reorganizer.js
  * Project structure reorganizer script
  * Consolidates directory structure to match intended organization
  */
