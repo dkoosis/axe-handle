@@ -5,7 +5,8 @@
 import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs/promises';
-const chalk = require('chalk');
+import chalk from 'chalk';
+//sconst chalk = require('chalk');
 import { generateMcpServer } from './index';
 import { AxeError, GeneratorOptions } from './types';
 import { logger, LogLevel } from './utils/logger';

@@ -1,38 +1,54 @@
-# Axe-Handle TODO List
+Axe Handle Project TODO List
+Immediate Tasks
+-Fix TypeScript Version Compatibility
 
-## Architecture & Organization
-- [ ] Consolidate duplicate adapter/cache files in parsers/modelContextProtocol directory
-- [ ] Rename protocol.json to spec.ts in parsers/modelContextProtocol
-- [ ] Remove dist/ directory entirely (it should be git-ignored)
-- [ ] Rename "generated" directory to "generatedServer"
+Downgrade from TypeScript 5.8.2 to 5.1.6 to ensure compatibility with @typescript-eslint
+-Refine Linting of Generated Code
 
-## Template System
-- [ ] Flatten template directory structure; all .eta files should be at root level
-- [ ] Ensure consistent naming convention for all template files
-- [ ] Remove duplicate templates across different directories
+Add proper exclusion for the generated/ directory in .eslintignore
+Fix malformed package.json in the generated directory
+Consider adding separate linting configuration specifically for generated code
+-Standardize Path Headers
 
-## Parsers
-- [ ] Standardize on single source of truth for MCP protocol
-- [ ] Ensure parsers properly handle all MCP schema variations
-- [ ] Document schema format requirements in docs/
+Ensure all source files have proper // Path: [filepath] headers
+Automate path header validation in CI pipeline
+Code Organization Tasks
+-Implement Directory Structure According to Rules
 
-## Utils vs Build Scripts
-- [ ] Keep runtime utilities in src/utils/
-- [ ] Keep build/maintenance scripts in root /utils directory
-- [ ] Consider standardizing script naming for easier discovery
+Organize files by feature, not by type (Rule 2)
+Consolidate utility functions into feature-specific modules
+-Refactor File Names for Clarity
 
-## Documentation
-- [ ] Complete project documentation in docs/
-- [ ] Add JSDoc to all public functions
-- [ ] Ensure README reflects current project structure
-- [ ] Document CLI interface and options
+Replace generic names with specific ones (Rule 1)
+Ensure filenames are concise but descriptive
+Documentation Tasks
+-Improve API Documentation
 
-## Tests
-- [ ] Add unit tests for core functionality
-- [ ] Add integration tests for end-to-end generation
-- [ ] Set up test fixtures in tests/fixtures/
+Add comprehensive JSDoc comments to all public interfaces
+Document business rules and edge cases (Rule 13)
+Technical Debt
+-Address Circular Dependencies
 
-## Clean Up
-- [ ] Remove unused dependencies in package.json
-- [ ] Add proper .gitignore entries for build artifacts
-- [ ] Standardize code formatting and linting
+Review and eliminate circular imports
+Improve module boundaries
+-Consolidate Duplicate Utilities
+
+Identify and merge duplicate functionality across codebase
+Create shared utilities for common operations
+Error Handling
+-Expand Use of Neverthrow
+
+Evaluate opportunities to use neverthrow for more comprehensive and consistent error handling throughout the codebase.
+Consider defining custom Result types for common error scenarios.
+Future Enhancements
+-Improve Tree Shaking
+
+Optimize code for better tree shaking (Rule 23)
+Review and reduce bundle size
+-Enhance Error Handling
+
+Implement consistent error handling patterns (Rule 26)
+Improve error messages and logging
+
+
+Sources and related content

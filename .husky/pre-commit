@@ -35,4 +35,4 @@ for FILE in $STAGED_FILES; do
   git add "$FILE"
 done
 
-echo "Pre-commit validation successful!"
+echo "Pre-commit validation successful!"npm run validate && node utils/validate-path-headers.js
