@@ -1,4 +1,4 @@
-// Path: src/types/index.ts
+// Path: src/types.ts
 // Contains shared TypeScript type definitions used throughout the project.
 
 /**

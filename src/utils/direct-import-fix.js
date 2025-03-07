@@ -77,7 +77,7 @@ function ensureBaseGenerator() {
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { GeneratorOptions } from '../../types';
+import { GeneratorOptions } from '../../types/index';
 import { logger, LogCategory } from '../../utils/logger';
 import { createGeneratorError } from '../../utils/errorUtils';
 
