@@ -1,5 +1,6 @@
 # Axe-Handle Code Quality Enforcement
 
+
 ## Implemented Tools & Checks
 
 ### 1. Directory Structure Enforcement
