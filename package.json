@@ -8,19 +8,23 @@
     "axe-handle": "dist/cli.js"
   },
 
-  "scripts": {
-    "prebuild": "node scripts/validate-structure.js",
-    "refactor": "ts-node refactoring-script.ts",
-    "build": "tsc && tsc-alias",
-    "postbuild": "cp -r templates dist/",
-    "start": "node dist/index.js",
-    "dev": "ts-node -r tsconfig-paths/register src/index.ts",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "lint": "eslint 'src/**/*.ts'",
-    "generate": "ts-node -r  src/cli.ts",
-    "clean": "rm -rf dist"
-  },
+  {
+    "scripts": {
+      "check-structure": "node utils/check-directory-structure.js",
+      "prebuild": "npm run check-structure",
+      "refactor": "ts-node refactoring-script.ts",
+      "build": "tsc && tsc-alias",
+      "postbuild": "cp -r templates dist/",
+      "start": "node dist/index.js",
+      "dev": "npm run check-structure && ts-node -r tsconfig-paths/register src/index.ts",
+      "test": "jest",
+      "test:watch": "jest --watch",
+      "lint": "eslint 'src/**/*.ts'",
+      "generate": "ts-node -r tsconfig-paths/register src/cli.ts",
+      "clean": "rm -rf dist"
+    }
+  }
+  
   "keywords": [
     "mcp",
     "model-context-protocol",
