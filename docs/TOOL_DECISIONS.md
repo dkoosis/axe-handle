@@ -17,6 +17,7 @@ This document records definitive decisions about tooling choices for the Axe Han
 | Neverthrow | Functional error handling | ✅ Selected |
 | TypeScript + tsc | Language & compiler | ✅ Selected |
 | GitHub Actions | CI/CD platform | ✅ Selected |
+| Google TypeScript Style (GTS) | Opinionated TS configuration | ❌ Rejected |
 
 ## Package Management
 
@@ -54,6 +55,21 @@ This document records definitive decisions about tooling choices for the Axe Han
 - TypeScript-specific rules through `@typescript-eslint/eslint-plugin`
 
 *See also: [.eslintrc.json](./.eslintrc.json) for current linting configuration*
+
+### Google TypeScript Style (GTS) ❌
+
+**Decision Date:** 2025-03-09
+
+**Rationale:**
+- Too opinionated and conflicts with project-specific standards
+- Reduced flexibility for custom rules (especially neverthrow integration)
+- Project has established its own code standards documented in CODE_STANDARDS.md
+- Adds unnecessary complexity to the toolchain
+
+**Implementation Notes:**
+- Remove any GTS references from existing configuration files
+- Maintain consistent use of custom ESLint rules
+- Follow project-specific standards in CODE_STANDARDS.md
 
 ### ESLint Complexity Plugin ✅
 
@@ -98,8 +114,6 @@ This document records definitive decisions about tooling choices for the Axe Han
   3. TypeScript type checking
 
 *See also: [.husky/pre-commit](./.husky/pre-commit) for current hook configuration*
-
-
 
 ## Templating
 
@@ -155,6 +169,7 @@ This document records definitive decisions about tooling choices for the Axe Han
 - Target ES2020 for modern Node.js support
 - CommonJS modules for Node.js compatibility
 - Strict mode enabled to maximize type safety benefits
+- TypeScript version 5.1.6 for compatibility with ESLint plugins
 
 *See also: [tsconfig.json](./tsconfig.json) for current TypeScript configuration*
 
@@ -178,8 +193,6 @@ This document records definitive decisions about tooling choices for the Axe Han
 *See also: [.github/workflows/](./.github/workflows/) for CI configuration*
 
 ## Development Workflow
-
-
 
 ## Dependencies
 
