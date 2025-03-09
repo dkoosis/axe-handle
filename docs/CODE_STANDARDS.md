@@ -12,6 +12,7 @@ This document outlines the code quality standards and guidelines for the Axe Han
 - [Code Structure](#code-structure)
 - [Error Handling](#error-handling)
 - [Path Headers](#path-headers)
+- [Package Management](#package-management)
 - [Pre-commit Checks](#pre-commit-checks)
 
 ## Naming Conventions
@@ -89,6 +90,28 @@ This header is used for:
 - Validating file organization
 - Maintaining consistent structure
 
+## Package Management
+
+**IMPORTANT**: This project exclusively uses pnpm as its package manager:
+
+1. **Adding Dependencies**:
+   ```bash
+   pnpm add <package>         # For dependencies
+   pnpm add -D <package>      # For dev dependencies
+   ```
+
+2. **Installing Dependencies**:
+   ```bash
+   pnpm install
+   ```
+
+3. **Running Scripts**:
+   ```bash
+   pnpm run <script-name>
+   ```
+
+4. **DO NOT use npm or yarn** for any operations within this project
+
 ## Pre-commit Checks
 
 The following checks run automatically on commit:
@@ -98,10 +121,10 @@ The following checks run automatically on commit:
 3. **Directory Structure**: Ensures files are in the correct locations
 
 You can run these checks manually:
-- `npm run check-paths`: Validates file headers
-- `npm run lint`: Runs ESLint checks
-- `npm run check-structure`: Validates directory structure
+- `pnpm run check-paths`: Validates file headers
+- `pnpm run lint`: Runs ESLint checks
+- `pnpm run check-structure`: Validates directory structure
 
 To automatically fix issues:
-- `npm run fix-paths`: Automatically adds or fixes path headers
-- `npm run lint:fix`: Attempts to fix linting issues
+- `pnpm run fix-paths`: Automatically adds or fixes path headers
+- `pnpm run lint:fix`: Attempts to fix linting issues

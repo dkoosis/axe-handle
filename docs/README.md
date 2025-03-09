@@ -1,136 +1,130 @@
-# Axe-Handle Project Structure
+# Axe Handle Code Standards
 
-This document describes the directory structure and organization of the Axe-Handle project, an MCP server generator.
+This document outlines the code quality standards and guidelines for the Axe Handle project. These standards can be used by both human developers and AI code reviewers to ensure consistent, maintainable code.
 
-![Axe-Handle Logo](assets/axe-handle-100x100.svg)
+## Table of Contents
+- [Naming Conventions](#naming-conventions)
+  - [Filenames](#filenames)
+  - [Variables](#variables)
+  - [Functions and Methods](#functions-and-methods)
+  - [Types and Interfaces](#types-and-interfaces)
+- [Documentation](#documentation)
+- [Code Structure](#code-structure)
+- [Error Handling](#error-handling)
+- [Path Headers](#path-headers)
+- [Package Management](#package-management)
+- [Pre-commit Checks](#pre-commit-checks)
 
-## Core Purpose for Axe Handle
+## Naming Conventions
 
-Axe Handle is a code generation tool designed for developers who want to create Model Context Protocol (MCP) servers rapidly and reliably. It serves developers who want to add MCP interfaces to existing services (like Google Calendar, task managers, or project management tools) or build entirely new MCP-compatible services so that LLM chat agents such as Claude can effectively interact with these services.
+### Filenames
+1. **Descriptive Names**: Replace generic names (e.g., `util.ts`) with specific names (e.g., `authenticationService.ts`)
+2. **Organization**: Organize files by feature, not by type
+3. **Conciseness**: Keep filenames concise but clear
+4. **Conventions**:
+   - `*Generator.ts` for code generators
+   - `*Parser.ts` for schema parsers
+   - `*.eta` for templates (no .ts in template filenames)
 
-By simply defining your service's resources and data structures in a Protobuf schema, Axe Handle generates a complete, production-ready MCP server that wraps your existing APIs. This eliminates the tedious and error-prone process of manually coding MCP interfaces, allowing you to:
+### Variables
+1. **Case**: Use camelCase for all variable names
+2. **Descriptiveness**: Names must be descriptive and self-explanatory
+3. **Abbreviations**: Avoid cryptic abbreviations
+4. **Booleans**: Prefix boolean variables with `is`, `has`, `should`, `can`, `will`, or `does`
 
-1. Quickly enable AI agents to interact with your existing services
-2. Maintain consistent implementation of the MCP specification
-3. Focus on service-specific logic rather than protocol implementation details
+### Functions and Methods
+1. **Case**: Use camelCase for function and method names
+2. **Action-Oriented**: Start function names with verbs indicating the function's action
+3. **Specificity**: Function names must be specific, avoiding generic names like `process()`
+4. **Boolean Returns**: Prefix boolean-returning methods with `is` or `has`
+5. **Size**: Keep under 80 lines to maintain readability
 
-While currently generating TypeScript Express.js servers from Protobuf schemas, Axe Handle's architecture is designed to be adaptable to different input formats and output frameworks as requirements evolve.
+### Types and Interfaces
+1. **Case**: Use PascalCase for interface and type names
+2. **Descriptiveness**: Type names must be descriptive nouns or noun phrases
+3. **Prefixing**:
+   - `Axe*` for generator components (e.g., `AxeServerGenerator`)
+   - `Mcp*` for generated server components (e.g., `McpResourceHandler`)
 
-## Top-Level Directories
+## Documentation
 
-```
-axe-handle/
-├── docs/
-├── src/
-│   ├── cli/
-│   ├── mcpServerGenerator/
-│   ├── parsers/
-│   │   └── modelContextProtocol/
-│   ├── templateProcessor/
-│   ├── types/
-│   └── utils/
-├── templates/
-├── tests/
-│   └── fixtures/
-└── README.md
-```
+1. **JSDoc Comments**: Use JSDoc or TSDoc for all functions, classes, and interfaces
+2. **Property Documentation**: Document interface properties with JSDoc comments
+3. **Context**: Explain why the code is written, not just what it does
+4. **Business Rules**: Document business rules and edge cases in comments
+5. **Path Headers**: Every file must include path header comment (see [Path Headers](#path-headers))
 
-*   **`docs/`**: Contains high-level documentation for the project, such as design documents, user guides, and API references.
-*   **`src/`**: Contains all the source code for the project (written in TypeScript).
-*   **`templates/`**: Contains the actual template files used for code generation. These are `.eta` files (see File Extensions below).
-*   **`tests/`**: Contains the automated tests for the project.  The structure within `tests/` will mirror the `src/` structure as tests are added.
-*    **`tests/fixtures`**: Contains data used for testing, for example example input schemas.
-*   **`README.md`**: The main project README file, providing an overview of the project, build instructions, usage examples, etc.
+## Code Structure
 
-## `src/` Directory Structure
+1. **Single Responsibility**: Each file must adhere to the Single Responsibility Principle
+2. **Module Design**: Use modular design with clear separation of concerns
+3. **File Size**: 
+   - Keep files under 400 lines of code when possible
+   - Split files that exceed 500 lines into multiple focused modules
+   - Consider AI tool compatibility when determining file size (large files may be difficult for AI assistants to process effectively)
+4. **Organization**: Use consistent file organization based on features or modules
+5. **Complexity**: Keep cyclomatic complexity under 10
 
-```
-src/
-├── cli/
-│   └── index.ts
-├── mcpServerGenerator/
-│   ├── handlerGenerator.ts
-│   └── serverGenerator.ts
-├── parsers/
-│   └── modelContextProtocol/
-│       ├── index.ts
-│       ├── adapter.ts
-│       ├── cache.ts
-│       ├── protocol.ts
-│       └── protocol.json
-├── templateProcessor/
-│   ├── templateProcessor.ts
-│   ├── templateLoader.ts
-│   └── templateRenderer.ts
-├── types/
-│   └── index.ts
-└── utils/
-    ├── errorUtils.ts
-    ├── logger.ts
-    └── ...
-```
+## Error Handling
 
-![Axe-Handle Data Flow](assets/axe-handle-dataflow-01.png)
+We use the `neverthrow` library for functional error handling:
 
+1. **No Direct Throws**: Use `err()` from resultUtils instead of throwing errors
+2. **Result Handling**: Always properly handle Result objects
+3. **Checked Catches**: Use proper error handling in catch blocks
+4. **Helper Functions**: Use the provided helpers when possible:
+   - `runOperation` and `runAsyncOperation` for wrapping try/catch blocks
+   - `okResult` and `errResult` for creating Result objects
+   - `combineResults` for handling multiple Results
 
-*   **`cli/`**: Contains the code for the command-line interface.
-    *   `index.ts`: The entry point for the CLI. This file handles parsing command-line arguments and invoking the appropriate functionality.
+## Path Headers
 
-*   **`mcpServerGenerator/`**: Contains the code generator for MCP-compliant servers.
-    *   `handlerGenerator.ts`: Generates the request handler code.
-    *   `serverGenerator.ts`: Generates the main server code (currently using Express).
+All source files must include a path header comment as the first line (after shebang if present):
 
-*   **`parsers/`**: Contains code for parsing input schemas and related data.
-    *   `modelContextProtocol/`:  Specifically handles parsing of the Model-Context Protocol (MCP) related inputs.
-        *   `index.ts`: Main entry point and exports for the MCP parsing module.
-        *   `adapter.ts`: Contains code for adapting the parsed MCP data to a format suitable for code generation.
-        *   `cache.ts`: Implements caching for MCP-related data (e.g., the protocol schema).
-        *   `protocol.ts`:  TypeScript definitions related to the MCP protocol. This is generated from `protocol.json`.
-        *   `protocol.json`:  The MCP protocol schema in JSON format.  This is the *source of truth* for the protocol definition.
-
-*   **`templateProcessor/`**: Contains the template engine logic. This is a general-purpose template processor, not specific to MCP or server generation.
-    *   `templateProcessor.ts`: The main template processor class.
-    *   `templateLoader.ts`: Handles loading template files from the filesystem.
-    *   `templateRenderer.ts`: Handles rendering templates (substituting data into templates).
-
-*   **`types/`**: Contains global type definitions used throughout the project.
-    *   `index.ts`: Exports the type definitions.
-
-*   **`utils/`**: Contains utility functions that are used in multiple parts of the codebase.
-    *   `errorUtils.ts`:  Provides utility functions for error handling.
-    *   `logger.ts`:  Provides logging functionality.
-    *   `...`:  Other utility functions can be added here as needed.
-
-## `templates/` Directory
-
-```
-templates/
-├── server.eta
-├── handler.eta
-└── ...
+```typescript
+// Path: src/utils/example.ts
 ```
 
-This folder contains the templates used to construct the MCP Server.
+This header is used for:
+- Ensuring correct imports
+- Validating file organization
+- Maintaining consistent structure
 
-*   **`server.eta`**: template used to generate the server
-*   **`handler.eta`**: template used to generate the handlers.
+## Package Management
 
-## File Extensions
+**IMPORTANT**: This project exclusively uses pnpm as its package manager:
 
-*   **`.ts`**: TypeScript source code files.
-*   **`.eta`**: Template files using the Eta template engine (see [https://eta.js.org/](https://eta.js.org/)).
-*   **`.json`**: JSON data files (used for the MCP protocol schema).
-*   **`.proto`**: Protocol Buffers schema files (used for example input schemas).
-*    **`.md`**: Markdown files. Used for documentation.
+1. **Adding Dependencies**:
+   ```bash
+   pnpm add <package>         # For dependencies
+   pnpm add -D <package>      # For dev dependencies
+   ```
 
-![Axe-Handle Data Flow](assets/axe-handle-architecture-01.png)
+2. **Installing Dependencies**:
+   ```bash
+   pnpm install
+   ```
 
-## Guidelines for Adding New Code
+3. **Running Scripts**:
+   ```bash
+   pnpm run <script-name>
+   ```
 
-1.  **Maintain Separation of Concerns:** Each directory and file should have a clear and specific purpose. Avoid mixing unrelated functionality.
-2.  **Follow Existing Naming Conventions:** Use consistent naming conventions (camelCase for variables and functions, PascalCase for classes and interfaces).
-3.  **Write Tests:** Add unit tests for all new code. The test files should be placed in the `tests/` directory, mirroring the structure of the `src/` directory.
-4. **Keep it Simple:** Avoid over-engineering.
-5. **Document as You Go:** Add JSDoc comments and update the necessary documentation in `/docs` or `README.md`
+4. **DO NOT use npm or yarn** for any operations within this project
 
-This document provides a comprehensive overview of the Axe-Handle project structure and should serve as a guide for developers working on the project.
+## Pre-commit Checks
+
+The following checks run automatically on commit:
+
+1. **Path Headers**: Validates that files have correct headers
+2. **ESLint**: Runs linting rules including neverthrow compliance
+3. **Directory Structure**: Ensures files are in the correct locations
+
+You can run these checks manually:
+- `pnpm run check-paths`: Validates file headers
+- `pnpm run lint`: Runs ESLint checks
+- `pnpm run check-structure`: Validates directory structure
+
+To automatically fix issues:
+- `pnpm run fix-paths`: Automatically adds or fixes path headers
+- `pnpm run lint:fix`: Attempts to fix linting issues

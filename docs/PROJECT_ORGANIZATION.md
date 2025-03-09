@@ -9,6 +9,7 @@ This document describes the directory structure, organization patterns, and arch
 - [Data Flow](#data-flow)
 - [Template System](#template-system)
 - [Generated Output](#generated-output)
+- [Development Practices](#development-practices)
 
 ## Directory Structure
 
@@ -150,3 +151,33 @@ generated/
 ├── package.json          # Dependencies
 └── README.md             # Usage instructions
 ```
+
+## Development Practices
+
+### Package Management
+
+**IMPORTANT**: This project uses pnpm exclusively as its package manager. Do not use npm or yarn.
+
+- Adding dependencies:
+  ```
+  pnpm add <package>       # For runtime dependencies
+  pnpm add -D <package>    # For dev dependencies
+  ```
+
+- Scripts should be run with pnpm:
+  ```
+  pnpm run build
+  pnpm run test
+  ```
+
+### Code Quality Enforcement
+
+The project uses several automated tools to enforce code quality:
+
+1. **TypeScript** for type safety (using version 5.1.6)
+2. **ESLint** with custom rules for code style
+3. **Path Header Validation** to ensure files have proper headers
+4. **Directory Structure Validation** to maintain proper organization
+5. **Husky** for pre-commit hooks
+
+These tools are run automatically through the project's CI/CD pipeline and before commits.
