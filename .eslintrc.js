@@ -72,6 +72,25 @@ module.exports = {
         'max-lines-per-function': 'off',
         'neverthrow/no-throw': 'off'
       }
+    },
+    {
+      // Configuration for JavaScript files (non-TypeScript)
+      files: ['**/*.js'],
+      parser: 'espree', // Use the default parser for JS files
+      parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: 'module',
+        project: null // No TypeScript project for JS files
+      },
+      rules: {
+        // Disable TypeScript-specific rules for JS files
+        '@typescript-eslint/no-floating-promises': 'off',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
+        // Re-enable equivalent ESLint rules for JS
+        'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }]
+      }
     }
   ]
 };
