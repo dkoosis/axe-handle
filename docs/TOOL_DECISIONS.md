@@ -17,6 +17,12 @@ This document records definitive decisions about tooling choices for the Axe Han
 | Neverthrow | Functional error handling | ✅ Selected |
 | TypeScript + tsc | Language & compiler | ✅ Selected |
 | GitHub Actions | CI/CD platform | ✅ Selected |
+| Jest | Testing framework | ✅ Selected |
+| Prettier | Code formatting | ✅ Selected |
+| tsc-alias | Path alias resolution | ✅ Selected |
+| lint-staged | Pre-commit file filtering | ✅ Selected |
+| Chalk | Terminal styling | ✅ Selected |
+| Glob | File pattern matching | ✅ Selected |
 | Google TypeScript Style (GTS) | Opinionated TS configuration | ❌ Rejected |
 
 ## Package Management
@@ -173,6 +179,60 @@ This document records definitive decisions about tooling choices for the Axe Han
 
 *See also: [tsconfig.json](./tsconfig.json) for current TypeScript configuration*
 
+### tsc-alias ✅
+
+**Decision Date:** 2025-02-10
+
+**Rationale:**
+- Resolves TypeScript path aliases during build
+- Preserves the path aliasing structure in output code
+- Simplifies import statements with the `@/*` pattern
+- Lightweight and purpose-built for this specific need
+
+**Implementation:**
+- Used in post-compilation step to resolve `@/*` imports
+- Integrated into build process via npm scripts
+
+## Testing
+
+### Jest ✅
+
+**Decision Date:** 2025-01-15
+
+**Rationale:**
+- Industry standard testing framework for TypeScript/JavaScript
+- Robust feature set with mocking capabilities
+- Good integration with TypeScript via ts-jest
+- Built-in code coverage reporting
+
+**Configuration:**
+- Node.js test environment
+- TypeScript integration via ts-jest
+- Test files use pattern `**/*.test.ts`
+- Coverage thresholds set at 70-80% for various metrics
+
+*See also: [jest.config.js](./jest.config.js) for current testing configuration*
+
+## Code Formatting
+
+### Prettier ✅
+
+**Decision Date:** 2025-01-30
+
+**Rationale:**
+- Opinionated code formatter that ensures consistent style
+- Integrates well with ESLint
+- Reduces code review time spent on style issues
+- Popular and widely used in the ecosystem
+
+**Configuration:**
+- Single quotes for strings
+- 100 character line width
+- 2 spaces for indentation
+- Trailing commas in all multi-line constructs
+
+*See also: [.prettierrc.json](./.prettierrc.json) for current formatting configuration*
+
 ## CI/CD
 
 ### GitHub Actions ✅
@@ -193,6 +253,48 @@ This document records definitive decisions about tooling choices for the Axe Han
 *See also: [.github/workflows/](./.github/workflows/) for CI configuration*
 
 ## Development Workflow
+
+### lint-staged ✅
+
+**Decision Date:** 2025-02-20
+
+**Rationale:**
+- Optimizes pre-commit hooks by only checking staged files
+- Significantly improves performance over running checks on all files
+- Enables quick feedback for code quality issues
+- Works well with Husky for git hook integration
+
+**Configuration:**
+- Runs ESLint, Prettier, and path validation only on changed files
+- Used in pre-commit hook to ensure code quality
+
+### Chalk ✅
+
+**Decision Date:** 2025-02-25
+
+**Rationale:**
+- Provides terminal string styling for better user experience
+- Makes CLI output more readable with color-coded messages
+- Simple API with minimal overhead
+- De facto standard for terminal styling in Node.js
+
+**Implementation:**
+- Used in CLI tools and utility scripts for highlighting important information
+- Color scheme: errors in red, warnings in yellow, success in green, info in cyan
+
+### Glob ✅
+
+**Decision Date:** 2025-02-28
+
+**Rationale:**
+- Efficient pattern matching for file operations
+- Standard way to handle file path patterns in Node.js
+- Required for path validation and file discovery
+- Lightweight and focused functionality
+
+**Implementation:**
+- Used in validation scripts to find files matching specific patterns
+- Integrated with path header validation and other file system operations
 
 ## Dependencies
 
@@ -224,3 +326,10 @@ All team members should refer to this document when making implementation choice
 - [CODE_STANDARDS.md](./docs/CODE_STANDARDS.md) - Detailed coding guidelines
 - [PROJECT_ORGANIZATION.md](./docs/PROJECT_ORGANIZATION.md) - Project structure overview
 - [TODO.md](./docs/TODO.md) - Current development priorities
+
+<!--
+metadata:
+  path: docs/TOOL_DECISIONS.md
+  purpose: Decision log to prevent revisiting settled tooling choices
+  audience: Project contributors and maintainers
+-->

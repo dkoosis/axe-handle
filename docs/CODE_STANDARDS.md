@@ -128,3 +128,10 @@ You can run these checks manually:
 To automatically fix issues:
 - `pnpm run fix-paths`: Automatically adds or fixes path headers
 - `pnpm run lint:fix`: Attempts to fix linting issues
+
+<!--
+metadata:
+  path: docs/CODE_STANDARDS.md
+  purpose: Self-contained reference optimized for both human developers and AI assistants
+  audience: Developers and AI code review systems
+-->

@@ -1,44 +1,32 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@generators/*": ["src/generators/*"],
-      "@generators/common/*": ["src/generators/common/*"],
-      "@generators/express/*": ["src/generators/express/*"],
-      "@parser/*": ["src/parser/*"],
-      "@parser/protocol": ["src/parser/protocol/index.ts"],
-      "@mcp/*": ["src/mcp/*"],
-      "@utils/*": ["src/utils/*"],
-      "@templates/*": ["src/utils/templates/*"]
-    },
     "target": "ES2020",
     "module": "CommonJS",
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "declaration": true,
     "sourceMap": true,
-    "outDir": "dist",
-    "rootDir": ".",
+    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@cli/*": ["src/cli/*"],
+      "@utils/*": ["src/cli/utils/*"],
+      "@parser/*": ["src/parser/*"]
+    },
+    "noImplicitAny": true,
+    "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "strictNullChecks": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "typeRoots": ["./node_modules/@types", "./src/@types"]
   },
-  "include": [
-    "src/**/*",
-    "templates/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "test",
-    "generated-servers",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

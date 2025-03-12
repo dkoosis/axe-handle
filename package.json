@@ -1,87 +1,85 @@
 {
   "name": "axe-handle",
   "version": "0.1.0",
-  "description": "MCP Server Generator for Express.js",
+  "description": "Axe Handle Project - Code generator for creating Model Context Protocol (MCP) servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "axe-handle": "dist/cli.js"
+    "axe-handle": "dist/cli/index.js"
   },
   "scripts": {
-    "check-structure": "node utils/check-directory-structure.js",
-    "check-paths": "node utils/validate-path-headers.js",
-    "fix-paths": "node utils/validate-path-headers.js --fix",
-    "fix-all-paths": "node utils/validate-path-headers.js --fix",
-    "ensureTemplates": "ts-node -r tsconfig-paths/register src/ensureProjectStructure.ts",
-    "type-check": "tsc --noEmit",
-    "lint": "NODE_OPTIONS='--max-old-space-size=4096' eslint \"src/**/*.ts\"",
-    "lint:fix": "NODE_OPTIONS='--max-old-space-size=4096' eslint \"src/**/*.ts\" --fix",
-    "validate": "npm run type-check && npm run lint && npm run check-paths",
-    "validate-staged": "lint-staged",
-    "prebuild": "npm run fix-all-paths && npm run ensureTemplates && npm run lint",
-    "build": "tsc && tsc-alias",
-    "postbuild": "cp -r templates dist/",
-    "start": "node dist/index.js",
-    "dev": "ts-node -r tsconfig-paths/register src/index.ts",
+    "prepare": "husky install",
+    "build": "node utils/buildValidator.js && tsc && tsc-alias",
+    "prebuild": "",
+    "postbuild": "pnpm run copy-templates",
+    "start": "node dist/cli/index.js",
+    "dev": "ts-node -r tsconfig-paths/register src/cli/index.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "generate": "ts-node -r tsconfig-paths/register src/cli.ts",
-    "clean": "rm -rf dist",
-    "prepare": "husky install"
+    "test:coverage": "jest --coverage",
+    "validate": "node utils/buildValidator.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.{js,ts}\"",
+    "lint:fix": "eslint \"src/**/*.{js,ts}\" --fix",
+    "format": "prettier --write \"src/**/*.{js,ts}\"",
+    "check-paths": "node utils/validate-path-headers.js",
+    "fix-paths": "node utils/validate-path-headers.js --fix",
+    "check-structure": "node utils/check-directory-structure.js",
+    "update-structure": "node utils/check-directory-structure.js --update",
+    "copy-templates": "copyfiles -u 1 \"templates/**/*\" dist/templates",
+    "headers:check": "node dist/tools/validateHeaders.js",
+    "headers:fix": "node dist/tools/validateHeaders.js --fix"
   },
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "generator",
-    "express",
-    "typescript"
+    "code-generator",
+    "typescript",
+    "express"
   ],
-  "author": "Your Name <your.email@example.com>",
-  "license": "MIT",
-  "dependencies": {
-    "commander": "^11.1.0",
-    "eta": "^2.2.0",
-    "express": "^4.18.2",
-    "glob": "^10.4.5",
-    "neverthrow": "^6.2.0",
-    "protobufjs": "^7.4.0",
-    "uuid": "^9.0.1"
-  },
+  "author": "Axe Handle Team",
+  "license": "ISC",
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/glob": "^8.1.0",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.7.5",
-    "@types/uuid": "^9.0.8",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "chalk": "^4.1.2",
-    "eslint": "^8.56.0",
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.15.11",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-neverthrow": "^1.1.4",
-    "husky": "^8.0.0",
-    "jest": "^29.7.0",
-    "lint-staged": "^15.2.0",
-    "ts-jest": "^29.2.6",
-    "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.8",
+    "eslint-plugin-prettier": "^4.2.1",
+    "glob": "^10.2.2",
+    "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "lint-staged": "^13.2.2",
+    "prettier": "^2.8.8",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.6",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.1.6"
+    "typescript": "5.1.6"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yourusername/axe-handle.git"
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.0.0",
+    "eta": "^2.2.0",
+    "neverthrow": "^6.0.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && pnpm run check-paths"
+    }
   },
   "lint-staged": {
-    "*.ts": [
+    "*.{js,ts}": [
       "eslint --fix",
-      "node utils/validate-path-headers.js --fix"
-    ],
-    "*.js": [
-      "eslint --fix",
-      "node utils/validate-path-headers.js --fix"
+      "prettier --write"
     ]
   }
 }

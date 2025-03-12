@@ -1,0 +1,39 @@
+graph TD
+    A[README.md] --> B[PROJECT_ORGANIZATION.md]
+    A --> C[CODE_STANDARDS.md]
+    A --> D[TOOL_DECISIONS.md]
+    A --> E[DEVELOPMENT_GUIDE.md]
+    A --> F[ROADMAP.md]
+    
+    B --- G[Project Architecture]
+    B --- H[Directory Structure]
+    B --- I[Component Design]
+    
+    C --- J[Naming Conventions]
+    C --- K[Documentation Standards]
+    C --- L[Error Handling]
+    
+    D --- M[Package Management]
+    D --- N[Code Quality Tools]
+    D --- O[Build System]
+    
+    E --- P[Environment Setup]
+    E --- Q[Development Workflow]
+    E --- R[Testing Strategy]
+    
+    F --- S[Immediate Tasks]
+    F --- T[Future Enhancements]
+    F --- U[Technical Debt]
+    
+    P -.-> N
+    Q -.-> J
+    Q -.-> K
+    Q -.-> L
+    
+    classDef primary fill:#d0e0ff,stroke:#3080ff,stroke-width:2px
+    classDef secondary fill:#e0f0e0,stroke:#30a030,stroke-width:1px
+    classDef tertiary fill:#f0e0e0,stroke:#a03030,stroke-width:1px
+    
+    class A primary
+    class B,C,D,E,F secondary
+    class G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U tertiary

@@ -1,15 +1,66 @@
 # Axe Handle Project Organization
 
-This document describes the directory structure, organization patterns, and architectural components of the Axe Handle project.
+<!-- Path: docs/PROJECT_ORGANIZATION.md -->
+<!-- Purpose: Comprehensive overview of project architecture, directory structure, and component design -->
+
+This document describes the architecture, directory structure, organization patterns, and components of the Axe Handle project.
+
+## Overview
+
+Axe Handle is a code generator for creating Model Context Protocol (MCP) servers. It takes a service definition as input and generates a TypeScript/Express.js implementation of an MCP-compliant server.
 
 ## Table of Contents
+- [Core Architecture](#core-architecture)
 - [Directory Structure](#directory-structure)
 - [Naming Conventions](#naming-conventions)
 - [Component Architecture](#component-architecture)
 - [Data Flow](#data-flow)
 - [Template System](#template-system)
 - [Generated Output](#generated-output)
-- [Development Practices](#development-practices)
+
+## Core Architecture
+
+Axe Handle follows a pipeline architecture for transforming input schemas into generated code:
+
+```
+User Schema (.proto) → Parser → Validator → Mapper → Generator → TypeScript Server
+```
+
+### Key Components
+
+1. **Parser**
+   - Processes the input schema (Protobuf format)
+   - Extracts resources, operations, and types
+
+2. **Validator**
+   - Ensures compliance with MCP specifications
+   - Validates schema against business rules
+
+3. **Mapper**
+   - Transforms parsed schema into an intermediate representation
+   - Resolves relationships between resources
+
+4. **Generator**
+   - Creates server code from templates using the mapped data
+   - Manages output directory structure
+
+### Supporting Systems
+
+1. **Template System**
+   - A flexible, cacheable template engine built around Eta
+   - Templates organized by target framework and component type
+
+2. **Validation Utilities**
+   - Comprehensive validation for inputs, paths, and schemas
+   - Ensures data integrity throughout the pipeline
+
+3. **Error Handling**
+   - Structured error types with detailed codes and messages
+   - Using neverthrow for functional error handling through Result pattern
+
+4. **Logging**
+   - Structured logging with categories and levels
+   - Performance tracking for generation steps
 
 ## Directory Structure
 
@@ -119,6 +170,25 @@ The data flows through the system as follows:
 4. **Generation**: Code is generated from templates using mapped data
 5. **Output**: Express.js server implementing the MCP protocol
 
+### Data Flow Diagram
+
+```
+┌───────────┐    ┌──────────┐    ┌──────────────┐    ┌───────────┐    ┌───────────┐
+│           │    │          │    │              │    │           │    │           │
+│  Protobuf │───>│  Parser  │───>│ Intermediate │───>│  Mapper   │───>│  Context  │
+│  Schema   │    │          │    │ Representation│    │           │    │ Model     │
+│           │    │          │    │              │    │           │    │           │
+└───────────┘    └──────────┘    └──────────────┘    └───────────┘    └─────┬─────┘
+                                                                            │
+                                                                            ▼
+┌───────────┐    ┌──────────┐    ┌──────────────┐    ┌───────────┐    ┌───────────┐
+│           │    │          │    │              │    │           │    │           │
+│  Output   │<───│ Generated│<───│  Rendered    │<───│ Template  │<───│ Template  │
+│  Server   │    │  Files   │    │  Templates   │    │ Engine    │    │ Loader    │
+│           │    │          │    │              │    │           │    │           │
+└───────────┘    └──────────┘    └──────────────┘    └───────────┘    └───────────┘
+```
+
 ## Template System
 
 Templates are organized by target framework and component type:
@@ -134,6 +204,23 @@ templates/
 │   └── [future frameworks]/
 └── common/
 ```
+
+### Template Engine
+
+The project uses Eta as its template engine with the following configuration:
+
+- Templates are cached in production mode
+- Whitespace is preserved for better readability
+- Each template can include other templates
+- Data passed to templates is strongly typed
+
+### Template Helpers
+
+A set of helper functions is available within templates:
+
+- Type conversion helpers (camelCase, PascalCase, etc.)
+- Code generation helpers (indent, wrapComment, etc.)
+- Validation helpers for generated code
 
 ## Generated Output
 
@@ -152,32 +239,11 @@ generated/
 └── README.md             # Usage instructions
 ```
 
-## Development Practices
+The generated code includes:
 
-### Package Management
-
-**IMPORTANT**: This project uses pnpm exclusively as its package manager. Do not use npm or yarn.
-
-- Adding dependencies:
-  ```
-  pnpm add <package>       # For runtime dependencies
-  pnpm add -D <package>    # For dev dependencies
-  ```
-
-- Scripts should be run with pnpm:
-  ```
-  pnpm run build
-  pnpm run test
-  ```
-
-### Code Quality Enforcement
-
-The project uses several automated tools to enforce code quality:
-
-1. **TypeScript** for type safety (using version 5.1.6)
-2. **ESLint** with custom rules for code style
-3. **Path Header Validation** to ensure files have proper headers
-4. **Directory Structure Validation** to maintain proper organization
-5. **Husky** for pre-commit hooks
-
-These tools are run automatically through the project's CI/CD pipeline and before commits.
+- TypeScript interfaces for all resources
+- Express.js routes for all operations
+- Handler implementations with validation
+- Documentation for the generated API
+- Configuration for the Express.js server
+- Middleware for authentication and logging

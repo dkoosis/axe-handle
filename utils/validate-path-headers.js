@@ -148,8 +148,6 @@ function checkSingleFile(filePath) {
 
 // Main function
 function main() {
-  return
-  // dk stub
   // If checking a single file
   if (SINGLE_FILE) {
     return checkSingleFile(SINGLE_FILE);

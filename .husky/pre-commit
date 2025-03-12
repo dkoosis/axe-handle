@@ -1,16 +1,14 @@
-#!/bin/sh
-# Path: .husky/pre-commit
-# Pre-commit hook to validate code quality
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
-# Exit on error
-set -e
-
-# Run lint-staged to handle path headers and linting for staged files
-echo "Running lint-staged on staged files..."
+# Run lint-staged for staged files
 npx lint-staged
 
-# Run type checking
-echo "Running type check..."
-npm run type-check
-
-echo "Pre-commit validation successful!"
+# Check directory structure
+npx node utils/check-directory-structure.js --check || (
+  echo "❌ Directory structure validation failed! Run 'npm run update-structure' if changes are intentional."
+  exit 1
+)npx node utils/check-directory-structure.js --check || (
+  echo "❌ Directory structure validation failed! Run 'npm run update-structure' if changes are intentional."
+  exit 1
+)

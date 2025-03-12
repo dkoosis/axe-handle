@@ -1,33 +1,25 @@
 # Axe Handle Project Roadmap
 
-This document outlines the development roadmap for the Axe Handle project, combining immediate tasks, technical improvements, and future enhancements.
+<!-- Path: docs/ROADMAP.md -->
+<!-- Purpose: Strategic vision document that outlines the future direction and milestones -->
 
-## Immediate Tasks
+This document outlines the development roadmap for the Axe Handle project, providing a strategic vision and key milestones.
 
-### Environment and Build System
-- Standardize TypeScript Configuration
-  - Use TypeScript 5.1.6 for compatibility with all tools
-  - Set up consistent tsconfig.json across project components
-- Set Up Comprehensive Linting
-  - Configure ESLint with typescript-eslint and appropriate rules
-  - Add complexity rules to enforce cyclomatic complexity limits
-  - Set up Prettier for code formatting
-  - Add proper exclusion for the generated/ directory in .eslintignore
-  - Create separate linting configuration for generated code
-- Establish Testing Framework
-  - Set up Vitest for unit and integration testing
-  - Create initial test structure and examples
+*[Return to README](../README.md) | [Project Organization](./PROJECT_ORGANIZATION.md) | [Code Standards](./CODE_STANDARDS.md) | [Development Guide](./DEVELOPMENT_GUIDE.md) | [TODO List](./TODO.md)*
 
-### Code Organization and Standards
-- Standardize Path Headers
-  - Ensure all source files have proper `// Path: [filepath]` headers
-  - Automate path header validation in CI pipeline
-- Implement Directory Structure According to Rules
-  - Organize files by feature, not by type (Rule 2)
-  - Consolidate utility functions into feature-specific modules
-- Refactor File Names for Clarity
-  - Replace generic names with specific ones (Rule 1)
-  - Ensure filenames are concise but descriptive
+## Project Vision
+
+Axe Handle is a code generator for creating Model Context Protocol (MCP) servers. It bridges the gap between existing services and AI agents by enabling seamless integration through the MCP standard. The generator takes a service definition (Protocol Buffer schema) as input and produces a TypeScript/Express.js implementation of an MCP-compliant server.
+
+## Current Focus
+
+Our immediate focus is on establishing a stable, functioning build environment before proceeding with feature development. For specific actionable tasks, see [TODO.md](./TODO.md) or check our [GitHub Issues](https://github.com/dkoosis/axe-handle/issues).
+
+The current critical areas are:
+- Fixing build validation tools
+- Standardizing on pnpm for package management
+- Ensuring proper ESLint configuration 
+- Establishing consistent code quality standards
 
 ## Technical Debt
 
@@ -35,9 +27,14 @@ This document outlines the development roadmap for the Axe Handle project, combi
 - Address Circular Dependencies
   - Review and eliminate circular imports
   - Improve module boundaries
-- Consolidate Duplicate Utilities
-  - Identify and merge duplicate functionality across codebase
-  - Create shared utilities for common operations
+- Maintain Simple Directory Structure
+  - Avoid creating directories with only one file
+  - Keep organization practical rather than theoretical
+  - Directories should contain related files that serve a common purpose
+- Apply Consistent Standards
+  - Standardize coding patterns across all utilities
+  - Gradually convert JavaScript files to TypeScript where appropriate
+  - Ensure all utilities follow project coding standards
 
 ### Documentation
 - Improve API Documentation
@@ -53,14 +50,13 @@ This document outlines the development roadmap for the Axe Handle project, combi
 
 ### Performance and Architecture
 - Improve Tree Shaking
-  - Optimize code for better tree shaking (Rule 23)
+  - Optimize code for better tree shaking
   - Review and reduce bundle size
 - Enhance Error Handling
-  - Implement consistent error handling patterns (Rule 26)
+  - Implement consistent error handling patterns
   - Improve error messages and logging
 
 ### Testing and Quality Assurance
-<!-- These items are confirmed as still relevant and desired -->
 - Add Test Coverage Checks
   - Implement minimum test coverage requirements
   - Create comprehensive test suite
@@ -74,7 +70,6 @@ This document outlines the development roadmap for the Axe Handle project, combi
 
 ## Project Expansion
 
-<!-- These expansion plans are confirmed as accurate and desired -->
 - Support Additional Target Frameworks
   - Explore beyond Express.js for generated servers
   - Consider support for other runtime environments
@@ -85,16 +80,40 @@ This document outlines the development roadmap for the Axe Handle project, combi
   - Add customization options for generated code
   - Support for different architectural patterns in generated servers
 
-## Documentation Improvements
+## Release Planning
 
-### Immediate Documentation Tasks
-- Review editorial notes in consolidated documents and make decisions
-- Delete or archive redundant documentation files
-- Complete skeleton documents that need more detailed content
-- Update existing documentation references to point to new structure
+### v0.1 (Initial Release)
+- Core functionality for generating Express.js servers from Protobuf schemas
+- Basic MCP protocol compliance
+- Command-line interface for generation
+- Documentation for getting started
 
-### Documentation Expansion
-- Create a comprehensive Getting Started guide
-- Add contribution guidelines (possibly as CONTRIBUTING.md)
-- Develop user tutorials with examples
-- Document the release process in the Development Workflow guide
+### v0.2 (Quality Improvements)
+- Comprehensive error handling
+- Improved template system
+- Enhanced validation of input schemas
+- Test coverage for critical components
+
+### v0.3 (Feature Expansion)
+- Support for additional frameworks
+- Customization options for generated code
+- Schema migration tools
+- API for programmatic usage
+
+## For Code Assistants
+
+When working on the Axe Handle project, be mindful of the following guidelines. For more detailed information, see our [Code Standards](./CODE_STANDARDS.md) and [Development Guide](./DEVELOPMENT_GUIDE.md):
+
+- **Error Handling**: Uses the Result pattern from neverthrow instead of throwing exceptions
+- **Header Systems**: 
+  - Path Headers: Every source file must begin with `// Path: path/to/file.ts`
+  - JSDoc Headers: Complex files should have JSDoc-style file headers with @file, @description, etc.
+- **Code Organization**: 
+  - Files are organized by feature, not by type
+  - Avoid creating directories with only one file
+  - Keep organization simple and practical
+- **Templates**: Uses Eta templating engine with a specific directory structure
+- **Style Guide**: Follow TypeScript best practices defined in `docs/CODE_STANDARDS.md`
+- **Package Management**: Use pnpm exclusively, not npm or yarn
+
+Before modifying any file, please review the relevant sections in `docs/PROJECT_ORGANIZATION.md` and existing code patterns in similar files. When adding new features, follow the established module boundaries and separation of concerns.

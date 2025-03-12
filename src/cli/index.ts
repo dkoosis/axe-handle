@@ -7,7 +7,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import chalk from 'chalk';
 //sconst chalk = require('chalk');
-import { generateMcpServer } from './index';
+import { generateMcpServer } from '../index'; // Fix the import path
 import { AxeError, GeneratorOptions } from './types';
 import { logger, LogLevel } from './utils/logger';
 
