@@ -1,4 +1,4 @@
-// internal/server/server.go
+// internal/mcp/server/server.go
 package server
 
 import (
@@ -6,43 +6,21 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/dkoosis/axe-handle/internal/handlers"
-	"github.com/yourusername/axe-handle/internal/config"
-	"github.com/yourusername/axe-handle/internal/protocol"
-	"github.com/yourusername/axe-handle/pkg/mcperrors"
+	"github.com/dkoosis/axe-handle/internal/config"
+	"github.com/dkoosis/axe-handle/internal/mcp/prompts"
+	"github.com/dkoosis/axe-handle/internal/mcp/protocol"
+	"github.com/dkoosis/axe-handle/internal/mcp/resources"
+	"github.com/dkoosis/axe-handle/internal/mcp/server/provider"
+	"github.com/dkoosis/axe-handle/internal/mcp/tools"
+	handlers "github.com/dkoosis/axe-handle/internal/mcp/tools/manager"
+	"github.com/dkoosis/axe-handle/pkg/mcperrors"
 )
 
-// Add to internal/server/server.go
-
-type Server struct {
-	config             *config.Config
-	capabilities       protocol.ServerCapabilities
-	clientCapabilities protocol.ClientCapabilities
-	initialized        bool
-	toolsManager       *handlers.ToolsManager
-	mu                 sync.RWMutex
-}
-
 // NewServer creates a new MCP server
 func NewServer(cfg *config.Config) *Server {
 	return &Server{
-		config:       cfg,
-		toolsManager: handlers.NewToolsManager(),
-		capabilities: protocol.ServerCapabilities{
-			// ... existing capabilities ...
-		},
-	}
-}
-
-// RegisterTool registers a tool with the server
-func (s *Server) RegisterTool(tool protocol.Tool, handler handlers.ToolHandler) {
-	s.toolsManager.RegisterTool(tool, handler)
-}
-
-// NewServer creates a new MCP server
-func NewServer(cfg *config.Config) *Server {
-	return &Server{
-		config: cfg,
+		config:           cfg,
+		providerRegistry: provider.NewRegistry(),
 		capabilities: protocol.ServerCapabilities{
 			Logging: &struct{}{},
 			Tools: &struct {
@@ -64,6 +42,35 @@ func NewServer(cfg *config.Config) *Server {
 			},
 		},
 	}
+}
+
+// RegisterResourceProvider registers a resource provider with the server
+func (s *Server) RegisterResourceProvider(provider resources.Provider) {
+	s.providerRegistry.RegisterResourceProvider(provider)
+}
+
+// RegisterToolProvider registers a tool provider with the server
+func (s *Server) RegisterToolProvider(provider tools.Provider) {
+	s.providerRegistry.RegisterToolProvider(provider)
+}
+
+// RegisterPromptProvider registers a prompt provider with the server
+func (s *Server) RegisterPromptProvider(provider prompts.Provider) {
+	s.providerRegistry.RegisterPromptProvider(provider)
+}
+
+type Server struct {
+	config             *config.Config
+	capabilities       protocol.ServerCapabilities
+	clientCapabilities protocol.ClientCapabilities
+	initialized        bool
+	toolsManager       *handlers.ToolsManager
+	mu                 sync.RWMutex
+}
+
+// RegisterTool registers a tool with the server
+func (s *Server) RegisterTool(tool protocol.Tool, handler handlers.ToolHandler) {
+	s.toolsManager.RegisterTool(tool, handler)
 }
 
 // Initialize handles the initialize request
@@ -97,21 +104,6 @@ func (s *Server) Initialize(ctx context.Context, params protocol.InitializeParam
 		},
 		Instructions: "Axe Handle MCP Server - A reference implementation",
 	}, nil
-}
-
-// Initialized handles the initialized notification
-func (s *Server) Initialized(ctx context.Context) error {
-	s.mu.RLock()
-	initialized := s.initialized
-	s.mu.RUnlock()
-
-	if !initialized {
-		return mcperrors.NewInvalidRequestError("Server not initialized")
-	}
-
-	// Log successful initialization
-	slog.Info("Server fully initialized")
-	return nil
 }
 
 // checkInitialized checks if the server is initialized

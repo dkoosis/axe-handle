@@ -542,3 +542,261 @@ This architecture allows:
 - Document public APIs
 
 This roadmap will evolve as implementation progresses, but it provides a starting framework for development with a clear path for RTM integration.
+
+Go Libraries and Tools Guidelines for Axe Handle MCP Server
+Error Handling
+cockroachdb/errors
+goCopyimport "github.com/cockroachdb/errors"
+Use for:
+
+Error wrapping with context preservation
+Detailed error chains
+Attaching structured metadata to errors
+Creating domain-specific error types
+
+Key features we'll leverage:
+
+errors.Wrap(err, "message") for wrapping errors
+errors.Wrapf(err, format, args...) for formatted wrapping
+errors.WithDetail(err, "detail") for adding structured details
+errors.Is() and errors.As() for type checking
+
+Usage pattern:
+goCopyif err != nil {
+    return errors.Wrapf(err, "failed to process request for resource %s", uri)
+}
+Logging
+slog (standard library)
+goCopyimport "log/slog"
+Use for:
+
+Structured logging throughout the application
+Consistent field naming
+Level-based logging control
+JSON output for machine parsing
+
+Key features we'll leverage:
+
+slog.Info(), slog.Debug(), etc. for level-based logging
+slog.With() for attaching context
+Handler customization for output formatting
+Group support for organizing log fields
+
+Usage pattern:
+goCopyslog.Info("Processing request",
+    "method", request.Method,
+    "uri", request.URI,
+    "client_id", clientID)
+Configuration Management
+koanf
+goCopyimport "github.com/knadh/koanf/v2"
+Use for:
+
+Loading configuration from multiple sources
+Supporting various formats (YAML, JSON, etc.)
+Environment variable mapping
+Default values
+
+Key features we'll leverage:
+
+Multiple providers (file, env, etc.)
+Type-safe configuration access
+Configuration watching/reloading
+Nested configuration
+
+Usage pattern:
+goCopyk := koanf.New(".")
+k.Load(file.Provider("config.yaml"), yaml.Parser())
+k.Load(env.Provider("APP_", ".", func(s string) string {
+    return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "APP_")), "_", ".", -1)
+}), nil)
+JSON-RPC
+sourcegraph/jsonrpc2
+goCopyimport "github.com/sourcegraph/jsonrpc2"
+Use for:
+
+JSON-RPC 2.0 message handling
+Request/response management
+Notification support
+Transport abstraction
+
+Key features we'll leverage:
+
+Message encoding/decoding
+Handler interfaces
+Connection management
+Stream abstraction
+
+Usage pattern:
+goCopyconn := jsonrpc2.NewConn(ctx, jsonrpc2.NewBufferedStream(stream, jsonrpc2.VSCodeObjectCodec{}), handler)
+JSON Processing
+encoding/json (standard library)
+goCopyimport "encoding/json"
+Use for:
+
+Protocol message serialization/deserialization
+Structured data handling
+Schema validation
+
+Key features we'll leverage:
+
+Custom marshaling/unmarshaling
+Streaming JSON processing
+Error handling for malformed input
+
+Usage pattern:
+goCopyvar request Request
+if err := json.Unmarshal(data, &request); err != nil {
+    return nil, errors.Wrap(err, "invalid request format")
+}
+HTTP/SSE Transport
+net/http (standard library)
+goCopyimport "net/http"
+Use for:
+
+HTTP server for SSE transport
+Request handling
+Response streaming
+Middleware support
+
+Usage pattern:
+goCopymux := http.NewServeMux()
+mux.HandleFunc("/sse", handleSSE)
+mux.HandleFunc("/messages", handleMessages)
+server := &http.Server{Addr: ":8080", Handler: mux}
+Testing
+testing (standard library) + testify
+goCopyimport (
+    "testing"
+    "github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/require"
+)
+Use for:
+
+Unit testing
+Integration testing
+Assertions and test helpers
+Mock implementations
+
+Key features we'll leverage:
+
+Table-driven tests
+Assertions and requirements
+Test suites
+Mocking
+
+Usage pattern:
+goCopyfunc TestResourceProvider(t *testing.T) {
+    tests := []struct {
+        name     string
+        uri      string
+        expected string
+        wantErr  bool
+    }{
+        // Test cases...
+    }
+    
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            result, err := provider.GetResource(tt.uri)
+            if tt.wantErr {
+                assert.Error(t, err)
+                return
+            }
+            require.NoError(t, err)
+            assert.Equal(t, tt.expected, result.Text)
+        })
+    }
+}
+Concurrency Management
+sync package (standard library) + golang.org/x/sync
+goCopyimport (
+    "sync"
+    "golang.org/x/sync/errgroup"
+)
+Use for:
+
+Mutex-based synchronization
+Wait groups
+Error groups for concurrent operations
+Once execution
+
+Key features we'll leverage:
+
+sync.Mutex and sync.RWMutex for state protection
+sync.WaitGroup for synchronization
+errgroup.Group for concurrent error handling
+sync.Once for one-time initialization
+
+Usage pattern:
+goCopyvar g errgroup.Group
+for _, provider := range providers {
+    p := provider // Create local copy for goroutine
+    g.Go(func() error {
+        resources, err := p.ListResources(ctx)
+        if err != nil {
+            return err
+        }
+        mu.Lock()
+        allResources = append(allResources, resources...)
+        mu.Unlock()
+        return nil
+    })
+}
+return g.Wait()
+Context Management
+context (standard library)
+goCopyimport "context"
+Use for:
+
+Request cancellation
+Timeout management
+Value propagation
+Graceful shutdown
+
+Key features we'll leverage:
+
+context.WithCancel() for cancellation
+context.WithTimeout() for deadlines
+context.WithValue() for request metadata
+Context chain propagation
+
+Usage pattern:
+goCopyctx, cancel := context.WithTimeout(parentCtx, 30*time.Second)
+defer cancel()
+result, err := provider.GetResource(ctx, uri)
+Code Organization
+Internal Structure
+We'll organize code into these key packages:
+
+cmd/server - Application entry point
+internal/mcp - Core MCP domain
+
+internal/mcp/resources - Resource interfaces
+internal/mcp/tools - Tool interfaces
+internal/mcp/prompts - Prompt interfaces
+internal/mcp/server - Server implementation
+internal/mcp/transport - Transport implementations
+
+
+internal/providers - Provider implementations
+pkg/mcperrors - Error handling utilities
+pkg/logging - Logging configuration
+
+Each package should have clear responsibilities and minimal dependencies.
+Documentation
+godoc (standard tool)
+Use for:
+
+Package documentation
+API references
+Example code
+Usage patterns
+
+Usage pattern:
+goCopy// Package resources provides interfaces and implementations for MCP resources.
+//
+// Resources represent data that can be exposed to clients through the MCP protocol.
+// This package defines the core interfaces and types for resource management.
+package resources
+These guidelines provide a clear framework for our implementation, ensuring consistency and leveraging the strengths of each tool for appropriate needs.
