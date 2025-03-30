@@ -13,6 +13,8 @@ The following diagram shows how the documentation is organized and how different
 
 ## Getting Started
 
+ 1. useful? https://github.com/mark3labs/mcp-go
+
 ## Project Status
 
 Axe Handle is currently in active development. See the [Roadmap](./docs/ROADMAP.md) for current priorities and future plans.
