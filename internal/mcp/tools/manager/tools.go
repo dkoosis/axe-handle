@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/yourusername/axe-handle/internal/protocol"
-	"github.com/yourusername/axe-handle/pkg/mcperrors"
+	"github.com/dkoosis/axe-handle/internal/protocol"
+	"github.com/dkoosis/axe-handle/pkg/mcperrors"
 )
 
 // ToolHandler is a function that handles a tool call

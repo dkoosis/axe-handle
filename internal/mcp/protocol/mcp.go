@@ -4,8 +4,8 @@ package protocol
 import (
 	"encoding/json"
 
+	"github.com/dkoosis/axe-handle/pkg/mcperrors"
 	"github.com/sourcegraph/jsonrpc2"
-	"github.com/yourusername/axe-handle/pkg/mcperrors"
 )
 
 const (

@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	"github.com/dkoosis/axe-handle/internal/protocol"
+	"github.com/dkoosis/axe-handle/pkg/mcperrors"
 	"github.com/sourcegraph/jsonrpc2"
-	"github.com/yourusername/axe-handle/internal/protocol"
-	"github.com/yourusername/axe-handle/pkg/mcperrors"
 )
 
 // Handler implements the jsonrpc2.Handler interface

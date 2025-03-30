@@ -9,10 +9,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/yourusername/axe-handle/internal/config"
-	"github.com/yourusername/axe-handle/internal/server"
-	"github.com/yourusername/axe-handle/internal/transport"
-	"github.com/yourusername/axe-handle/pkg/logging"
+	"github.com/dkoosis/axe-handle/internal/config"
+	"github.com/dkoosis/axe-handle/internal/server"
+	"github.com/dkoosis/axe-handle/internal/transport"
+	"github.com/dkoosis/axe-handle/pkg/logging"
 )
 
 func main() {
