@@ -13,7 +13,7 @@ type Resource struct {
 type Provider interface {
 	// ListResources returns a list of available resources
 	ListResources() ([]Resource, error)
-	
+
 	// GetResource returns the content of a specific resource
 	GetResource(uri string) (interface{}, error)
 }

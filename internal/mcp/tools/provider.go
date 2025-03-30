@@ -12,7 +12,7 @@ type Tool struct {
 type Provider interface {
 	// ListTools returns a list of available tools
 	ListTools() ([]Tool, error)
-	
+
 	// ExecuteTool executes a tool with the given arguments
 	ExecuteTool(name string, args map[string]interface{}) (interface{}, error)
 }

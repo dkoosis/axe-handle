@@ -19,7 +19,7 @@ type PromptArgument struct {
 type Provider interface {
 	// ListPrompts returns a list of available prompts
 	ListPrompts() ([]Prompt, error)
-	
+
 	// GetPrompt returns a prompt template with the given arguments
 	GetPrompt(name string, args map[string]string) (interface{}, error)
 }

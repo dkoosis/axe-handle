@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/dkoosis/axe-handle/internal/protocol"
 	"github.com/dkoosis/axe-handle/pkg/mcperrors"
 )
 
