@@ -1,11 +1,10 @@
-// Path: src/index.ts
 /**
- * @file src/index.ts
- * @description Main entry point for the Axe Handle code generator
- * @author Axe Handle Team
- * @created 2025-03-12
- * @copyright Copyright (c) 2025 Axe Handle Project
- * @license ISC
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
  */
 
 // We'll import these when needed in implementation
@@ -26,9 +25,9 @@ import { AxeResult } from '@cli/utils/resultUtils';
 export async function generateMcpServer(_options: any): Promise<AxeResult<any>> {
   logger.log(LogCategory.INFO, 'Starting MCP server generation', LogLevel.INFO);
   performance.start('generate-server');
-  
+
   // Implementation will be added here
-  
+
   performance.end('generate-server');
   return { success: true, data: {} };
 }

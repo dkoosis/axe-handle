@@ -7,6 +7,7 @@ module.exports = {
   ],
   plugins: [
     '@typescript-eslint',
+    'neverthrow',
     'complexity',
     'header'
   ],
@@ -27,6 +28,9 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
     '@typescript-eslint/explicit-module-boundary-types': 'warn',
     '@typescript-eslint/no-floating-promises': 'error',
+    
+    // Neverthrow rules
+    'neverthrow/no-throw': 'error',
     
     // Complexity rules
     'complexity': ['warn', 10],
@@ -65,7 +69,8 @@ module.exports = {
       // Disable certain rules for test files
       files: ['**/*.test.ts', '**/*.spec.ts'],
       rules: {
-        'max-lines-per-function': 'off'
+        'max-lines-per-function': 'off',
+        'neverthrow/no-throw': 'off'
       }
     },
     {

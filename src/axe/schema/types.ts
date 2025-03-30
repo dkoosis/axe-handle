@@ -1,5 +1,11 @@
-// Path: src/axe/schema/types.ts
-// Type definitions for schema handling
+/**
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
+ */
 
 /**
  * Options for the generator

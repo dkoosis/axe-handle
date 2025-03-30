@@ -1,11 +1,10 @@
-// Path: src/parser/protocol.ts
 /**
- * @file src/parser/protocol.ts
- * @description Protocol parser for MCP specifications
- * @author Axe Handle Team
- * @created 2025-03-12
- * @copyright Copyright (c) 2025 Axe Handle Project
- * @license ISC
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
  */
 
 /**
@@ -15,10 +14,10 @@
 export function parseProtocol(filePath: string): any {
   // Implementation will be added later
   console.log(`Parsing protocol from: ${filePath}`);
-  
+
   return {
     version: '1.0',
     resources: [],
-    operations: []
+    operations: [],
   };
 }

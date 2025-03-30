@@ -1,11 +1,10 @@
-// Path: src/cli/utils/resultUtils.ts
 /**
- * @file src/cli/utils/resultUtils.ts
- * @description Utility functions for handling Results and error handling
- * @author Axe Handle Team
- * @created 2025-03-12
- * @copyright Copyright (c) 2025 Axe Handle Project
- * @license ISC
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
  */
 
 import { Result, ok, err } from 'neverthrow';
@@ -25,16 +24,16 @@ export function createGeneratorError(
   errorCode: number,
   message: string,
   details?: Record<string, unknown>,
-  cause?: Error
+  cause?: Error,
 ): Error {
   const error = new Error(message);
   (error as any).code = errorCode;
   (error as any).details = details || {};
-  
+
   if (cause) {
     (error as any).cause = cause;
   }
-  
+
   return error;
 }
 
@@ -43,7 +42,7 @@ export function createGeneratorError(
  */
 export async function runAsyncOperation<T>(
   operation: () => Promise<T>,
-  errorCategory = 'OPERATION_ERROR'
+  errorCategory = 'OPERATION_ERROR',
 ): Promise<Result<T, AppError>> {
   try {
     const result = await operation();
@@ -59,7 +58,7 @@ export async function runAsyncOperation<T>(
  */
 export function runOperation<T>(
   operation: () => T,
-  errorCategory = 'OPERATION_ERROR'
+  errorCategory = 'OPERATION_ERROR',
 ): Result<T, AppError> {
   try {
     const result = operation();

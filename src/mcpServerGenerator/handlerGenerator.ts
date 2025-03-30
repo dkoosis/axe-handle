@@ -1,5 +1,11 @@
-// Path: src/mcpServerGenerator/handlerGenerator.ts
-// Generator for MCP server handlers
+/**
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
+ */
 
 import { GeneratorOptions } from '../axe/schema/types';
 
@@ -13,5 +19,5 @@ export const mcpServerGenerator = {
   async generateServer(mappedService: any, options: GeneratorOptions): Promise<void> {
     // Stub implementation
     console.log(`Would generate server for ${mappedService.name} in ${options.outputDir}`);
-  }
+  },
 };

@@ -1,11 +1,10 @@
-// Path: src/utils/errors.ts
 /**
- * @file src/utils/errors.ts
- * @description Error utilities and types for the Axe Handle generator
- * @author Axe Handle Team
- * @created 2025-03-12
- * @copyright Copyright (c) 2025 Axe Handle Project
- * @license ISC
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
  */
 
 import { Result, ResultAsync, err, ok } from 'neverthrow';

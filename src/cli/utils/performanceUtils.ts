@@ -1,11 +1,10 @@
-// Path: src/cli/utils/performanceUtils.ts
 /**
- * @file src/cli/utils/performanceUtils.ts
- * @description Performance measurement utilities
- * @author Axe Handle Team
- * @created 2025-03-12
- * @copyright Copyright (c) 2025 Axe Handle Project
- * @license ISC
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
  */
 
 // Import Node.js performance API
@@ -52,7 +51,7 @@ class Performance {
 
     const elapsed = nodePerformance.now() - start;
     delete this.timers[name];
-    
+
     console.log(`[Performance] ${name}: ${elapsed.toFixed(2)}ms`);
     return elapsed;
   }

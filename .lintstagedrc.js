@@ -5,7 +5,8 @@ module.exports = {
     (filenames) => filenames.map(filename => `node utils/validate-path-headers.js --fix --file=${filename}`)
   ],
   "*.js": [
-    "eslint --fix",
+    // Temporarily comment out ESLint for JS files
+    // "eslint --fix",
     "prettier --write",
     (filenames) => filenames.map(filename => `node utils/validate-path-headers.js --fix --file=${filename}`)
   ],

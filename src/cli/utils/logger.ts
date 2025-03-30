@@ -1,11 +1,10 @@
-// Path: src/cli/utils/logger.ts
 /**
- * @file src/cli/utils/logger.ts
- * @description Logger utility for the Axe Handle generator
- * @author Axe Handle Team
- * @created 2025-03-12
- * @copyright Copyright (c) 2025 Axe Handle Project
- * @license ISC
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
  */
 
 export enum LogLevel {

@@ -1,11 +1,10 @@
-// Path: src/cli/utils/configManager.ts
 /**
- * @file src/cli/utils/configManager.ts
- * @description Configuration manager for the Axe Handle generator
- * @author Axe Handle Team
- * @created 2025-03-12
- * @copyright Copyright (c) 2025 Axe Handle Project
- * @license ISC
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
  */
 
 /**
@@ -50,7 +49,7 @@ export class ConfigManager {
    * @param defaultValue Default value if key doesn't exist
    */
   public get<T>(key: string, defaultValue?: T): T {
-    return (this.config[key] as T) || defaultValue as T;
+    return (this.config[key] as T) || (defaultValue as T);
   }
 
   /**

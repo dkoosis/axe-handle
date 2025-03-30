@@ -1,6 +1,12 @@
 #!/usr/bin/env node
-// Path: src/cli/index.ts
-// Provides the command-line interface for the Axe Handle code generator.
+/**
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
+ */
 
 import { Command } from 'commander';
 import path from 'path';
@@ -47,7 +53,10 @@ program
   .version('0.1.0');
 
 program
-  .argument('<schema>', 'Protobuf schema file (.proto) or OpenAPI specification (.yaml, .yml, .json)')
+  .argument(
+    '<schema>',
+    'Protobuf schema file (.proto) or OpenAPI specification (.yaml, .yml, .json)',
+  )
   .argument('<output-dir>', 'Output directory for generated code')
   .option('-c, --config <file>', 'Configuration file (JSON)')
   .option('-o, --overwrite', 'Overwrite existing files', false)
@@ -60,11 +69,11 @@ program
       // Configure logger based on CLI options
       logger.updateConfig({
         level: cmdOptions.verbose ? LogLevel.DEBUG : LogLevel.INFO,
-        colors: cmdOptions.color !== false
+        colors: cmdOptions.color !== false,
       });
-      
+
       logger.section('Axe Handle MCP Server Generator');
-      
+
       // Validate input file
       const inputFile = path.resolve(process.cwd(), schemaFile);
       try {
@@ -106,42 +115,47 @@ program
         overwrite: cmdOptions.overwrite,
         interactive: cmdOptions.interactive,
         generateDocs: cmdOptions.docs,
-        verbose: cmdOptions.verbose
+        verbose: cmdOptions.verbose,
       };
 
       // Log options in verbose mode
-      logger.debug(`Generator Options: ${JSON.stringify({
-        overwrite: options.overwrite,
-        interactive: options.interactive,
-        generateDocs: options.generateDocs,
-        verbose: options.verbose
-      }, null, 2)}`);
+      logger.debug(
+        `Generator Options: ${JSON.stringify(
+          {
+            overwrite: options.overwrite,
+            interactive: options.interactive,
+            generateDocs: options.generateDocs,
+            verbose: options.verbose,
+          },
+          null,
+          2,
+        )}`,
+      );
 
       // Generate the MCP server
       logger.section('Generating MCP Server');
-      
+
       await generateMcpServer(options);
-      
+
       logger.section('Generation Complete');
       logger.success(`MCP server generated successfully!`);
       logger.info(`Output directory: ${outDir}`);
-      
+
       if (options.generateDocs) {
         const docsPath = path.join(outDir, 'docs', 'api.md');
         logger.info(`API documentation: ${docsPath}`);
       }
-      
+
       logger.info('\nNext steps:');
       logger.info(`  cd ${outputDir}`);
       logger.info('  npm install');
       logger.info('  npm run dev');
-
     } catch (error) {
       logger.section('Generation Failed');
-      
+
       if (error instanceof Error) {
         logger.error(formatError(error));
-        
+
         if ('code' in error && (error as any).details) {
           const details = (error as any).details;
           logger.debug(`Error details: ${JSON.stringify(details, null, 2)}`);
@@ -149,7 +163,7 @@ program
       } else {
         logger.error(`Unknown error: ${JSON.stringify(error, null, 2)}`);
       }
-      
+
       process.exit(1);
     }
   });

@@ -1,5 +1,11 @@
-// Path: src/mcp/mapper.ts
-// Mapper for MCP service transformation
+/**
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
+ */
 
 /**
  * Mapper for transforming services to MCP format
@@ -12,7 +18,7 @@ export const mapper = {
     // Stub implementation
     return {
       ...service,
-      mappedToMcp: true
+      mappedToMcp: true,
     };
-  }
+  },
 };

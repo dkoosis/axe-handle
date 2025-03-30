@@ -1,5 +1,11 @@
-// Path: src/types.ts
-// Common types used throughout the application
+/**
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
+ */
 
 /**
  * Options for the generator
@@ -40,7 +46,7 @@ export function createAxeError(
   code: number | string,
   message: string,
   details?: Record<string, unknown>,
-  cause?: Error
+  cause?: Error,
 ): AxeError {
   const error = new Error(message) as AxeError;
   error.code = code;

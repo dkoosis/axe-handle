@@ -1,5 +1,11 @@
-// Path: src/cli/types.ts
-// Type definitions for the CLI
+/**
+ * @file ${filename}
+ * @description ${description}
+ * @author ${author}
+ * @created ${created}
+ * @copyright ${copyright}
+ * @license ${license}
+ */
 
 /**
  * Generator options for the CLI
