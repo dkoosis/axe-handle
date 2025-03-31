@@ -1,4 +1,4 @@
-// internal/transport/sse.go
+// internal/mcp/server/transport/sse.go
 package transport
 
 import (
@@ -103,9 +103,10 @@ func (t *SSETransport) handleSSE(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Set up client connection with a custom stream
+	adapter := newSSEStreamAdapter(client, clientID)
 	client.conn = jsonrpc2.NewConn(
 		r.Context(),
-		jsonrpc2.NewBufferedStream(newSSEStream(client, clientID), jsonrpc2.VSCodeObjectCodec{}),
+		jsonrpc2.NewBufferedStream(adapter, jsonrpc2.VSCodeObjectCodec{}),
 		t.handler,
 	)
 
@@ -187,48 +188,69 @@ func (t *SSETransport) Close() error {
 	return nil
 }
 
-// sseStream implements jsonrpc2.Stream for SSE
-type sseStream struct {
+// sseStreamAdapter adapts our SSE stream to the io.ReadWriteCloser interface
+// that jsonrpc2.NewBufferedStream expects
+type sseStreamAdapter struct {
 	client   *sseClient
 	clientID string
-	msgs     chan json.RawMessage
+	msgBuf   []byte
+	incoming chan []byte
 }
 
-func newSSEStream(client *sseClient, clientID string) *sseStream {
-	return &sseStream{
+// newSSEStreamAdapter creates a new SSE stream adapter
+func newSSEStreamAdapter(client *sseClient, clientID string) *sseStreamAdapter {
+	return &sseStreamAdapter{
 		client:   client,
 		clientID: clientID,
-		msgs:     make(chan json.RawMessage, 100),
+		msgBuf:   nil,
+		incoming: make(chan []byte, 10),
 	}
 }
 
-func (s *sseStream) Read(ctx context.Context) (json.RawMessage, error) {
+// Read implements the io.Reader interface
+func (s *sseStreamAdapter) Read(p []byte) (int, error) {
+	// If we have data in the buffer, return it
+	if len(s.msgBuf) > 0 {
+		n := copy(p, s.msgBuf)
+		s.msgBuf = s.msgBuf[n:]
+		return n, nil
+	}
+
+	// Otherwise, wait for a new message
 	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
 	case <-s.client.done:
-		return nil, io.EOF
-	case msg, ok := <-s.msgs:
+		return 0, io.EOF
+	case msg, ok := <-s.incoming:
 		if !ok {
-			return nil, io.EOF
+			return 0, io.EOF
 		}
-		return msg, nil
+		// If message is larger than buffer, store remainder
+		if len(msg) > len(p) {
+			n := copy(p, msg)
+			s.msgBuf = msg[n:]
+			return n, nil
+		}
+		// Otherwise return whole message
+		return copy(p, msg), nil
 	}
 }
 
-func (s *sseStream) Write(ctx context.Context, msg json.RawMessage) error {
+// Write implements the io.Writer interface
+func (s *sseStreamAdapter) Write(p []byte) (int, error) {
 	select {
-	case <-ctx.Done():
-		return ctx.Err()
 	case <-s.client.done:
-		return io.EOF
+		return 0, io.EOF
 	default:
-		s.client.messagesCh <- msg
-		return nil
+		// Copy the data since we can't guarantee p won't be modified
+		data := make([]byte, len(p))
+		copy(data, p)
+		s.client.messagesCh <- data
+		return len(p), nil
 	}
 }
 
-func (s *sseStream) Close() error {
-	close(s.msgs)
+// Close implements the io.Closer interface
+func (s *sseStreamAdapter) Close() error {
+	close(s.incoming)
 	return nil
 }

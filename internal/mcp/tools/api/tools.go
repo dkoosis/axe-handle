@@ -140,21 +140,44 @@ func (h *ToolsHandler) HandleToolsCall(ctx context.Context, conn *jsonrpc2.Conn,
 func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err error) {
 	rpcErr := mcperrors.FromError(err)
 
-	// Convert data to JSON before assigning to jsonrpc2.Error.Data
-	var jsonData json.RawMessage
+	// Convert data to interface{} before assigning
+	var data interface{}
 	if rpcErr.Data != nil {
+		// Convert to JSON first
 		if raw, err := json.Marshal(rpcErr.Data); err == nil {
-			jsonData = raw
+			data = raw
 		}
 	}
 
 	jsonErr := &jsonrpc2.Error{
 		Code:    int64(rpcErr.Code),
 		Message: rpcErr.Message,
-		Data:    jsonData,
+		Data:    data,
 	}
 
-	if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
-		slog.Error("Failed to send error response", "error", err)
+	// Only send error if ID is valid
+	if hasValidID(id) {
+		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
+			slog.Error("Failed to send error response", "error", err)
+		}
+	}
+}
+
+// hasValidID checks if the ID is non-nil and has a meaningful value
+func hasValidID(id jsonrpc2.ID) bool {
+	if id == nil {
+		return false
+	}
+
+	switch v := id.(type) {
+	case string:
+		return v != ""
+	case int:
+		return v != 0
+	case float64:
+		return v != 0
+	default:
+		// For any other type, assume it has value
+		return true
 	}
 }

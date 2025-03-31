@@ -57,8 +57,8 @@ func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 		h.handleInitialized(ctx, conn, req)
 	default:
 		err := mcperrors.NewMethodNotFoundError(req.Method)
-		// Check if req.ID is the zero value (empty string or 0)
-		if req.ID != "" && req.ID != 0 {
+		// Check if request has a non-nil ID (meaning it's not a notification)
+		if hasValidID(req.ID) {
 			// Only send error for requests, not notifications
 			if err := conn.ReplyWithError(ctx, req.ID, protocol.ErrorConverter(err)); err != nil {
 				slog.Error("Failed to send error response", "error", err)
@@ -105,10 +105,29 @@ func (h *Handler) handlePing(ctx context.Context, conn *jsonrpc2.Conn, req *json
 
 // sendError sends an error response
 func (h *Handler) sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err error) {
-	// Check if id is the zero value (empty string or 0)
-	if id != "" && id != 0 {
+	// Only send error if ID is valid
+	if hasValidID(id) {
 		if err := conn.ReplyWithError(ctx, id, protocol.ErrorConverter(err)); err != nil {
 			slog.Error("Failed to send error response", "error", err)
 		}
+	}
+}
+
+// hasValidID checks if the ID is non-nil and has a meaningful value
+func hasValidID(id jsonrpc2.ID) bool {
+	if id == nil {
+		return false
+	}
+
+	switch v := id.(type) {
+	case string:
+		return v != ""
+	case int:
+		return v != 0
+	case float64:
+		return v != 0
+	default:
+		// For any other type, assume it has value
+		return true
 	}
 }

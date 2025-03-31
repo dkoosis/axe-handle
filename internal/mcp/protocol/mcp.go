@@ -26,6 +26,7 @@ type ClientCapabilities struct {
 		ListChanged bool `json:"listChanged,omitempty"`
 	} `json:"roots,omitempty"`
 	Sampling *struct{} `json:"sampling,omitempty"`
+	Logging  *struct{} `json:"logging,omitempty"`
 }
 
 // ServerCapabilities represents capabilities that a server may support
@@ -132,18 +133,17 @@ func ErrorConverter(err error) *jsonrpc2.Error {
 	rpcErr := mcperrors.FromError(err)
 
 	// Don't try to use data directly in the jsonrpc2.Error struct
-	// as it expects different types than what we might have
-	var jsonData json.RawMessage
+	var data interface{}
 	if rpcErr.Data != nil {
 		// Convert to JSON first
 		if raw, err := json.Marshal(rpcErr.Data); err == nil {
-			jsonData = raw
+			data = raw
 		}
 	}
 
 	return &jsonrpc2.Error{
 		Code:    int64(rpcErr.Code),
 		Message: rpcErr.Message,
-		Data:    jsonData,
+		Data:    data,
 	}
 }
