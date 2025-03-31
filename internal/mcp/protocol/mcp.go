@@ -133,19 +133,19 @@ func ErrorConverter(err error) *jsonrpc2.Error {
 	rpcErr := mcperrors.FromError(err)
 
 	// Create a properly typed data field
-	var data interface{}
+	var jsonData *json.RawMessage
 	if rpcErr.Data != nil {
 		// Convert to JSON first
-		if rawBytes, err := json.Marshal(rpcErr.Data); err == nil {
-			// Create a json.RawMessage and use its address
-			jsonData := json.RawMessage(rawBytes)
-			data = &jsonData // Using pointer to satisfy *json.RawMessage requirement
+		rawBytes, err := json.Marshal(rpcErr.Data)
+		if err == nil {
+			temp := json.RawMessage(rawBytes)
+			jsonData = &temp
 		}
 	}
 
 	return &jsonrpc2.Error{
 		Code:    int64(rpcErr.Code),
 		Message: rpcErr.Message,
-		Data:    data,
+		Data:    jsonData, // Now properly typed as *json.RawMessage
 	}
 }
