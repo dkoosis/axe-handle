@@ -145,7 +145,7 @@ func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err err
 	if rpcErr.Data != nil {
 		// Convert to JSON first
 		if raw, err := json.Marshal(rpcErr.Data); err == nil {
-			data = raw
+			data = json.RawMessage(raw)
 		}
 	}
 
@@ -163,19 +163,21 @@ func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err err
 	}
 }
 
-// hasValidID checks if the ID is non-nil and has a meaningful value
+// hasValidID checks if the ID is valid for responding
 func hasValidID(id jsonrpc2.ID) bool {
-	if id == nil {
+	// Check if it's nil or empty
+	if id == nil || id == jsonrpc2.ID(nil) {
 		return false
 	}
 
-	switch v := id.(type) {
+	// Handle different ID types
+	switch id := id.(type) {
 	case string:
-		return v != ""
-	case int:
-		return v != 0
+		return id != ""
 	case float64:
-		return v != 0
+		return id != 0
+	case int:
+		return id != 0
 	default:
 		// For any other type, assume it has value
 		return true

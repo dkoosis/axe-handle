@@ -137,9 +137,8 @@ func ErrorConverter(err error) *jsonrpc2.Error {
 	if rpcErr.Data != nil {
 		// Convert to JSON first
 		if rawBytes, err := json.Marshal(rpcErr.Data); err == nil {
-			// Convert to json.RawMessage instead of using raw interface{}
-			rawMsg := json.RawMessage(rawBytes)
-			data = &rawMsg
+			// Use type assertion to convert interface{} to json.RawMessage
+			data = json.RawMessage(rawBytes)
 		}
 	}
 
