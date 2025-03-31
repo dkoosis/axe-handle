@@ -113,8 +113,8 @@ func (h *Handler) sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc
 	}
 }
 
-// hasValidID checks if the ID is valid for responding
-func hasValidID(id jsonrpc2.ID) bool {
+// isValidID checks if the ID is valid for responding
+func isValidID(id jsonrpc2.ID) bool {
 	// For string IDs, check if it's not empty
 	if id.IsString {
 		return id.Str != ""

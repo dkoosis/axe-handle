@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"log/slog"
 
-	"github.com/dkoosis/axe-handle/internal/mcp/protocol"
 	"github.com/dkoosis/axe-handle/internal/mcp/tools/manager"
 	"github.com/dkoosis/axe-handle/pkg/mcperrors"
+	"github.com/dkoosis/axe-hasndle/internal/mcp/protocol"
 	"github.com/sourcegraph/jsonrpc2"
 )
 
@@ -173,9 +173,8 @@ func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err err
 	_ = conn.ReplyWithError(ctx, id, jsonErr)
 }
 
-// hasValidID checks if the ID is valid for responding.
-// hasValidID checks if the ID is valid for responding
-func hasValidID(id jsonrpc2.ID) bool {
+// isValidID checks if the ID is valid for responding.
+func isValidID(id jsonrpc2.ID) bool {
 	// For string IDs, check if it's not empty
 	if id.IsString {
 		return id.Str != ""
@@ -195,7 +194,7 @@ func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err err
 	}
 
 	// Only send error if ID is valid
-	if hasValidID(id) {
+	if isValidID(id) {
 		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
 			slog.Error("Failed to send error response", "error", err)
 		}
