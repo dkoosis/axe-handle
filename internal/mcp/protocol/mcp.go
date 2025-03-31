@@ -132,12 +132,14 @@ func ErrorConverter(err error) *jsonrpc2.Error {
 
 	rpcErr := mcperrors.FromError(err)
 
-	// Don't try to use data directly in the jsonrpc2.Error struct
+	// Create a properly typed data field
 	var data interface{}
 	if rpcErr.Data != nil {
 		// Convert to JSON first
-		if raw, err := json.Marshal(rpcErr.Data); err == nil {
-			data = raw
+		if rawBytes, err := json.Marshal(rpcErr.Data); err == nil {
+			// Convert to json.RawMessage instead of using raw interface{}
+			rawMsg := json.RawMessage(rawBytes)
+			data = &rawMsg
 		}
 	}
 
