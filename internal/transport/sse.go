@@ -103,9 +103,11 @@ func (t *SSETransport) handleSSE(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Set up client connection with a custom stream
+	// We need to create an adapter that converts our SSE stream to a proper io.ReadWriteCloser
+	adapter := &sseStreamAdapter{client: client, clientID: clientID}
 	client.conn = jsonrpc2.NewConn(
 		r.Context(),
-		jsonrpc2.NewBufferedStream(newSSEStream(client, clientID), jsonrpc2.VSCodeObjectCodec{}),
+		jsonrpc2.NewBufferedStream(adapter, jsonrpc2.VSCodeObjectCodec{}),
 		t.handler,
 	)
 
@@ -187,48 +189,56 @@ func (t *SSETransport) Close() error {
 	return nil
 }
 
-// sseStream implements jsonrpc2.Stream for SSE
-type sseStream struct {
+// sseStreamAdapter adapts our SSE stream to the io.ReadWriteCloser interface
+// that jsonrpc2.NewBufferedStream expects
+type sseStreamAdapter struct {
 	client   *sseClient
 	clientID string
+	msgBuf   []byte
 	msgs     chan json.RawMessage
 }
 
-func newSSEStream(client *sseClient, clientID string) *sseStream {
-	return &sseStream{
-		client:   client,
-		clientID: clientID,
-		msgs:     make(chan json.RawMessage, 100),
+// Read implements the io.Reader interface
+func (s *sseStreamAdapter) Read(p []byte) (int, error) {
+	// If we have data in the buffer, return it
+	if len(s.msgBuf) > 0 {
+		n := copy(p, s.msgBuf)
+		s.msgBuf = s.msgBuf[n:]
+		return n, nil
 	}
-}
 
-func (s *sseStream) Read(ctx context.Context) (json.RawMessage, error) {
+	// Otherwise, wait for a new message
+	ctx := context.Background()
 	select {
 	case <-ctx.Done():
-		return nil, ctx.Err()
+		return 0, ctx.Err()
 	case <-s.client.done:
-		return nil, io.EOF
+		return 0, io.EOF
 	case msg, ok := <-s.msgs:
 		if !ok {
-			return nil, io.EOF
+			return 0, io.EOF
 		}
-		return msg, nil
+		// Copy the message into the buffer
+		s.msgBuf = msg
+		n := copy(p, s.msgBuf)
+		s.msgBuf = s.msgBuf[n:]
+		return n, nil
 	}
 }
 
-func (s *sseStream) Write(ctx context.Context, msg json.RawMessage) error {
+// Write implements the io.Writer interface
+func (s *sseStreamAdapter) Write(p []byte) (int, error) {
 	select {
-	case <-ctx.Done():
-		return ctx.Err()
 	case <-s.client.done:
-		return io.EOF
+		return 0, io.EOF
 	default:
-		s.client.messagesCh <- msg
-		return nil
+		s.client.messagesCh <- p
+		return len(p), nil
 	}
 }
 
-func (s *sseStream) Close() error {
+// Close implements the io.Closer interface
+func (s *sseStreamAdapter) Close() error {
 	close(s.msgs)
 	return nil
 }

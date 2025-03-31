@@ -44,7 +44,11 @@ func Configure(level LogLevel) {
 	slog.SetDefault(logger)
 }
 
-// WithContext adds context values to the logger
-func WithContext(ctx context.Context) *slog.Logger {
-	return slog.Default().WithContext(ctx)
+// LoggerWithContext adds context values to the logger as attributes
+func LoggerWithContext(ctx context.Context, attrs ...slog.Attr) *slog.Logger {
+	logger := slog.Default()
+	for _, attr := range attrs {
+		logger = logger.With(attr.Key, attr.Value)
+	}
+	return logger
 }

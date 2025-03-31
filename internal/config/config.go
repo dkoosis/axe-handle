@@ -87,23 +87,26 @@ func Load() (*Config, error) {
 
 // loadDefaults loads the default configuration
 func loadDefaults(k *koanf.Koanf) error {
-	// Load defaults (implement marshaling to map first)
-	defaults := make(map[string]interface{})
-	// ... convert defaultConfig to map ...
-
-	// Simple implementation for demonstration
-	defaults["server.name"] = defaultConfig.Server.Name
-	defaults["server.version"] = defaultConfig.Server.Version
-	defaults["server.logLevel"] = defaultConfig.Server.LogLevel
-	defaults["transport.type"] = defaultConfig.Transport.Type
-	defaults["transport.sse.port"] = defaultConfig.Transport.SSE.Port
-	defaults["transport.sse.host"] = defaultConfig.Transport.SSE.Host
-
-	for k, v := range defaults {
-		if err := k.Set(k, v); err != nil {
-			return err
-		}
+	// Set default values directly instead of using MapProvider
+	if err := k.Set("server.name", defaultConfig.Server.Name); err != nil {
+		return err
 	}
+	if err := k.Set("server.version", defaultConfig.Server.Version); err != nil {
+		return err
+	}
+	if err := k.Set("server.logLevel", defaultConfig.Server.LogLevel); err != nil {
+		return err
+	}
+	if err := k.Set("transport.type", defaultConfig.Transport.Type); err != nil {
+		return err
+	}
+	if err := k.Set("transport.sse.port", defaultConfig.Transport.SSE.Port); err != nil {
+		return err
+	}
+	if err := k.Set("transport.sse.host", defaultConfig.Transport.SSE.Host); err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -1,4 +1,4 @@
-// internal/protocol/mcp.go
+// internal/mcp/protocol/mcp.go
 package protocol
 
 import (
@@ -67,6 +67,28 @@ const (
 	NotificationLoggingMessage       = "notifications/message"
 )
 
+// LoggingLevel defines the level of log message
+type LoggingLevel string
+
+// Logging level constants
+const (
+	LoggingLevelDebug     LoggingLevel = "debug"
+	LoggingLevelInfo      LoggingLevel = "info"
+	LoggingLevelNotice    LoggingLevel = "notice"
+	LoggingLevelWarning   LoggingLevel = "warning"
+	LoggingLevelError     LoggingLevel = "error"
+	LoggingLevelCritical  LoggingLevel = "critical"
+	LoggingLevelAlert     LoggingLevel = "alert"
+	LoggingLevelEmergency LoggingLevel = "emergency"
+)
+
+// LoggingMessageParams represents parameters for a logging message notification
+type LoggingMessageParams struct {
+	Level  LoggingLevel `json:"level"`
+	Logger string       `json:"logger,omitempty"`
+	Data   interface{}  `json:"data"`
+}
+
 // InitializeParams defines parameters for the initialize request
 type InitializeParams struct {
 	ProtocolVersion string             `json:"protocolVersion"`
@@ -82,6 +104,25 @@ type InitializeResult struct {
 	Instructions    string             `json:"instructions,omitempty"`
 }
 
+// Content represents a piece of content for a tool result
+type Content struct {
+	Type string `json:"type"`
+	Text string `json:"text,omitempty"`
+}
+
+// ToolsCallResult represents the result of a tool call
+type ToolsCallResult struct {
+	Content []Content `json:"content"`
+	IsError bool      `json:"isError,omitempty"`
+}
+
+// Tool represents a tool definition
+type Tool struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description,omitempty"`
+	InputSchema interface{} `json:"inputSchema"`
+}
+
 // ErrorConverter converts Go errors to jsonrpc2.Error objects
 func ErrorConverter(err error) *jsonrpc2.Error {
 	if err == nil {
@@ -90,16 +131,19 @@ func ErrorConverter(err error) *jsonrpc2.Error {
 
 	rpcErr := mcperrors.FromError(err)
 
-	var data json.RawMessage
+	// Don't try to use data directly in the jsonrpc2.Error struct
+	// as it expects different types than what we might have
+	var jsonData json.RawMessage
 	if rpcErr.Data != nil {
-		if jsonData, err := json.Marshal(rpcErr.Data); err == nil {
-			data = jsonData
+		// Convert to JSON first
+		if raw, err := json.Marshal(rpcErr.Data); err == nil {
+			jsonData = raw
 		}
 	}
 
 	return &jsonrpc2.Error{
 		Code:    int64(rpcErr.Code),
 		Message: rpcErr.Message,
-		Data:    data,
+		Data:    jsonData,
 	}
 }
