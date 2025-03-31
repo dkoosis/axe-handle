@@ -140,21 +140,58 @@ func (h *ToolsHandler) HandleToolsCall(ctx context.Context, conn *jsonrpc2.Conn,
 func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err error) {
 	rpcErr := mcperrors.FromError(err)
 
-	// Create a properly typed data field
-	var data interface{}
-	if rpcErr.Data != nil {
-		// Convert to JSON first
-		if rawBytes, err := json.Marshal(rpcErr.Data); err == nil {
-			jsonData := json.RawMessage(rawBytes)
-			data = &jsonData
-		}
+	// Create error object directly without trying to set a Data field
+	jsonErr := &jsonrpc2.Error{
+		Code:    int64(rpcErr.Code),
+		Message: rpcErr.Message,
 	}
+
+	// Only send error if ID is valid - we'll use JSON marshaling to check
+	if _, ok := id.(string); ok {
+		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
+			slog.Error("Failed to send error response", "error", err)
+		}
+		return
+	}
+
+	if _, ok := id.(float64); ok {
+		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
+			slog.Error("Failed to send error response", "error", err)
+		}
+		return
+	}
+
+	if _, ok := id.(int); ok {
+		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
+			slog.Error("Failed to send error response", "error", err)
+		}
+		return
+	}
+
+	// For all other cases, try to send the error but don't worry if it fails
+	// This handles the case where id might be nil or another type
+	_ = conn.ReplyWithError(ctx, id, jsonErr)
+}
+
+// hasValidID checks if the ID is valid for responding.
+// hasValidID checks if the ID is valid for responding
+func hasValidID(id jsonrpc2.ID) bool {
+	// For string IDs, check if it's not empty
+	if id.IsString {
+		return id.Str != ""
+	}
+	// For numeric IDs, check if it's not zero
+	return id.Num != 0
+}
+
+// sendError sends an error response
+func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err error) {
+	rpcErr := mcperrors.FromError(err)
 
 	jsonErr := &jsonrpc2.Error{
 		Code:    int64(rpcErr.Code),
 		Message: rpcErr.Message,
-		// TODO: this assumes  data is already a json.RawMessage. Can we test?
-		Data: data.(json.RawMessage),
+		Data:    rpcErr.Data, // Data can be any type, no conversion needed
 	}
 
 	// Only send error if ID is valid
@@ -162,23 +199,5 @@ func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err err
 		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
 			slog.Error("Failed to send error response", "error", err)
 		}
-	}
-}
-
-// hasValidID checks if the ID is valid for responding
-// Replace lines 170-178 in tools.go with:
-func hasValidID(id jsonrpc2.ID) bool {
-	// Check if it has valid value
-	switch v := id.(type) {
-	case string:
-		return v != ""
-	case float64:
-		return v != 0
-	case int:
-		return v != 0
-	case nil:
-		return false
-	default:
-		return true
 	}
 }

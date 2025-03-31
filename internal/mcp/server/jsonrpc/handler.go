@@ -57,8 +57,8 @@ func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 		h.handleInitialized(ctx, conn, req)
 	default:
 		err := mcperrors.NewMethodNotFoundError(req.Method)
-		// Check if request has a non-nil ID (meaning it's not a notification)
-		if hasValidID(req.ID) {
+		// Check if request has a valid ID (meaning it's not a notification)
+		if isValidID(req.ID) {
 			// Only send error for requests, not notifications
 			if err := conn.ReplyWithError(ctx, req.ID, protocol.ErrorConverter(err)); err != nil {
 				slog.Error("Failed to send error response", "error", err)
@@ -106,7 +106,7 @@ func (h *Handler) handlePing(ctx context.Context, conn *jsonrpc2.Conn, req *json
 // sendError sends an error response
 func (h *Handler) sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err error) {
 	// Only send error if ID is valid
-	if hasValidID(id) {
+	if isValidID(id) {
 		if err := conn.ReplyWithError(ctx, id, protocol.ErrorConverter(err)); err != nil {
 			slog.Error("Failed to send error response", "error", err)
 		}
@@ -115,18 +115,10 @@ func (h *Handler) sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc
 
 // hasValidID checks if the ID is valid for responding
 func hasValidID(id jsonrpc2.ID) bool {
-	// Using JSON marshaling to safely check validity
-	bytes, err := json.Marshal(id)
-	if err != nil {
-		return false // Error marshaling, assume invalid
+	// For string IDs, check if it's not empty
+	if id.IsString {
+		return id.Str != ""
 	}
-
-	// Check various empty/null representations
-	jsonStr := string(bytes)
-	return jsonStr != "" &&
-		jsonStr != "null" &&
-		jsonStr != "0" &&
-		jsonStr != "\"\"" &&
-		jsonStr != "{}" &&
-		jsonStr != "[]"
+	// For numeric IDs, check if it's not zero
+	return id.Num != 0
 }
