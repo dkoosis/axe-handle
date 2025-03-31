@@ -113,21 +113,20 @@ func (h *Handler) sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc
 	}
 }
 
-// hasValidID checks if the ID is non-nil and has a meaningful value
+// hasValidID checks if the ID is valid for responding
 func hasValidID(id jsonrpc2.ID) bool {
-	if id == nil {
-		return false
+	// Using JSON marshaling to safely check validity
+	bytes, err := json.Marshal(id)
+	if err != nil {
+		return false // Error marshaling, assume invalid
 	}
 
-	switch v := id.(type) {
-	case string:
-		return v != ""
-	case int:
-		return v != 0
-	case float64:
-		return v != 0
-	default:
-		// For any other type, assume it has value
-		return true
-	}
+	// Check various empty/null representations
+	jsonStr := string(bytes)
+	return jsonStr != "" &&
+		jsonStr != "null" &&
+		jsonStr != "0" &&
+		jsonStr != "\"\"" &&
+		jsonStr != "{}" &&
+		jsonStr != "[]"
 }

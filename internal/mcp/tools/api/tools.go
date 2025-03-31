@@ -140,12 +140,13 @@ func (h *ToolsHandler) HandleToolsCall(ctx context.Context, conn *jsonrpc2.Conn,
 func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err error) {
 	rpcErr := mcperrors.FromError(err)
 
-	// Convert data to interface{} before assigning
+	// Create a properly typed data field
 	var data interface{}
 	if rpcErr.Data != nil {
 		// Convert to JSON first
-		if raw, err := json.Marshal(rpcErr.Data); err == nil {
-			data = json.RawMessage(raw)
+		if rawBytes, err := json.Marshal(rpcErr.Data); err == nil {
+			jsonData := json.RawMessage(rawBytes)
+			data = &jsonData
 		}
 	}
 
