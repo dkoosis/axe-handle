@@ -153,7 +153,8 @@ func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err err
 	jsonErr := &jsonrpc2.Error{
 		Code:    int64(rpcErr.Code),
 		Message: rpcErr.Message,
-		Data:    data,
+		// TODO: this assumes  data is already a json.RawMessage. Can we test?
+		Data: data.(json.RawMessage),
 	}
 
 	// Only send error if ID is valid
@@ -165,22 +166,19 @@ func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err err
 }
 
 // hasValidID checks if the ID is valid for responding
+// Replace lines 170-178 in tools.go with:
 func hasValidID(id jsonrpc2.ID) bool {
-	// Check if it's nil or empty
-	if id == nil || id == jsonrpc2.ID(nil) {
-		return false
-	}
-
-	// Handle different ID types
-	switch id := id.(type) {
+	// Check if it has valid value
+	switch v := id.(type) {
 	case string:
-		return id != ""
+		return v != ""
 	case float64:
-		return id != 0
+		return v != 0
 	case int:
-		return id != 0
+		return v != 0
+	case nil:
+		return false
 	default:
-		// For any other type, assume it has value
 		return true
 	}
 }

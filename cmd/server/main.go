@@ -11,6 +11,7 @@ import (
 
 	"github.com/dkoosis/axe-handle/internal/config"
 	"github.com/dkoosis/axe-handle/internal/mcp/server"
+	"github.com/dkoosis/axe-handle/internal/mcp/server/jsonrpc"
 	"github.com/dkoosis/axe-handle/internal/transport"
 	"github.com/dkoosis/axe-handle/pkg/logging"
 )
@@ -30,7 +31,7 @@ func main() {
 	mcp := server.NewServer(cfg)
 
 	// Create handler
-	handler := server.NewHandler(mcp)
+	handler := jsonrpc.NewHandler(mcp)
 
 	// Create transport based on configuration
 	var t transport.Transport
