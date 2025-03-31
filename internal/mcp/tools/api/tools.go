@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	"github.com/dkoosis/axe-handle/internal/mcp/protocol"
 	"github.com/dkoosis/axe-handle/internal/mcp/tools/manager"
 	"github.com/dkoosis/axe-handle/pkg/mcperrors"
-	"github.com/dkoosis/axe-hasndle/internal/mcp/protocol"
 	"github.com/sourcegraph/jsonrpc2"
 )
 
