@@ -39,7 +39,7 @@ FAIL_LINES := 650  # Fail if lines exceed this
 # --- Core Targets ---
 
 # Default target - run all checks and build
-all: check deps fmt golangci-lint check-line-length test build
+all: check deps fmt golangci-lint check-line-length test tree build
 	@printf "$(GREEN)$(BOLD)✨ All checks passed and build completed successfully! ✨$(NC)\n"
 
 # Build the application
@@ -200,6 +200,12 @@ run-http:
 run-debug:
 	@printf "$(ICON_START) $(BOLD)$(BLUE)Running Axe Handle MCP server with debug logging...$(NC)\n"
 	@./$(BINARY_NAME) serve --log-level debug
+
+# Generate a tree view of the project
+tree:
+	@printf "$(ICON_START) $(BOLD)$(BLUE)Generating project tree...$(NC)\n"
+	@tree -I 'vendor|test' --dirsfirst > ./docs/tree.txt
+	@printf "   $(ICON_OK) $(GREEN)Project tree generated at ./docs/tree.txt$(NC)\n"
 
 # --- Help ---
 

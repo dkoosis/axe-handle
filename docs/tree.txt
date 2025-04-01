@@ -1,0 +1,69 @@
+.
+├── cmd
+│   └── server
+│       └── main.go
+├── docs
+│   └── tree.txt
+├── internal
+│   ├── config
+│   │   └── config.go
+│   ├── mcp
+│   │   ├── prompts
+│   │   │   ├── errors.go
+│   │   │   └── provider.go
+│   │   ├── protocol
+│   │   │   └── mcp.go
+│   │   ├── resources
+│   │   │   ├── errors.go
+│   │   │   └── provider.go
+│   │   ├── server
+│   │   │   ├── jsonrpc
+│   │   │   │   └── handler.go
+│   │   │   ├── lifecycle
+│   │   │   ├── provider
+│   │   │   │   └── registry.go
+│   │   │   ├── transport
+│   │   │   │   ├── sse.go
+│   │   │   │   ├── stdio.go
+│   │   │   │   └── transport.go
+│   │   │   └── server.go
+│   │   ├── tools
+│   │   │   ├── api
+│   │   │   │   └── tools.go
+│   │   │   ├── manager
+│   │   │   │   └── tools.go
+│   │   │   ├── errors.go
+│   │   │   └── provider.go
+│   │   └── README.md
+│   ├── providers
+│   │   ├── example
+│   │   │   └── example.go
+│   │   ├── filesystem
+│   │   └── README.md
+│   └── transport
+│       ├── sse.go
+│       ├── stdio.go
+│       └── transport.go
+├── pkg
+│   ├── doc
+│   │   └── TODO.md
+│   ├── logging
+│   │   └── logger.go
+│   ├── mcperrors
+│   │   └── errors.go
+│   └── model
+├── reference
+│   ├── TS-SDK.md
+│   ├── llms-full.txt
+│   ├── mcp_server.md
+│   ├── schema.ts
+│   └── working_with_claude_on_MCP.md
+├── scripts
+│   └── check_file_length.sh
+├── Makefile
+├── README.md
+├── axe-handle
+├── go.mod
+└── go.sum
+
+29 directories, 38 files

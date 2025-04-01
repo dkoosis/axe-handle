@@ -216,8 +216,8 @@ func (s *Server) Exit() error {
 	return nil
 }
 
-// checkInitialized checks if the server is initialized and returns an error if not.
-func (s *Server) checkInitialized() error {
+// CheckInitialized checks if the server is initialized and returns an error if not.
+func (s *Server) CheckInitialized() error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -230,6 +230,11 @@ func (s *Server) checkInitialized() error {
 	}
 
 	return nil
+}
+
+// GetToolsManager returns the tools manager used by the server
+func (s *Server) GetToolsManager() *manager.ToolsManager {
+	return s.toolsManager
 }
 
 // isProtocolVersionCompatible checks if the client's protocol version is compatible with the server's.

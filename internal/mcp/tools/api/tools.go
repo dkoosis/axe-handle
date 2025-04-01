@@ -136,43 +136,6 @@ func (h *ToolsHandler) HandleToolsCall(ctx context.Context, conn *jsonrpc2.Conn,
 	}
 }
 
-// sendError sends an error response
-func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err error) {
-	rpcErr := mcperrors.FromError(err)
-
-	// Create error object directly without trying to set a Data field
-	jsonErr := &jsonrpc2.Error{
-		Code:    int64(rpcErr.Code),
-		Message: rpcErr.Message,
-	}
-
-	// Only send error if ID is valid - we'll use JSON marshaling to check
-	if _, ok := id.(string); ok {
-		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
-			slog.Error("Failed to send error response", "error", err)
-		}
-		return
-	}
-
-	if _, ok := id.(float64); ok {
-		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
-			slog.Error("Failed to send error response", "error", err)
-		}
-		return
-	}
-
-	if _, ok := id.(int); ok {
-		if err := conn.ReplyWithError(ctx, id, jsonErr); err != nil {
-			slog.Error("Failed to send error response", "error", err)
-		}
-		return
-	}
-
-	// For all other cases, try to send the error but don't worry if it fails
-	// This handles the case where id might be nil or another type
-	_ = conn.ReplyWithError(ctx, id, jsonErr)
-}
-
 // isValidID checks if the ID is valid for responding.
 func isValidID(id jsonrpc2.ID) bool {
 	// For string IDs, check if it's not empty
@@ -187,10 +150,21 @@ func isValidID(id jsonrpc2.ID) bool {
 func sendError(ctx context.Context, conn *jsonrpc2.Conn, id jsonrpc2.ID, err error) {
 	rpcErr := mcperrors.FromError(err)
 
+	// Create the jsonrpc2.Error object
 	jsonErr := &jsonrpc2.Error{
 		Code:    int64(rpcErr.Code),
 		Message: rpcErr.Message,
-		Data:    rpcErr.Data, // Data can be any type, no conversion needed
+	}
+
+	// Handle the Data field with proper type conversion
+	if rpcErr.Data != nil {
+		// Convert the data to JSON
+		dataBytes, err := json.Marshal(rpcErr.Data)
+		if err == nil {
+			// Set the data using the SetError method
+			rawMsg := json.RawMessage(dataBytes)
+			jsonErr.Data = &rawMsg
+		}
 	}
 
 	// Only send error if ID is valid
