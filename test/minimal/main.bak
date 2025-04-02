@@ -1,0 +1,176 @@
+package main
+
+import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+)
+
+func main() {
+	// Setup logging to stderr
+	logger := func(format string, args ...interface{}) {
+		fmt.Fprintf(os.Stderr, format+"\n", args...)
+	}
+
+	logger("TEST SERVER: Starting up")
+
+	reader := bufio.NewReader(os.Stdin)
+	writer := bufio.NewWriter(os.Stdout)
+
+	// Main processing loop
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			logger("Error reading line: %v", err)
+			return
+		}
+		line = strings.TrimSpace(line)
+		logger("Read line: %q", line)
+
+		if line == "" { // Skip empty lines
+			continue
+		}
+
+		// Step 4: Parse the JSON-RPC message
+		var message map[string]interface{}
+		if err := json.Unmarshal([]byte(line), &message); err != nil {
+			logger("Error parsing JSON: %v", err)
+			continue
+		}
+
+		// Step 5: Check the message type and respond accordingly
+		method, _ := message["method"].(string)
+		id, _ := message["id"]
+
+		logger("Processing method: %s with ID: %v", method, id)
+
+		// Handle initialize request
+		if method == "initialize" {
+			// Create and send initialize response
+			response := map[string]interface{}{
+				"jsonrpc": "2.0",
+				"id":      id,
+				"result": map[string]interface{}{
+					"protocolVersion": "2024-11-05",
+					"serverInfo": map[string]interface{}{
+						"name":    "test-mcp-server",
+						"version": "0.1.0",
+					},
+					"capabilities": map[string]interface{}{
+						"tools": map[string]interface{}{
+							"listChanged": true,
+						},
+					},
+				},
+			}
+
+			responseBytes, _ := json.Marshal(response)
+
+			// Write with proper headers
+			headerStr := fmt.Sprintf("Content-Length: %d\r\n\r\n", len(responseBytes))
+			writer.WriteString(headerStr)
+			writer.Write(responseBytes)
+			writer.Flush()
+
+			logger("Sent initialize response")
+
+			// Send initialized notification
+			notification := map[string]interface{}{
+				"jsonrpc": "2.0",
+				"method":  "notifications/initialized",
+				"params":  map[string]interface{}{},
+			}
+
+			notifBytes, _ := json.Marshal(notification)
+
+			headerStr = fmt.Sprintf("Content-Length: %d\r\n\r\n", len(notifBytes))
+			writer.WriteString(headerStr)
+			writer.Write(notifBytes)
+			writer.Flush()
+
+			logger("Sent initialized notification")
+		} else if method == "tools/list" {
+			// Respond with a hello world tool
+			response := map[string]interface{}{
+				"jsonrpc": "2.0",
+				"id":      id,
+				"result": map[string]interface{}{
+					"tools": []map[string]interface{}{
+						{
+							"name":        "hello_world",
+							"description": "Says hello to someone",
+							"inputSchema": map[string]interface{}{
+								"type": "object",
+								"properties": map[string]interface{}{
+									"name": map[string]interface{}{
+										"type":        "string",
+										"description": "Name to greet",
+									},
+								},
+								"required": []string{"name"},
+							},
+						},
+					},
+				},
+			}
+
+			responseBytes, _ := json.Marshal(response)
+
+			headerStr := fmt.Sprintf("Content-Length: %d\r\n\r\n", len(responseBytes))
+			writer.WriteString(headerStr)
+			writer.Write(responseBytes)
+			writer.Flush()
+
+			logger("Sent tools/list response")
+		} else if method == "tools/call" {
+			// Handle a simple hello world tool call
+			paramData, _ := message["params"].(map[string]interface{})
+			toolName, _ := paramData["name"].(string)
+
+			logger("Tool call: %s", toolName)
+
+			// Simple hello world response
+			response := map[string]interface{}{
+				"jsonrpc": "2.0",
+				"id":      id,
+				"result": map[string]interface{}{
+					"content": []map[string]interface{}{
+						{
+							"type": "text",
+							"text": "Hello, world!",
+						},
+					},
+				},
+			}
+
+			responseBytes, _ := json.Marshal(response)
+
+			headerStr := fmt.Sprintf("Content-Length: %d\r\n\r\n", len(responseBytes))
+			writer.WriteString(headerStr)
+			writer.Write(responseBytes)
+			writer.Flush()
+
+			logger("Sent tools/call response")
+		} else if method == "ping" {
+			// Handle ping
+			response := map[string]interface{}{
+				"jsonrpc": "2.0",
+				"id":      id,
+				"result":  map[string]interface{}{},
+			}
+
+			responseBytes, _ := json.Marshal(response)
+
+			headerStr := fmt.Sprintf("Content-Length: %d\r\n\r\n", len(responseBytes))
+			writer.WriteString(headerStr)
+			writer.Write(responseBytes)
+			writer.Flush()
+
+			logger("Sent ping response")
+		} else {
+			logger("Unknown method: %s", method)
+		}
+	}
+}

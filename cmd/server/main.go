@@ -3,10 +3,12 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/dkoosis/axe-handle/internal/config"
@@ -17,15 +19,49 @@ import (
 )
 
 func main() {
+	// Check if we have a subcommand
+	if len(os.Args) > 1 && os.Args[1] == "setup" {
+		// Process setup command
+		setupCmd := flag.NewFlagSet("setup", flag.ExitOnError)
+		// Define the flag, but ignore the value for now using '_' since runSetup is commented out
+		_ = setupCmd.String("config", getDefaultConfigPath(), "Path to configuration file") // <-- Fix 1: Use _
+
+		if err := setupCmd.Parse(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing setup command flags: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Assuming runSetup exists and is defined elsewhere
+		// configPathVal := *configPath // If you were using it, get value like this
+		// if err := runSetup(configPathVal); err != nil {
+		// 	fmt.Fprintf(os.Stderr, "Setup failed: %v\n", err)
+		//  os.Exit(1)
+		// }
+
+		fmt.Println("Setup command placeholder executed.") // Placeholder
+		return
+	}
+
+	// Regular command (not setup)
+	defaultConfigPath := getDefaultConfigPath()
+	flag.String("config", defaultConfigPath, "Path to configuration file (uses AXEHANDLE_CONFIG env var if set, overrides default)")
+	flag.Parse()
+
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading configuration: %v\n", err)
-		os.Exit(1)
+		// Log the config loading error and exit, similar to original logic
+		fmt.Fprintf(os.Stderr, "ERROR: Error loading configuration: %v\n", err) // <-- Fix 2: Log Error and Exit
+		os.Exit(1)                                                              // <-- Fix 2: Exit on failure
 	}
+	// If we reach here, cfg should be non-nil and valid
 
+	// --- Start Logging Modification ---
 	// Configure logging
-	logging.Configure(logging.LogLevel(cfg.Server.LogLevel))
+	// logging.Configure(logging.LogLevel(cfg.Server.LogLevel)) // <-- Original line commented out
+	logging.Configure(logging.LevelDebug)               // <--- FORCE DEBUG LEVEL for this test
+	slog.Debug("DEBUG LOGGING HAS BEEN FORCED ENABLED") // Add this line to confirm
+	// --- End Logging Modification ---
 
 	// Create server
 	mcp := server.NewServer(cfg)
@@ -74,3 +110,26 @@ func main() {
 		slog.Error("Error closing transport", "error", err)
 	}
 }
+
+// getDefaultConfigPath returns the default path for the configuration file
+func getDefaultConfigPath() string {
+	// Allow override via environment variable first
+	if envPath := os.Getenv("AXEHANDLE_CONFIG"); envPath != "" {
+		return envPath
+	}
+	// Fallback to default user config directory
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "config.yaml" // Fallback to current directory if home dir fails
+	}
+	return filepath.Join(homeDir, ".config", "axe-handle", "config.yaml")
+}
+
+// Placeholder for runSetup - replace with your actual implementation
+// func runSetup(configPath string) error {
+//   fmt.Printf("Running setup with config path: %s\n", configPath)
+//   // Add actual setup logic here
+//   return nil
+// }
+
+// NOTE: No DefaultConfig function assumed anymore

@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	github.com/cockroachdb/errors v1.11.3
+	github.com/gorilla/websocket v1.5.3
 	github.com/knadh/koanf/parsers/json v0.1.0
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/env v1.0.0

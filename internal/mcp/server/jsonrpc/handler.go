@@ -4,6 +4,7 @@ package jsonrpc
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 
 	"github.com/dkoosis/axe-handle/internal/mcp/protocol"
@@ -68,22 +69,41 @@ func (h *Handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 }
 
 // handleInitialize processes the initialize request
+// In internal/mcp/server/jsonrpc/handler.go -> handleInitialize
+
 func (h *Handler) handleInitialize(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) {
 	var params protocol.InitializeParams
+	slog.Debug("Attempting to unmarshal Initialize params") // <-- Add
 	if err := json.Unmarshal(*req.Params, &params); err != nil {
+		slog.Error("Failed to unmarshal Initialize params", "error", err) // <-- Add info
 		h.sendError(ctx, conn, req.ID, mcperrors.NewInvalidParamsError(err))
 		return
 	}
 
+	slog.Debug("Params unmarshalled, attempting to call server.Initialize", "params", params) // <-- Add info
 	result, err := h.server.Initialize(ctx, params)
+	slog.Debug("Returned from server.Initialize", "error", err) // <-- Add log
 	if err != nil {
+		slog.Error("server.Initialize returned error", "error", err) // <-- Add info
 		h.sendError(ctx, conn, req.ID, err)
 		return
 	}
 
-	if err := conn.Reply(ctx, req.ID, result); err != nil {
-		slog.Error("Failed to send initialize response", "error", err)
+	// Check if result is nil just in case, though Initialize shouldn't return nil result on success
+	if result == nil {
+		slog.Error("server.Initialize returned nil result with nil error")
+		h.sendError(ctx, conn, req.ID, mcperrors.NewInternalError(fmt.Errorf("unexpected nil result from Initialize")))
+		return
 	}
+
+	slog.Debug("Attempting to send success reply", "result", result) // <-- Add log
+	replyErr := conn.Reply(ctx, req.ID, result)
+	slog.Debug("Returned from conn.Reply", "error", replyErr) // <-- Add log
+	if replyErr != nil {
+		// Log the error, but don't try to send another error response
+		slog.Error("Failed to send initialize response via conn.Reply", "error", replyErr)
+	}
+	slog.Debug("handleInitialize finished") // <-- Add
 }
 
 // handleInitialized processes the initialized notification

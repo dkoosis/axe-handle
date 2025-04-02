@@ -2,136 +2,102 @@
 package transport
 
 import (
-	"bufio"
 	"context"
-	"fmt"
+	"io"
 	"log/slog"
 	"os"
-	"strconv"
-	"strings"
-	"sync"
 
-	"github.com/dkoosis/axe-handle/pkg/mcperrors"
+	// "encoding/hex" // Uncomment if using hex logging in Read/Write
+
 	"github.com/sourcegraph/jsonrpc2"
 )
 
 // StdioTransport implements the Transport interface for stdio communication
 type StdioTransport struct {
-	conn     *jsonrpc2.Conn
-	reader   *bufio.Reader
-	writer   *bufio.Writer
-	mu       sync.Mutex
-	doneChan chan struct{}
+	conn *jsonrpc2.Conn
 }
 
 // NewStdioTransport creates a new stdio transport
 func NewStdioTransport() *StdioTransport {
-	return &StdioTransport{
-		reader:   bufio.NewReader(os.Stdin),
-		writer:   bufio.NewWriter(os.Stdout),
-		doneChan: make(chan struct{}),
-	}
+	return &StdioTransport{}
 }
 
-// Connect establishes the transport connection over stdin/stdout
-func (t *StdioTransport) Connect(ctx context.Context, handler jsonrpc2.Handler) (*jsonrpc2.Conn, error) {
-	// Create a JSONRPC stream using our custom stdio reader/writer
-	stream := jsonrpc2.NewBufferedStream(t, jsonrpc2.VSCodeObjectCodec{})
+// In internal/transport/stdio.go -> Connect method
 
-	// Create connection with the provided handler
+// In internal/transport/stdio.go -> Connect method
+
+func (t *StdioTransport) Connect(ctx context.Context, handler jsonrpc2.Handler) (*jsonrpc2.Conn, error) {
+	// Use NewPlainObjectStream for unframed JSON over stdio
+	stream := jsonrpc2.NewPlainObjectStream(stdioPipe{}) // <-- Use NewPlainObjectStream
+
 	conn := jsonrpc2.NewConn(ctx, stream, handler)
 	t.conn = conn
 
-	slog.Info("Connected stdio transport")
+	slog.Info("Connected stdio transport (using NewPlainObjectStream)") // <-- Log updated
+
 	return conn, nil
 }
 
 // Close closes the transport
 func (t *StdioTransport) Close() error {
 	if t.conn != nil {
+		// Add check to prevent closing if already disconnected? Maybe not necessary.
 		err := t.conn.Close()
-		t.conn = nil
-		close(t.doneChan)
+		t.conn = nil // Prevent double close attempts
+		slog.Info("stdio transport connection closed")
 		return err
 	}
+	slog.Warn("Close called on stdio transport but connection was already nil")
 	return nil
 }
 
-// Read implements io.Reader for jsonrpc2.Stream
-// Handles reading messages with Content-Length headers
-func (t *StdioTransport) Read(p []byte) (int, error) {
-	// Read headers
-	var contentLength int
+// stdioPipe implements io.ReadWriteCloser for stdin/stdout
+type stdioPipe struct{}
 
-	for {
-		line, err := t.reader.ReadString('\n')
-		if err != nil {
-			return 0, err
+// Read reads from standard input and logs the data/errors
+func (stdioPipe) Read(p []byte) (n int, err error) {
+	n, err = os.Stdin.Read(p)
+
+	// Log the data read (only if bytes were actually read)
+	if n > 0 {
+		// Log prefix to avoid excessive log size for large messages
+		prefixLen := 150 // Log roughly the first 150 bytes
+		if n < prefixLen {
+			prefixLen = n
 		}
-
-		line = strings.TrimSpace(line)
-		if line == "" {
-			break // End of headers
-		}
-
-		if strings.HasPrefix(line, "Content-Length: ") {
-			length := strings.TrimPrefix(line, "Content-Length: ")
-			contentLength, err = strconv.Atoi(length)
-			if err != nil {
-				return 0, mcperrors.NewParseError(
-					fmt.Errorf("invalid Content-Length header: %w", err))
-			}
-		}
+		slog.Debug("stdioPipe Read",
+			"bytes_read", n,
+			"data_prefix", string(p[:prefixLen]), // Log prefix as string
+			// For more detail, uncomment below to log hex:
+			// "data_hex_prefix", hex.EncodeToString(p[:prefixLen]),
+		)
 	}
 
-	if contentLength == 0 {
-		return 0, mcperrors.NewParseError(
-			fmt.Errorf("missing or zero Content-Length header"))
-	}
-
-	// Check if our buffer is big enough
-	if len(p) < contentLength {
-		return 0, mcperrors.NewInternalError(
-			fmt.Errorf("buffer too small for message: %d < %d", len(p), contentLength))
-	}
-
-	// Read exactly contentLength bytes
-	bytesRead := 0
-	for bytesRead < contentLength {
-		n, err := t.reader.Read(p[bytesRead:contentLength])
-		if err != nil {
-			return bytesRead, err
-		}
-		bytesRead += n
-	}
-
-	return contentLength, nil
-}
-
-// Write implements io.Writer for jsonrpc2.Stream
-// Adds proper Content-Length headers to outgoing messages
-func (t *StdioTransport) Write(p []byte) (int, error) {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	// Write header with content length
-	header := fmt.Sprintf("Content-Length: %d\r\n\r\n", len(p))
-	if _, err := t.writer.WriteString(header); err != nil {
-		return 0, err
-	}
-
-	// Write message body
-	n, err := t.writer.Write(p)
+	// Log any error encountered, including EOF
 	if err != nil {
-		return n, err
+		// EOF is expected when the client closes stdin, log as debug/info?
+		if err == io.EOF {
+			slog.Debug("stdioPipe Read: EOF received")
+		} else {
+			slog.Error("stdioPipe Read error", "error", err)
+		}
 	}
 
-	// Flush to ensure message is sent
-	if err := t.writer.Flush(); err != nil {
-		return n, err
-	}
-
-	return n, nil
+	return n, err
 }
 
-// Close impl
+// Write writes to standard output
+func (stdioPipe) Write(p []byte) (int, error) {
+	// Optional: Add logging here too if debugging output framing?
+	// writePrefixLen := 150
+	// if len(p) < writePrefixLen { writePrefixLen = len(p)}
+	// slog.Debug("stdioPipe Write", "bytes_to_write", len(p), "data_prefix", string(p[:writePrefixLen]))
+	return os.Stdout.Write(p)
+}
+
+// Close is called when the jsonrpc2 connection is closing the stream
+func (stdioPipe) Close() error {
+	slog.Debug("stdioPipe Close called (Stdin/Stdout not actually closed)")
+	// We don't actually close stdin/stdout when the stream closes
+	return nil
+}

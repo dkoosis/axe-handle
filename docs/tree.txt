@@ -1,7 +1,8 @@
 .
 ├── cmd
 │   └── server
-│       └── main.go
+│       ├── main.go
+│       └── setup.go
 ├── docs
 │   └── tree.txt
 ├── internal
@@ -66,4 +67,4 @@
 ├── go.mod
 └── go.sum
 
-29 directories, 38 files
+29 directories, 39 files
